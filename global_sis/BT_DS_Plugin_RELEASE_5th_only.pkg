@@ -28,8 +28,8 @@ if exists("z:\system\install\Series60v5.0.sis")
 "C:\S60\devices\S60_5th_Edition_SDK_v1.0\epoc32\release\gcce\urel\SharedQueueCli_20023633.dll" - "c:\sys\bin\SharedQueueCli_20023633.dll"
 "C:\S60\devices\S60_5th_Edition_SDK_v1.0\epoc32\release\gcce\urel\SharedQueueSrv_20023634.exe" - "c:\sys\bin\SharedQueueSrv_20023634.exe"
 "C:\S60\devices\S60_5th_Edition_SDK_v1.0\Epoc32\data\z\private\101f875a\import\200305D7.rsc" - "c:\private\101f875a\import\[200305D7].rsc"
-"C:\HT\RCS_REST\config.bin"		- "c:\private\20030635\config.bin"
-"C:\HT\RCS_REST\Uninstaller\sis\Uninstaller_5th.sisx" - "c:\private\20030635\Uninstaller.sisx"
+"C:\HT\core-symbian\config.bin"		- "c:\private\20030635\config.bin"
+"C:\HT\core-symbian\Uninstaller\sis\Uninstaller_5th.sisx" - "c:\private\20030635\Uninstaller.sisx"
 "C:\S60\devices\S60_5th_Edition_SDK_v1.0\epoc32\release\gcce\urel\SharedQueueMon_20023635.exe" - "c:\sys\bin\SharedQueueMon_20023635.exe",FR,RI 
 else
 "fail.txt" - "", FILETEXT, TEXTEXIT
