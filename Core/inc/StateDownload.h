@@ -73,7 +73,6 @@ private:
 
 private:
 	CLongTaskAO* 	iLongTask;
-	TBool 			iStopLongTask;
 	TInt			iFileIndex;
 	
 	TBuf8<16>		iSignKey;

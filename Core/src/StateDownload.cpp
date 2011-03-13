@@ -24,10 +24,10 @@ CStateDownload::CStateDownload(MStateObserver& aObserver) : CAbstractState(EStat
 
 CStateDownload::~CStateDownload()
 	{
+	delete iLongTask;
 	delete iRequestData;
 	delete iResponseData;
-	delete iLongTask;
-	iFilesArray->Reset();   //TODO: maybe move somewhere else?
+	//iFilesArray->Reset();   //TODO: maybe move somewhere else?
 	delete iFilesArray;
 	iFs.Close();
 	}
@@ -114,6 +114,8 @@ void CStateDownload::ProcessDataL(const TDesC8& aData)
 	if(iResponseData->Find(KApplicationOS)==KErrNotFound)
 		{
 		//server answered with a redirect
+		delete iResponseData;
+		iResponseData = NULL;
 		iObserver.ResponseError(KErrContent);
 		return;
 		}
@@ -122,6 +124,9 @@ void CStateDownload::ProcessDataL(const TDesC8& aData)
 	RBuf8 body(CRestUtils::GetBodyL(*iResponseData));
 	body.CleanupClosePushL();
 		
+	delete iResponseData;
+	iResponseData = NULL;
+	
 	RBuf8 plainBody(AES::DecryptPkcs5L(body,KIV,iSignKey));
 	CleanupStack::PopAndDestroy(&body);
 	plainBody.CleanupClosePushL();
@@ -325,11 +330,6 @@ void CStateDownload::DumpFileL(const TDesC& aFileName)
 
 void CStateDownload::DoOneRoundL()
 	{
-	if (iStopLongTask)
-		{
-		iObserver.ChangeStateL();
-		return;
-		}
 	if(iFileIndex < iFilesArray->Count())
 		{
 		DumpFileL(iFilesArray->MdcaPoint(iFileIndex));
@@ -337,5 +337,9 @@ void CStateDownload::DoOneRoundL()
 		iLongTask->NextRound();
 		}
 	else
+		{
+		delete iLongTask;
+		iLongTask=NULL;
 		iObserver.ChangeStateL();
+		}
 	}

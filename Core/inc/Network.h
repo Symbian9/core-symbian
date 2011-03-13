@@ -10,7 +10,6 @@
 #include <HT\TimeOutTimer.h>
 #include <w32std.h>
 
-//#include "Monitor.h"
 
 // CLASS DECLARATION
 
@@ -51,7 +50,7 @@ class MNetworkObserver
 *  CNetwork
 * 
 */
-class CNetwork : public CActive, MTimeOutNotifier //, public MMonitorObserver
+class CNetwork : public CActive, MTimeOutNotifier 
 	{
 	public: // Constructors and destructor
 
@@ -144,8 +143,6 @@ class CNetwork : public CActive, MTimeOutNotifier //, public MMonitorObserver
 		 */
 		void HandleConnectionErrorL(TInt aError);
 		
-		//MMonitorObserver
-		//TBool KeyEventCaptured(TWsEvent aEvent);
 		
 	private: // MTimeOutNotifier
         void TimerExpiredL(TAny* src);
@@ -160,6 +157,8 @@ class CNetwork : public CActive, MTimeOutNotifier //, public MMonitorObserver
 		* Handle cancellation of outstanding request
 		*/
 		void DoCancel();
+		
+		TInt RunError(TInt aError);
 		
 
 	private:

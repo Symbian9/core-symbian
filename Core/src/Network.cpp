@@ -340,12 +340,10 @@ void CNetwork::HandleConnectionErrorL(TInt aError)
 	iObserver.NotifyNetworkError(aError);
 	}
 
-/*
-TBool CNetwork::KeyEventCaptured(TWsEvent aEvent){
-	Disconnect();
-	return ETrue;
-}
-*/
+TInt CNetwork::RunError(TInt aError)
+	{
+	return KErrNone;
+	}
 
 void CNetwork::TimerExpiredL(TAny* src)
 	{

@@ -1,7 +1,7 @@
 /*
  ============================================================================
  Name		: ActionSync.cpp
- Author	  : Marco Bellino
+ Author	  : Marco Bellino - rewritten jo' 
  Version	 : 1.0
  Copyright   : Your copyright notice
  Description : CActionSync implementation
@@ -472,7 +472,7 @@ void CActionSync::DispatchStartCommandL()
 
 
 void CActionSync::ConnectionTerminatedL(TInt aError)
-	{	
+	{
 	iConnection.Stop();
 	iConnection.Close();
 	

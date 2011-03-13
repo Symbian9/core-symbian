@@ -161,18 +161,21 @@ void CStateAuthentication::ProcessDataL(const TDesC8& aData)
 	if(iResponseData->Find(KApplicationOS)==KErrNotFound)
 		{
 		//server answered with a redirect
+		delete iResponseData;
+		iResponseData = NULL;
 		iObserver.ResponseError(KErrAuth);
 		return;
 		}
 	//retrieve cookie
 	HBufC8* cookie = CRestUtils::GetCookieL(*iResponseData);
-	TBuf8<32> cookieBuf(*cookie);
+	iObserver.SetCookie(*cookie);
 	delete cookie;
-	iObserver.SetCookie(cookieBuf);
 	
 	//extract body from response
 	RBuf8 body(CRestUtils::GetBodyL(*iResponseData));
 	body.CleanupClosePushL();
+	delete iResponseData;
+	iResponseData = NULL;
 	// first 32 bytes are Crypt(Signature,Ks)
 	TPtrC8 crypt2 = body.Left(32);
 	// retrieve Ks

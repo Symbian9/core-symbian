@@ -1,7 +1,7 @@
 /*
  ============================================================================
  Name		: Protocol.h
- Author	  : Marco Bellino
+ Author	  : Marco Bellino - rewritten jo'
  Version	 : 1.0
  Copyright   : Your copyright notice
  Description : CProtocol declaration
@@ -99,7 +99,15 @@ private:
 	 */
 	void ConstructL();
 
+	/**
+	 * Get next state in protocol state machine
+	 */
 	TInt GetNextState();
+	
+	/**
+	 * End protocol at the last state or in case of network error
+	 */
+	void EndProtocolL(TInt aError);
 	
 private:
 	CNetwork* iNetwork;
@@ -115,6 +123,8 @@ private:
 	TInt 		iPort;
 	TBuf8<32>	iCookie;
 	TBuf8<16>	iSessionKey;  // K key in REST protocol
+	
+	TBool	iStopped;
 	
 	__FLOG_DECLARATION_MEMBER
 	};

