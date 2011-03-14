@@ -82,12 +82,12 @@ private:
 	/*
 	 * Construct record log data for general path
 	 */
-	HBufC8* GetPathBuffer(TEntry aEntry, const TDesC& aParentPath);
+	HBufC8* GetPathBufferL(TEntry aEntry, const TDesC& aParentPath);
 
 	/*
 	 * Construct record log data for drives
 	 */
-	HBufC8* GetDriveBuffer(const TDesC& aDrivePath);
+	HBufC8* GetDriveBufferL(const TDesC& aDrivePath);
 	
 private:
 	

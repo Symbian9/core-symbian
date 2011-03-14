@@ -98,7 +98,11 @@ void CProtocol::StartRestProtocolL(TBool aMonitor,RSocketServ& aSocketServ, RCon
 	delete iCurrentState;
 	iCurrentState = authentication;
 		
-	iNetwork->ConnectToServerL( aServer, aPort); 
+	TRAPD(err,iNetwork->ConnectToServerL( aServer, aPort));
+	if(err != KErrNone)
+		{
+		EndProtocolL(err);
+		}
 	}
 
 void CProtocol::NotifyConnectionCompleteL()
@@ -310,7 +314,11 @@ void CProtocol::ReConnect()
 	if(iStopped)
 		return;
 	iNetwork->Disconnect();
-	iNetwork->ConnectToServerL(iServer,iPort);
+	TRAPD(err,iNetwork->ConnectToServerL(iServer,iPort));
+	if(err != KErrNone)
+		{
+		EndProtocolL(err);
+		}
 	}
 
 void CProtocol::ResponseError(TInt aError)
@@ -341,7 +349,11 @@ void CProtocol::ResponseError(TInt aError)
 			CAbstractState* bye = CStateBye::NewL(*this);
 			delete iCurrentState;
 			iCurrentState = bye;
-			iNetwork->ConnectToServerL(iServer,iPort);
+			TRAPD(err,iNetwork->ConnectToServerL(iServer,iPort));
+			if(err != KErrNone)
+				{
+				EndProtocolL(err);
+				}
 			}
 			break;
 		}
