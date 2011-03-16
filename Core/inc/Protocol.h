@@ -124,7 +124,7 @@ private:
 	TBuf8<32>	iCookie;
 	TBuf8<16>	iSessionKey;  // K key in REST protocol
 	
-	TBool	iStopped;
+	//TBool	iStopped;
 	
 	__FLOG_DECLARATION_MEMBER
 	};

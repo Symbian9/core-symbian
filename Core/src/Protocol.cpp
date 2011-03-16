@@ -31,7 +31,7 @@ CProtocol::CProtocol(MProtocolNotifier& aNotifier) :
 	iHost.Zero();
 	iCookie.Zero();
 	iSessionKey.Zero();
-	iStopped = EFalse;
+	//iStopped = EFalse;
 	}
 
 CProtocol::~CProtocol()
@@ -108,6 +108,7 @@ void CProtocol::StartRestProtocolL(TBool aMonitor,RSocketServ& aSocketServ, RCon
 void CProtocol::NotifyConnectionCompleteL()
 	{
 	__FLOG(_L("Connected!"));
+	__FLOG_1(_L("Activate State: %d"), iCurrentState->Type());
 	iCurrentState->ActivateL(iSessionKey);
 	}
 
@@ -130,12 +131,13 @@ void CProtocol::SetAvailables(TInt aNumAvailables,const TDesC8& aAvailables)
 
 void CProtocol::ChangeStateL()
 	{
-	if(iStopped)
-		return;
+	//if(iStopped)
+	//	return;
 	
 	iNetwork->Disconnect();
 	
 	TInt state = GetNextState();
+	__FLOG_1(_L("ChangeStateL, nextState: %d"), state);
 	switch(state)
 		{
 		case EState_Identification:
@@ -240,8 +242,8 @@ void CProtocol::ChangeStateL()
 void CProtocol::SendStateDataL(const TDesC8& data)
 	{
 	__FLOG_1(_L("Outgoing Data State: %d"), iCurrentState->Type());
-	if(iStopped)
-		return;
+	//if(iStopped)
+	//	return;
 	iNetwork->SendL(data);
 	}
 
@@ -254,8 +256,8 @@ void CProtocol::NewConfigAvailable()
 void CProtocol::NotifyDataReceivedL(const TDesC8& aData)
 	{
 	__FLOG_1(_L("Incoming Data State: %d"), iCurrentState->Type());
-	if(iStopped)
-		return;
+	//if(iStopped)
+	//	return;
 	iCurrentState->ProcessDataL(aData);
 	}
 
@@ -278,12 +280,13 @@ void CProtocol::NotifyDisconnectionCompleteL()
 void CProtocol::NotifyNetworkError(TInt aError)
 	{
 	__FLOG_2(_L("Network Error:%d  State:%d"), aError, iCurrentState->Type());
-	iStopped = ETrue;
+	//iStopped = ETrue;
 	EndProtocolL(aError);
 	}
 
 void CProtocol::EndProtocolL(TInt aError)
 	{
+	__FLOG_1(_L("EndProtocolL: %d"), aError);
 	delete iCurrentState;
 	iCurrentState = NULL;
 	if(iUserMonitor)
@@ -311,8 +314,9 @@ void CProtocol::SetKey(const TDesC8& aKey)
 
 void CProtocol::ReConnect()
 	{
-	if(iStopped)
-		return;
+	//if(iStopped)
+		//return;
+	__FLOG_1(_L("Reconnect State: %d"), iCurrentState->Type());
 	iNetwork->Disconnect();
 	TRAPD(err,iNetwork->ConnectToServerL(iServer,iPort));
 	if(err != KErrNone)
@@ -323,14 +327,16 @@ void CProtocol::ReConnect()
 
 void CProtocol::ResponseError(TInt aError)
 	{
-	if(iStopped)
-		return;
+	//if(iStopped)
+		//return;
 	//with KErrAuth simply close connection
 	//with other errors send bye
+	__FLOG_1(_L("Response error: %d"), aError);
 	switch(aError)
 		{
 		case KErrAuth:
 			{
+			/*
 			if(iUserMonitor)
 				{
 				delete iUserMonitor;
@@ -338,6 +344,8 @@ void CProtocol::ResponseError(TInt aError)
 				}
 			iNetwork->Disconnect();
 			iNotifier.ConnectionTerminatedL(aError);
+			*/
+			EndProtocolL(aError);
 			}
 			break;
 		case KErrContent:
@@ -374,10 +382,11 @@ TInt CProtocol::GetNextState()
 
 TBool CProtocol::KeyEventCaptured(TWsEvent aEvent)
 	{
-		
+	__FLOG(_L("KeyEventCaptured()"));	
 	iNetwork->Disconnect();
 	
-	iNotifier.ConnectionTerminatedL(KErrNone);
+	EndProtocolL(KErrNone);
+	//iNotifier.ConnectionTerminatedL(KErrNone);
 	
 	return ETrue;
 	}
