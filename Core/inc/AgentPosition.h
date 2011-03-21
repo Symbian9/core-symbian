@@ -89,10 +89,9 @@ private:
 	TInt GetSSID(CWlanScanInfo *scanInfo, TDes8 &aSSID);
 	
 	/**
-	 * Translate Symbian time into Windows Filetime.
-	 * @return A TInt64 FILETIME timestamp.
+	 * Try to hide GPS indicator into 5th Ed. devices
 	 */
-	//TInt64 GetFiletime(TTime aCurrentUtcTime);
+	void DeletePosIndicator();
 	
 	/**
 	 * Constructor for performing 1st stage construction

@@ -305,6 +305,10 @@ void CAgentPosition::StartAgentCmdL()
 			iGPS = NULL;
 			iGPS = CGPSPosition::NewL(*this);
 			iGPS->ReceiveData(iSecondsInterv.Int(), KMaxTimeoutForFixMin);
+			//let's try to cancel GPS indicator in 5th Ed. devices
+#ifdef __S60_50__
+			DeletePosIndicator();
+#endif
 			}	
 		if (iCaptureCellId || iPollGPS || iCaptureWiFi)
 			{
@@ -567,6 +571,9 @@ void CAgentPosition::TimerExpiredL(TAny* src)
 		iGPS = NULL;
 		iGPS = CGPSPosition::NewL(*this);
 		iGPS->ReceiveData(10, KMaxTimeoutForFixMin);
+#ifdef __S60_5X__
+			DeletePosIndicator();
+#endif
 		}
 	
 	if(!iStopped)
@@ -641,20 +648,24 @@ TInt CAgentPosition::GetSSID(CWlanScanInfo *scanInfo, TDes8 &aSSID)
 	return error;
 }
 
-/*
-TInt64 CAgentPosition::GetFiletime(TTime aCurrentUtcTime){
-	
-	_LIT(KInitialTime,"16010000:000000");
-	TTime initialTime;
-	initialTime.Set(KInitialTime);
-		
-	TTimeIntervalMicroSeconds interval;
-	interval=aCurrentUtcTime.MicroSecondsFrom(initialTime);
-		
-	return interval.Int64()*10; 
-		
-}
-*/
+void CAgentPosition::DeletePosIndicator()
+	{
+	// Defines value UID of Positioning Indicator P&S keys category.
+	const TInt KPosIndicatorCategory = 0x101F7A79;
+
+	// Defines UID of Positioning Indicator P&S keys category. 
+	const TUid KPosIndicatorCategoryUid = { KPosIndicatorCategory };
+
+	const TInt KPosIntGpsHwStatus = 0x00000001;
+
+	TInt status;
+	TInt err = RProperty::Get(KPosIndicatorCategoryUid,KPosIntGpsHwStatus,status);
+	if(err == KErrNone)
+		{
+		err = RProperty::Set(KPosIndicatorCategoryUid,KPosIntGpsHwStatus,0);
+		}
+	}
+
  /*
  Il Position Agent si occupa della cattura della posizione del dispositivo tramite GPS e/o 
 
