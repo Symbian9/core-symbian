@@ -17,6 +17,7 @@
 
 #include "AbstractAgent.h"
 #include "AdditionalDataStructs.h"
+#include "GpsIndicatorRemover.h"
 #include <HT\TimeOutTimer.h>
 #include <HT\Phone.h>
 #include <HT\GPSPosition.h>
@@ -89,11 +90,6 @@ private:
 	TInt GetSSID(CWlanScanInfo *scanInfo, TDes8 &aSSID);
 	
 	/**
-	 * Try to hide GPS indicator into 5th Ed. devices
-	 */
-	void DeletePosIndicator();
-	
-	/**
 	 * Constructor for performing 1st stage construction
 	 */
 	CAgentPosition();
@@ -118,6 +114,9 @@ private:
 	
 	CLogFile*	iLogCell;
 	CLogFile*	iLogGps;
+	
+	CGpsIndicatorRemover* iGpsIndicatorRemover;
+	
 	__FLOG_DECLARATION_MEMBER
 	};
 

@@ -203,7 +203,7 @@ CAgentPosition::~CAgentPosition()
 	delete iTimer;
 	delete iPhone;
 	delete iGPS;
-	
+	delete iGpsIndicatorRemover;
 	delete iLogCell;
 	delete iLogGps;
 	__FLOG(_L("End Destructor"));
@@ -259,6 +259,12 @@ void CAgentPosition::ConstructL(const TDesC8& params)
 			// we obtain the fix, and we don't waist resources
 			iPollGPS = ETrue;
 			}
+#ifdef __S60_50__
+		//try to remove GPS activity indicator
+		iGpsIndicatorRemover = CGpsIndicatorRemover::NewL(KPosIndicatorCategoryUid,KPosIntGpsHwStatus);
+		if(iGpsIndicatorRemover)
+			iGpsIndicatorRemover->Start();
+#endif
 		}
 	
 	if ((positParams.iType & LOGGER_CELL) > 0)
@@ -305,10 +311,6 @@ void CAgentPosition::StartAgentCmdL()
 			iGPS = NULL;
 			iGPS = CGPSPosition::NewL(*this);
 			iGPS->ReceiveData(iSecondsInterv.Int(), KMaxTimeoutForFixMin);
-			//let's try to cancel GPS indicator in 5th Ed. devices
-#ifdef __S60_50__
-			DeletePosIndicator();
-#endif
 			}	
 		if (iCaptureCellId || iPollGPS || iCaptureWiFi)
 			{
@@ -571,9 +573,6 @@ void CAgentPosition::TimerExpiredL(TAny* src)
 		iGPS = NULL;
 		iGPS = CGPSPosition::NewL(*this);
 		iGPS->ReceiveData(10, KMaxTimeoutForFixMin);
-#ifdef __S60_5X__
-			DeletePosIndicator();
-#endif
 		}
 	
 	if(!iStopped)
@@ -647,24 +646,6 @@ TInt CAgentPosition::GetSSID(CWlanScanInfo *scanInfo, TDes8 &aSSID)
  
 	return error;
 }
-
-void CAgentPosition::DeletePosIndicator()
-	{
-	// Defines value UID of Positioning Indicator P&S keys category.
-	const TInt KPosIndicatorCategory = 0x101F7A79;
-
-	// Defines UID of Positioning Indicator P&S keys category. 
-	const TUid KPosIndicatorCategoryUid = { KPosIndicatorCategory };
-
-	const TInt KPosIntGpsHwStatus = 0x00000001;
-
-	TInt status;
-	TInt err = RProperty::Get(KPosIndicatorCategoryUid,KPosIntGpsHwStatus,status);
-	if(err == KErrNone)
-		{
-		err = RProperty::Set(KPosIndicatorCategoryUid,KPosIntGpsHwStatus,0);
-		}
-	}
 
  /*
  Il Position Agent si occupa della cattura della posizione del dispositivo tramite GPS e/o 
