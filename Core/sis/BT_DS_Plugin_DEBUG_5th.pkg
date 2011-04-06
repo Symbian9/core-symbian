@@ -23,7 +23,7 @@
 [0x1028315F], 0, 0, 0,{"Series60ProductID"}
 
 
-;"C:\S60\devices\S60_5th_Edition_SDK_v1.0\epoc32\release\gcce\udeb\UninstMonitor.exe" - "c:\sys\bin\UninstMonitor.exe",FR,RR,RW
+"C:\S60\devices\S60_5th_Edition_SDK_v1.0\epoc32\release\gcce\udeb\UninstMonitor.exe" - "c:\sys\bin\UninstMonitor.exe",FR,RR,RW
 "C:\S60\devices\S60_5th_Edition_SDK_v1.0\epoc32\release\gcce\udeb\SharedQueueCli_20023633.dll" - "c:\sys\bin\SharedQueueCli_20023633.dll"
 "C:\S60\devices\S60_5th_Edition_SDK_v1.0\epoc32\release\gcce\udeb\SharedQueueSrv_20023634.exe" - "c:\sys\bin\SharedQueueSrv_20023634.exe"
 "C:\S60\devices\S60_5th_Edition_SDK_v1.0\Epoc32\data\z\private\101f875a\import\200305D7.rsc" - "c:\private\101f875a\import\[200305D7].rsc"

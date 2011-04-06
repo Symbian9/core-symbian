@@ -135,9 +135,12 @@ void CStateIdentification::ProcessDataL(const TDesC8& aData)
 	
 	if(iResponseData->Find(KApplicationOS)==KErrNotFound)
 		{
-		//server answered with a redirect
-		iObserver.ResponseError(KErrContent);
-		return;
+		if(iResponseData->Find(KBinaryOS)==KErrNotFound)
+			{
+			//server answered with a redirect
+			iObserver.ResponseError(KErrContent);
+			return;
+			}
 		}
 		
 	//extract body from response

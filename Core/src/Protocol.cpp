@@ -101,8 +101,10 @@ void CProtocol::StartRestProtocolL(TBool aMonitor,RSocketServ& aSocketServ, RCon
 	TRAPD(err,iNetwork->ConnectToServerL( aServer, aPort));
 	if(err != KErrNone)
 		{
+		__FLOG(_L("Trapped error on ConnectToServer"));
 		EndProtocolL(err);
 		}
+	__FLOG(_L("StartRestProtocolL exit"));
 	}
 
 void CProtocol::NotifyConnectionCompleteL()

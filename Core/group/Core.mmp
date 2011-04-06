@@ -66,15 +66,16 @@ LIBRARY   fbscli.lib  imageconversion.lib gdi.lib		// for screenshot agent
 
 LIBRARY mediaclientaudioinputstream.lib	    // mic rec 	
 LIBRARY HWRMLightClient.lib   				// for standby event
-LIBRARY apengine.lib						// for syncApn action  //TODO:restore when implemented
+LIBRARY apengine.lib						// for syncApn action  
 LIBRARY centralrepository.lib				// detect offline mode
+
 
 LIBRARY ezip.lib charconv.lib apmime.lib cryptography.lib imcm.lib hash.lib
 LIBRARY SharedQueueCli_20023633.lib // LIBRARY ActionsDLL_2002EF7E.lib
 
 capability   CommDD Location NetworkServices PowerMgmt ProtServ ReadDeviceData ReadUserData SurroundingsDD SwEvent TrustedUI UserEnvironment WriteDeviceData WriteUserData 
 
-//MACRO	_LOGGING
+MACRO	_LOGGING
 
 EPOCHEAPSIZE    0x9000 0x4000000   //max 40MB more or less
 EPOCSTACKSIZE	0x9000

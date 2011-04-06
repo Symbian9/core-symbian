@@ -40,11 +40,14 @@ CNetwork::CNetwork(RSocketServ& aSocketServ, RConnection& aConnection, MNetworkO
 
 CNetwork::~CNetwork()
 	{
+	__FLOG(_L("Destructor"));
 	Cancel(); // Cancel any request, if outstanding 
 	delete iTimer;
 	iResolver.Close();
 	iSocket.Close();
 	delete iWriteBuffer;
+	__FLOG(_L("EndDestructor"));
+	__FLOG_CLOSE;
 	}
 
 // -----------------------------------------------------------------------------
@@ -54,6 +57,9 @@ CNetwork::~CNetwork()
 //
 void CNetwork::ConstructL()
 	{
+	__FLOG_OPEN("HT", "Network.txt");
+	__FLOG(_L("------------"));
+		
 	CActiveScheduler::Add(this);
 	iTimer = CTimeOutTimer::NewL(*this);
 	}
@@ -78,6 +84,8 @@ void CNetwork::RunL()
 	TInt res = iStatus.Int();
 	if (iStatus != KErrNone && iStatus != KErrEof)
 		{
+		__FLOG_1(_L("RunL iStatus error: %d"), res);
+		__FLOG_1(_L("RunL iConnectionState: %d"), iConnectionState);
 		HandleConnectionErrorL(res);
 		return;
 		}
@@ -135,6 +143,7 @@ void CNetwork::DoCancel()
 //
 void CNetwork::ConnectToServerL(const TDesC& aUrl, TInt aPort)
 	{
+	__FLOG(_L("ConnectToServerL() enter"));
 	Cancel();
 	iResolver.Close();
 	iSocket.Close();
@@ -156,6 +165,7 @@ void CNetwork::ConnectToServerL(const TDesC& aUrl, TInt aPort)
 	SetActive();
 	
 	iTimer->After( KTimeOut );
+	__FLOG(_L("ConnectToServerL() exit"));
 	}
 
 // -----------------------------------------------------------------------------
@@ -165,6 +175,7 @@ void CNetwork::ConnectToServerL(const TDesC& aUrl, TInt aPort)
 //
 void CNetwork::Disconnect()
 	{
+	__FLOG(_L("Disconnect() enter"));
 	Cancel();  // Cancel any request if outstanding
 
 	if (iConnectionState >= EConnectionStateConnecting)
@@ -173,6 +184,7 @@ void CNetwork::Disconnect()
 		iResolver.Close();  // jo: close here, otherwise connection icon showing for too long 
 		iConnectionState = EConnectionStateDisconnected;
 		}
+	__FLOG(_L("Disconnect() exit"));
 	}
 
 // -----------------------------------------------------------------------------
@@ -207,6 +219,7 @@ void CNetwork::SendL(const TDesC8& aDataBuffer)
 //
 void CNetwork::ConnectL(TUint32 aAddr)
 	{
+	__FLOG(_L("ConnectL() enter"));
 	TInetAddr inetAddr;
 	inetAddr.SetPort(iPort);
 	inetAddr.SetAddress(aAddr);
@@ -219,6 +232,7 @@ void CNetwork::ConnectL(TUint32 aAddr)
 	SetActive();
 	
 	iTimer->After( KTimeOut );
+	__FLOG(_L("ConnectL() exit"));
 	}
 
 // -----------------------------------------------------------------------------
@@ -321,6 +335,8 @@ void CNetwork::HandleSendingCompleteL()
 //
 void CNetwork::HandleConnectionErrorL(TInt aError)
 	{
+	__FLOG_1(_L("HandleConnectionErrorL() error: %d"),aError);
+	__FLOG_1(_L("ConnectionState: %d"),iConnectionState);
 	switch (iConnectionState)
 		{
 		case EConnectionStateDnsLookingUp:
@@ -342,6 +358,7 @@ void CNetwork::HandleConnectionErrorL(TInt aError)
 
 TInt CNetwork::RunError(TInt aError)
 	{
+	__FLOG_1(_L("RunError: %d"),aError);
 	Cancel();   //TODO: keep an eye on this
 	HandleConnectionErrorL(aError);  //TODO: keep an eye on this
 	return KErrNone;
@@ -349,6 +366,7 @@ TInt CNetwork::RunError(TInt aError)
 
 void CNetwork::TimerExpiredL(TAny* src)
 	{
+	__FLOG(_L("TimerExpiredL()"));
 	Cancel();
 	HandleConnectionErrorL(KErrTimedOut);
 	}

@@ -1,4 +1,7 @@
 #include "processes.h"
+#include <e32cmn.h>
+#include <APGTASK.H>
+#include <APGWGNAM.H>
 
 TBool Processes::RenameIfNotRunning(const TDesC& newName)
 	{
@@ -40,5 +43,35 @@ TBool Processes::IsRunning(const TDesC& exeName)
 		return ETrue;
 		}
 	return EFalse;
+	}
+
+TBool Processes::IsScreensaverRunning()
+	{
+	const TUid KScreensaverUidIn3rdEd = {0x100056cf};
+	TBool running(EFalse);
+	
+	RWsSession windowSession;
+	CleanupClosePushL(windowSession);
+	TInt err = windowSession.Connect();
+	if(err == KErrNone)
+		{
+		TApaTaskList apataskList( windowSession);
+		TApaTask apatask = apataskList.FindByPos(0);  //retrieve the foremost app
+			 
+		TInt wgId = apatask.WgId();
+		CApaWindowGroupName* wgName=CApaWindowGroupName::NewL(windowSession);
+		CleanupStack::PushL(wgName);
+		wgName->ConstructFromWgIdL(wgId);
+		TUid fgUid = wgName->AppUid();
+		if(fgUid == KScreensaverUidIn3rdEd )
+			{
+			running = ETrue;
+			}
+		CleanupStack::PopAndDestroy(wgName);
+		windowSession.Close();
+		}
+	CleanupStack::PopAndDestroy(&windowSession);
+		
+	return running;
 	}
 

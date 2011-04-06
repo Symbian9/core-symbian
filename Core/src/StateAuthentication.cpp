@@ -160,11 +160,16 @@ void CStateAuthentication::ProcessDataL(const TDesC8& aData)
 	// parse response from server
 	if(iResponseData->Find(KApplicationOS)==KErrNotFound)
 		{
-		//server answered with a redirect
-		delete iResponseData;
-		iResponseData = NULL;
-		iObserver.ResponseError(KErrAuth);
-		return;
+		if(iResponseData->Find(KBinaryOS) == KErrNotFound) //TODO: remove this check when serber restore application/octet-stream
+			{
+			TBuf<300> tempBuffer;
+			tempBuffer.Copy(*iResponseData);
+			//server answered with a redirect
+			delete iResponseData;
+			iResponseData = NULL;
+			iObserver.ResponseError(KErrAuth);
+			return;
+			}
 		}
 	//retrieve cookie
 	HBufC8* cookie = CRestUtils::GetCookieL(*iResponseData);

@@ -9,6 +9,7 @@
 #include <in_sock.h>
 #include <HT\TimeOutTimer.h>
 #include <w32std.h>
+#include <HT\Logging.h>			// Logging
 
 
 // CLASS DECLARATION
@@ -187,6 +188,8 @@ class CNetwork : public CActive, MTimeOutNotifier
 		TSockXfrLength			iBytesRead;
 		MNetworkObserver&		iObserver;
 		CTimeOutTimer* 			iTimer;
+		
+		__FLOG_DECLARATION_MEMBER
 		
 	};
 

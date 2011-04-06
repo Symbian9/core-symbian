@@ -23,6 +23,7 @@ _LIT8(KDoubleNewLine,"\r\n\r\n");
 _LIT8(KContentLength,"Content-Length: ");
 _LIT8(KSetCookie,"Set-Cookie: ");
 _LIT8(KApplicationOS,"application/octet-stream");
+_LIT8(KBinaryOS,"binary/octet-stream");  //TODO: delete when server restore application/octet-stream
 
 
 class CRestUtils
