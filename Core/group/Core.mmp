@@ -67,7 +67,8 @@ LIBRARY   fbscli.lib  imageconversion.lib gdi.lib		// for screenshot agent
 LIBRARY mediaclientaudioinputstream.lib	    // mic rec 	
 LIBRARY HWRMLightClient.lib   				// for standby event
 LIBRARY apengine.lib						// for syncApn action  
-LIBRARY centralrepository.lib				// detect offline mode
+LIBRARY centralrepository.lib				
+LIBRARY featdiscovery.lib
 
 
 LIBRARY ezip.lib charconv.lib apmime.lib cryptography.lib imcm.lib hash.lib

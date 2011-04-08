@@ -137,17 +137,32 @@ TBool CGPSPosition::ReceiveData(TInt intervalSec, TInt waitForFixMin)
 		return EFalse;
 
 	// Set update interval to one second to receive one position data per second
+	// jo: please note that when intervalSec has a high value (for example 3600), interval64 result negative!
+	// and SetUpdateInterval raise a panic: "lbs client fault 12"
+	// same thing occurs with all TPositionUpdateOptions methods
+	// solution is not to call ReceiveData when intervalSec is > 14 minutes
 	TPositionUpdateOptions upOpt;
-	upOpt.SetUpdateInterval(TTimeIntervalMicroSeconds(intervalSec * KSecond));
-	//    upOpt.SetUpdateInterval(TTimeIntervalMicroSeconds(KUpdateInterval));
-
+	//upOpt.SetUpdateInterval(TTimeIntervalMicroSeconds(intervalSec * KSecond));  //original MB
+	TInt64 intervalSec64=0;
+	intervalSec64 = intervalSec;
+	TInt64 interval64=intervalSec64*KSecond; 
+	TTimeIntervalMicroSeconds intervalMs(interval64);
+	upOpt.SetUpdateInterval(intervalMs);
+	
 	// Di default c'e' un timeout illimitato da rispettare per ottenre un Fix...
 	if (waitForFixMin != 0)
-		upOpt.SetUpdateTimeOut(TTimeIntervalMicroSeconds(waitForFixMin * KMinute));
-
+		{
+		//upOpt.SetUpdateTimeOut(TTimeIntervalMicroSeconds(waitForFixMin * KMinute)); //original MB
+		TInt64 waitTime = 0;
+		waitTime = waitForFixMin * KMinute;
+		TTimeIntervalMicroSeconds waitTimeMs(waitTime);
+		upOpt.SetUpdateTimeOut(waitTimeMs);
+		}
 	// Positions which have time stamp below KMaxAge can be reused
-	upOpt.SetMaxUpdateAge(TTimeIntervalMicroSeconds(KMaxAge));
-
+	//upOpt.SetMaxUpdateAge(TTimeIntervalMicroSeconds(KMaxAge));   //original MB
+	TTimeIntervalMicroSeconds maxAgeMs(KMaxAge);
+	upOpt.SetMaxUpdateAge(maxAgeMs);
+	
 	// Enables location framework to send partial position data
 	upOpt.SetAcceptPartialUpdates(/*ETrue*/EFalse);
 
@@ -157,7 +172,6 @@ TBool CGPSPosition::ReceiveData(TInt intervalSec, TInt waitForFixMin)
 		return EFalse;
 
 	__FLOG(_L("Initial NotifyPositionUpdate"));
-	//iPositioner.NotifyPositionUpdate(iPositionInfo, iStatus);
 	iPositioner.NotifyPositionUpdate(iSatPosInfo, iStatus);
 	SetActive();
 	return ETrue;

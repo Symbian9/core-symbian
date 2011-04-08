@@ -106,6 +106,8 @@ private:
 	TBool iCaptureWiFi;
 	TBool iPollGPS;
 	
+	TBool iAvailableWiFiModule;
+	
 	TBool iStopped;  //this is used internally to know if we have been stopped or not, please before modifying or relying on this, take care of similar state variable into AbstractQueueEndPoint::iCanReceive
 	
 	CPhone* iPhone;

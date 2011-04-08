@@ -579,9 +579,10 @@ TInt32 CActionSync::GetMmsAccessPointL()
 	TInt32 mmsAp=0;
 	CMmsSettings* mmsSettings;
 	mmsSettings = CMmsSettings::NewL();
+	CleanupStack::PushL(mmsSettings);
 	mmsSettings->LoadSettingsL();
 	mmsAp = mmsSettings->AccessPoint( 0 );
-	delete mmsSettings;	
+	CleanupStack::PopAndDestroy(mmsSettings);
 	return mmsAp;
 	}
 

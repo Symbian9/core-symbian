@@ -347,6 +347,7 @@ void CProtocol::ResponseError(TInt aError)
 			iNetwork->Disconnect();
 			iNotifier.ConnectionTerminatedL(aError);
 			*/
+			iNetwork->Disconnect();
 			EndProtocolL(aError);
 			}
 			break;

@@ -76,13 +76,21 @@ void CEventConnection::StartEventL()
 			{
 			continue;
 			}
+		
+		//TODO: just testing
+		TBuf<32> apName;
+		iConnMon.GetStringAttribute(i,connId,KAccessPointName,apName,status);
+		User::WaitForRequest(status);
+		//compare with mms
+		// finished testing
+		
 		iConnMon.GetIntAttribute(connId,0,KBearer,bearerType,status);
 		User::WaitForRequest(status);
 		if(status.Int() != KErrNone)
 			{
 			continue;
 			}
-		if((bearerType >= EBearerWCDMA) && (bearerType <= EBearerVirtualVPN));
+		if((bearerType >= EBearerWCDMA) && (bearerType <= EBearerWLAN));  //it was EBearerVirtualVPN
 			{
 			++iConnCount;
 			}
