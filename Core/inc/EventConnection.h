@@ -65,8 +65,10 @@ private:
 private:
 	TConnectionStruct iConnParams;
 	RConnectionMonitor	iConnMon;
-	TUint		iConnCount;
 	TBool		iWasConnected;
+	TInt32		iMmsApId;
+	TUid 		iMyUid;
+	RArray<TUint>	iActiveConnArray;
 	};
 
 

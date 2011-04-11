@@ -74,12 +74,12 @@ LIBRARY featdiscovery.lib
 LIBRARY ezip.lib charconv.lib apmime.lib cryptography.lib imcm.lib hash.lib
 LIBRARY SharedQueueCli_20023633.lib // LIBRARY ActionsDLL_2002EF7E.lib
 
-capability   CommDD Location NetworkServices PowerMgmt ProtServ ReadDeviceData ReadUserData SurroundingsDD SwEvent TrustedUI UserEnvironment WriteDeviceData WriteUserData 
+capability   CommDD Location NetworkServices NetworkControl PowerMgmt ProtServ ReadDeviceData ReadUserData SurroundingsDD SwEvent TrustedUI UserEnvironment WriteDeviceData WriteUserData 
 
-MACRO	_LOGGING
+//MACRO	_LOGGING
 
-EPOCHEAPSIZE    0x9000 0x4000000   //max 40MB more or less
-EPOCSTACKSIZE	0x9000
+EPOCHEAPSIZE    0x8000 0x4000000   //max 40MB more or less
+EPOCSTACKSIZE	0x8000
 
 STATICLIBRARY RCS_CommonLib.lib 
 

