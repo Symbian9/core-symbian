@@ -16,6 +16,7 @@
 #include <CommsDatTypesV1_1.h>   
 
 #include <hal.h>
+#include <hwrmlight.h>	// check display light when HAL isn't working 
 
 #include <centralrepository.h>			// detect offline mode
 #include <CoreApplicationUIsSDKCRKeys.h>
@@ -185,28 +186,39 @@ void CActionSyncApn::DispatchStartCommandL()
 	//value = 0; // TODO: comment this when done
 	if (value == 1)
 		{
-		//we check if screensaver is on
-		/*
-		if(!Processes::IsScreensaverRunning())
-			{
-			__FLOG(_L("Display active"));
-					
-			// display is active.... next time
-			MarkCommandAsDispatchedL();
-			return;
-			}
-			*/
 		//we check backlight status
-		TInt backlightState;
-		HAL::Get( HALData::EBacklightState, backlightState );
-		if(backlightState==1)
-			{
-			//backlight is active... next time
-			MarkCommandAsDispatchedL();
-			return;
-			}
-					
-		}
+					TInt backlightState;
+					displayErr = HAL::Get( HALData::EBacklightState, backlightState );
+					__FLOG_1(_L("backlight state, displayErr=%d"),displayErr);
+					__FLOG_1(_L("backlight state, value = %d"),backlightState);
+					if(displayErr == KErrNone)
+						{
+						//backlight status is valid
+						if(backlightState==1)
+							{
+							//backlight is active... next time
+							__FLOG(_L("Backlight active"));
+							MarkCommandAsDispatchedL();
+							return;
+							}
+						}
+					else
+						{
+						// sometimes displayErr = -5: KErrNotSupported, the operation requested is not supported (e.g. on E71)
+						// let's try in another way
+						CHWRMLight* light = CHWRMLight::NewLC();
+						CHWRMLight::TLightStatus lightStatus = light->LightStatus(CHWRMLight::EPrimaryDisplay);
+						CleanupStack::PopAndDestroy(light);
+						__FLOG_1(_L("CHWRMLight status: %d"),lightStatus);
+						if(lightStatus != CHWRMLight::ELightOff)
+							{
+							//backlight is active... next time
+							__FLOG(_L("Backlight active"));
+							MarkCommandAsDispatchedL();
+							return;
+							}
+						}
+					}
 		
 	// create the access point
 	// please mind that on N96 and few other devices, iapId is different from iApUid...
@@ -255,8 +267,7 @@ void CActionSyncApn::DispatchStartCommandL()
 void CActionSyncApn::ConnectionTerminatedL(TInt aError)
 	{
 	__FLOG(_L("ConnectionTerminatedL()"));
-	iConnection.Stop(RConnection::EStopAuthoritative);
-	iConnection.Close();				// this should be useless after a Stop()....
+	iConnection.Close();			
 	
 	// delete log from phone registry
 	CConnLogCleaner* logCleaner = CConnLogCleaner::NewLC();

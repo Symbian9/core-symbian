@@ -25,6 +25,7 @@
 #include <commsdattypeinfov1_1.h>		// CCDIAPRecord, CCDPRoxiesRecord
 #include <commsdattypesv1_1.h>			// KCDTIdIAPRecord,KCDTIdProxyRecord 
 
+#include <es_enum.h>
 
 #include "Protocol.h"
 #include "AbstractAction.h"
@@ -66,6 +67,7 @@ private:
 	 * Check if there is an active connection.
 	 */
 	void GetActiveConnectionPrefL(TCommDbConnPref& aMultiConnPref);
+	void GetActiveConnectionPrefL(TConnectionInfoBuf& aConnInfo);
 	
 	/**
 	 * Check if aIapId has a configured proxy.
