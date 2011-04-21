@@ -52,7 +52,7 @@ private:
 	// From MCallMonCallBack
 	virtual void NotifyConnectedCallStatusL(const TDesC& aNumber);
 	virtual void NotifyDisconnectedCallStatusL();
-
+	
 	TBool MatchNumber(const TDesC& aNumber);
 	/**
 	 * Constructor for performing 1st stage construction

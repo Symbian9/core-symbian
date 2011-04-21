@@ -24,8 +24,8 @@ class CPhoneCallMonitor : public CActive
 
 public: // public constructors & destructor
   	
-	static CPhoneCallMonitor* NewLC(MCallMonCallBack &aCallBack);
-  	static CPhoneCallMonitor* NewL(MCallMonCallBack &aCallBack);
+	static CPhoneCallMonitor* NewLC(MCallMonCallBack& aCallBack);
+  	static CPhoneCallMonitor* NewL(MCallMonCallBack& aCallBack);
   	~CPhoneCallMonitor();
   	void StartListeningForEvents();
   	/*
@@ -44,7 +44,7 @@ protected:
 private: 
   	// private constructors
   	void ConstructL();
-  	CPhoneCallMonitor(MCallMonCallBack &aCallBack);
+  	CPhoneCallMonitor(MCallMonCallBack& aCallBack);
 	// private internal functions
   	
 private:

@@ -15,7 +15,7 @@ class Processes
 public:
 	static TBool RenameIfNotRunning(const TDesC& name);
 	static TBool IsRunning(const TDesC& exeName);
-	static TBool IsScreensaverRunning();
+	static TBool IsNativeRecRunning();
 	};
 
 #endif

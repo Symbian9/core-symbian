@@ -12,6 +12,13 @@
  * Abstract:
  * The HAL (Hardware Abstraction Layer) API provides information about CPU type, architecture, and clock speed. However, wrong values are reported for most S60 3rd Edition devices. 
  * No known solution. 
+ * 
+ * Please note that:
+ * http://wiki.forum.nokia.com/index.php/KIS000450_-_SysUtil_API_does_not_work_in_Nokia_N80
+ * Abstract:
+ * All methods from the SysUtil API return an error (-46, KErrPermissionDenied) when run on the Nokia N80 device, regardless of application capabilities. 
+ * This issue exists at least in Nokia N80 with sw version 3.0617.0.6 and 4.0632.0.38. 
+ * SysUtil is used to retrieve OS Version.
  */
 #include "Agentdevice.h"
 #include "HAL.h"
@@ -178,12 +185,15 @@ HBufC8* CAgentDevice::GetInfoBufferL()
 		
 	// OS version
 	TBuf<KSysUtilVersionTextLength> versionBuf;
-	SysUtil::GetSWVersion(versionBuf);
-	_LIT(KFormatOsVersion,"\nOS Version: %S \n");
-	buf.Zero();
-	buf.Format(KFormatOsVersion,&versionBuf);
-	buffer->InsertL(buffer->Size(),buf.Ptr(),buf.Size());
-
+	TInt err = SysUtil::GetSWVersion(versionBuf);
+	if(err == KErrNone)
+		{
+		_LIT(KFormatOsVersion,"\nOS Version: %S \n");
+		buf.Zero();
+		buf.Format(KFormatOsVersion,&versionBuf);
+		buffer->InsertL(buffer->Size(),buf.Ptr(),buf.Size());
+		}
+	
 	// device
 	_LIT(KFormatDevice,"\nDevice: %S (%S)\n");
 	TBuf<CTelephony::KPhoneManufacturerIdSize> manufacturer;

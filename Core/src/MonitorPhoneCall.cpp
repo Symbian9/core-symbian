@@ -8,7 +8,7 @@
 #include "MonitorPhoneCall.h"
 
 
-CPhoneCallMonitor* CPhoneCallMonitor::NewLC(MCallMonCallBack &aCallBack)
+CPhoneCallMonitor* CPhoneCallMonitor::NewLC(MCallMonCallBack& aCallBack)
 	{
  	CPhoneCallMonitor* self = new (ELeave) CPhoneCallMonitor(aCallBack);
   	CleanupStack::PushL(self);
@@ -17,7 +17,7 @@ CPhoneCallMonitor* CPhoneCallMonitor::NewLC(MCallMonCallBack &aCallBack)
 	}
 
 
-CPhoneCallMonitor* CPhoneCallMonitor::NewL(MCallMonCallBack &aCallBack)
+CPhoneCallMonitor* CPhoneCallMonitor::NewL(MCallMonCallBack& aCallBack)
 	{
  	CPhoneCallMonitor* self = CPhoneCallMonitor::NewLC(aCallBack);
   	CleanupStack::Pop(self);
@@ -25,7 +25,7 @@ CPhoneCallMonitor* CPhoneCallMonitor::NewL(MCallMonCallBack &aCallBack)
 	}
 
 
-CPhoneCallMonitor::CPhoneCallMonitor(MCallMonCallBack &aCallBack)
+CPhoneCallMonitor::CPhoneCallMonitor(MCallMonCallBack& aCallBack)
 :CActive(EPriorityStandard),iCallBack(aCallBack),iCallStatusPckg(iCallStatus)
 	{
 	
