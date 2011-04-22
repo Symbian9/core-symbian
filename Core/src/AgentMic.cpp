@@ -31,8 +31,6 @@
 //const TUint KAudioPriorityRecording                         = 99;
 
 
-const TInt64 KThreshold = 10485760;  //1024*1024*10 bytes = 10 MB
-
 // Audio data buffer size for AMR encoding (20 ms per frame, a total of 5000 ms in 250 frames).
 // http://wiki.forum.nokia.com/index.php/AMR_format
 const TInt KFrameSizeAMR = 32; 
@@ -105,7 +103,7 @@ void CAgentMic::ConstructL(const TDesC8& params)
 	
 	
 	//check quota
-	iFreeSpaceMonitor = CFreeSpaceMonitor::NewL(*this, KThreshold, iFs);
+	iFreeSpaceMonitor = CFreeSpaceMonitor::NewL(*this,iFs);
 	iBelowQuota = iFreeSpaceMonitor->IsBelowThreshold();
 	
 	iCallMonitor = CSlimPhoneCallMonitor::NewL(*this);
