@@ -302,6 +302,7 @@ void CNetwork::HandleDataReceivedL()
 //we notify the observer sending an empty string
 void CNetwork::HandleDataReceivedL()
 	{
+	iTimer->Cancel();
 	TInt error = iStatus.Int();
 	if(error==KErrNone)
 		{
@@ -323,6 +324,7 @@ void CNetwork::HandleDataReceivedL()
 //
 void CNetwork::HandleSendingCompleteL()
 	{
+	iTimer->Cancel();
 	TInt err = iStatus.Int();
 	DoReceiveL();
 	iObserver.NotifySendingCompleteL();

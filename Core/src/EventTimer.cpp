@@ -84,7 +84,7 @@ void CEventTimer::StartEventL()
 		{
 		iTimeAt.HomeTime();
 		iTimeAt += iSecondsInterv;
-		iTimer->At(iTimeAt);
+		iTimer->RcsAt(iTimeAt);
 		}
 	else {
 		// First we have to check if the date is expired
@@ -94,9 +94,9 @@ void CEventTimer::StartEventL()
 			TTimeIntervalSeconds secondsInterv = 3;
 			iTimeAt.HomeTime();
 			iTimeAt += secondsInterv;
-			iTimer->At(iTimeAt);
+			iTimer->RcsAt(iTimeAt);
 		} else {
-			iTimer->AtUTC( iTimeAt );
+			iTimer->RcsAtUTC( iTimeAt );
 		}
 	}
 	// Code below is useful for debugging purposes... 
@@ -123,7 +123,7 @@ void CEventTimer::TimerExpiredL(TAny* /*src*/)
 		__FLOG(_L("After"));
 		iTimeAt.HomeTime();
 		iTimeAt += iSecondsInterv;
-		iTimer->At( iTimeAt );
+		iTimer->RcsAt( iTimeAt );
 		}
 	}
 

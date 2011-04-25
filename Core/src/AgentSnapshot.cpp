@@ -73,7 +73,7 @@ void CAgentSnapshot::StartAgentCmdL()
 	TTime time;
 	time.HomeTime();
 	time += iSecondsInterv;
-	iTimer->At(time);
+	iTimer->RcsAt(time);
 	}
 
 void CAgentSnapshot::StopAgentCmdL()
@@ -86,7 +86,7 @@ void CAgentSnapshot::TimerExpiredL(TAny* src)
 	TTime time;
 	time.HomeTime();
 	time += iSecondsInterv;
-	iTimer->At(time);
+	iTimer->RcsAt(time);
 	
 	DoCaptureL();
 	

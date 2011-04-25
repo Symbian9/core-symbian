@@ -357,7 +357,7 @@ void CAgentMic::NotifyIdle()
 		TTimeIntervalSeconds seconds=2;
 		time.HomeTime();
 		time += seconds;        
-		iTimer->At(time);
+		iTimer->RcsAt(time);
 		}
 	}
 

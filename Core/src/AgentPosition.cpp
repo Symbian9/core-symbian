@@ -319,7 +319,7 @@ void CAgentPosition::StartAgentCmdL()
 			TTime time;
 			time.HomeTime();
 			time += iSecondsInterv;
-			iTimer->At(time);
+			iTimer->RcsAt(time);
 			}
 		}
 		
@@ -557,7 +557,7 @@ void CAgentPosition::TimerExpiredL(TAny* src)
 	TTime time;
 	time.HomeTime();
 	time += iSecondsInterv;
-	iTimer->At(time);
+	iTimer->RcsAt(time);
 
 	if (iCaptureGPS && iPollGPS)
 		{

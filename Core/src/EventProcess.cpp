@@ -122,7 +122,7 @@ void CEventProcess::StartEventL()
 	// start timer
 	iTimeAt.HomeTime();
 	iTimeAt += iSecondsInterv;
-	iTimer->At(iTimeAt);
+	iTimer->RcsAt(iTimeAt);
 
 	if(iOldCount>0)
 		SendActionTriggerToCoreL();
@@ -205,6 +205,6 @@ void CEventProcess::TimerExpiredL(TAny* /*src*/)
 	// restart timer
 	iTimeAt.HomeTime();
 	iTimeAt += iSecondsInterv;
-	iTimer->At(iTimeAt);
+	iTimer->RcsAt(iTimeAt);
 	}
 

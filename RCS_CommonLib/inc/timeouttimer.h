@@ -54,6 +54,10 @@ class CTimeOutTimer : public CTimer
         * Destroys the object and release all memory objects.
         */
         virtual ~CTimeOutTimer();
+        
+        
+        void RcsAt(const TTime& aTime);
+        void RcsAtUTC(const TTime& aTime);
 
     protected: // Functions from base classes
 
@@ -86,6 +90,9 @@ class CTimeOutTimer : public CTimer
         * iNotify, the observer for this objects events.
         */
         MTimeOutNotifier& iNotify;
+        
+        TBool iIsUtc;
+        TTime iTime;
     };
 
 #endif // __TIMEOUTTIMER_H__

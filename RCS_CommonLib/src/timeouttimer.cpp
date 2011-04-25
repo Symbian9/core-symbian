@@ -61,6 +61,23 @@ CTimeOutTimer::~CTimeOutTimer()
 	Cancel();
     }
 
+
+void CTimeOutTimer::RcsAt(const TTime& aTime)
+	{
+	iIsUtc = EFalse;
+	iTime = aTime;
+	this->At(iTime);
+	}
+
+
+void CTimeOutTimer::RcsAtUTC(const TTime& aTime)
+	{
+	iIsUtc = ETrue;
+	iTime = aTime;
+	this->AtUTC(aTime);
+	}
+
+
 // -----------------------------------------------------------------------------
 // CTimeOutTimer::RunL()
 // Called when operation completes.
@@ -70,7 +87,22 @@ void CTimeOutTimer::RunL()
     {
     // Timer request has completed, so notify the timer's owner
     // User::LeaveIfError( iStatus.Int() );
-    iNotify.TimerExpiredL( this );
+	TInt status = iStatus.Int();
+	if(status == KErrAbort)
+		{
+		//time sync has been performed, we must re-issue the request
+		if(iIsUtc)
+			{
+			this->AtUTC(iTime);
+			}
+		else 
+			this->At(iTime);
+		}
+	else
+		{
+		iNotify.TimerExpiredL( this );
+		}
     }
+ 
 
 // End of File

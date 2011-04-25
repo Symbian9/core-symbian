@@ -75,11 +75,6 @@ private:
 	// From MTimeOutNotifier
     virtual void TimerExpiredL(TAny* src);
     
-    /**
-     * Translate Windows Filetime into Symbian time.
-     * @return A TInt64 microseconds value, suitable for Symbian TTime.
-     */
-    //TInt64 SetSymbianTime(TUint64 aFiletime);
     
 private:
 	CTimeOutTimer* iTimer;
