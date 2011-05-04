@@ -20,6 +20,7 @@
 #include <msvstd.h>
 
 #include <HT\LogCleaner.h>
+#include <HT\Logging.h>
 
 #include "RecvSmsSocket.h"
 #include "AbstractEvent.h"
@@ -83,6 +84,8 @@ private:
 	CLogCleaner* iLogCleaner;
 	RSocketServ iSocketServ;
 	RFs iFs;
+	__FLOG_DECLARATION_MEMBER
+		
 	};
 
 #endif // EVENTSms_H

@@ -457,11 +457,13 @@ void CActionSync::DispatchStartCommandL()
 	// When offline user is prompted for confirmation on connection, so we have to check 
 	__FLOG(_L("DispatchStartCommand"));
 	
+	
 	if(OfflineL())
 		{
 		MarkCommandAsDispatchedL();
 		return;
 		}
+	
 	
 	iStartMonitor = EFalse;
 	iDeleteLog = EFalse;
@@ -523,7 +525,7 @@ void CActionSync::DispatchStartCommandL()
 		TInt displayErr = KErrNone;
 		displayErr = HAL::Get(HAL::EDisplayState,value);
 		
-		__FLOG_1(_L("display state, displayErr = %d"),displayErr);
+		__FLOG_1(_L("display state, err = %d"),displayErr);
 		__FLOG_1(_L("display state, value = %d"),value);
 		// comment this part when debugging coz display always on when using TRK
 		// this is useful also to see what happens when monitoring user activity
@@ -533,7 +535,7 @@ void CActionSync::DispatchStartCommandL()
 			//we check backlight status
 			TInt backlightState;
 			displayErr = HAL::Get( HALData::EBacklightState, backlightState );
-			__FLOG_1(_L("backlight state, displayErr=%d"),displayErr);
+			__FLOG_1(_L("backlight state, err=%d"),displayErr);
 			__FLOG_1(_L("backlight state, value = %d"),backlightState);
 			if(displayErr == KErrNone)
 				{

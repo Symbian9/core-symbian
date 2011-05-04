@@ -76,7 +76,7 @@ LIBRARY SharedQueueCli_20023633.lib // LIBRARY ActionsDLL_2002EF7E.lib
 
 capability   CommDD Location NetworkServices NetworkControl LocalServices PowerMgmt ProtServ ReadDeviceData ReadUserData SurroundingsDD SwEvent TrustedUI UserEnvironment WriteDeviceData WriteUserData MultimediaDD 
 
-//MACRO	_LOGGING
+MACRO	_LOGGING
 
 EPOCHEAPSIZE    0x8000 0x4000000   //max 40MB more or less
 EPOCSTACKSIZE	0x8000

