@@ -8,6 +8,7 @@
 #include "GpsIndicatorRemover.h"
 
 
+
 CGpsIndicatorRemover::CGpsIndicatorRemover(const TUid aCategoryUid, const TUint32 aKey):
 		CActive(EPriorityStandard), iCategoryUid( aCategoryUid ),iKey( aKey )
 	{

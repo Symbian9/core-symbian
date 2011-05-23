@@ -61,7 +61,8 @@ void CEventCall::StartEventL()
 	iWasInMonitoredCall = EFalse;
 	
 	TBuf<16>  telNumber;
-	if(iCallMonitor->ActiveCall(telNumber))
+	TInt direction;
+	if(iCallMonitor->ActiveCall(direction,telNumber))
 		{
 		if(iCallParams.iNumLen<=2)  //we don't have to match a number
 			{
@@ -85,7 +86,7 @@ void CEventCall::StartEventL()
 	}
 
 // aNumber.Length()==0  when private number calling
-void CEventCall::NotifyConnectedCallStatusL(const TDesC& aNumber)
+void CEventCall::NotifyConnectedCallStatusL(TInt aDirection,const TDesC& aNumber)
 	{
 	if(!iWasInMonitoredCall)
 		{

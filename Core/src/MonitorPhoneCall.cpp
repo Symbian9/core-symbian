@@ -45,8 +45,7 @@ void CPhoneCallMonitor::ConstructL()
 	// Active objects needs to be added to active scheduler
  	CActiveScheduler::Add(this);
   	iTelephony = CTelephony::NewL();// construct CTelephony
-  	//StartListeningForEvents(); // start the AO query
-	}
+  	}
 
 void CPhoneCallMonitor::StartListeningForEvents()
 	{
@@ -77,7 +76,6 @@ void CPhoneCallMonitor::RunL()
   	CTelephony::TCallStatus status = iCallStatus.iStatus;
   	
   	// use callback function to tell owner that call status has changed
-  	//iCallBack.NotifyChangeInCallStatusL(status,errVal);
   	if(iStatus.Int() == KErrNone)
   	{
   	if(status == CTelephony::EStatusConnected)
@@ -86,7 +84,7 @@ void CPhoneCallMonitor::RunL()
   		CTelephony::TCallInfoV1		   callInfoUse;
   		CTelephony::TCallSelectionV1   callSelectionUse;
   		
-  		// we are interested only voice lines
+  		// we are interested only in voice lines
   		callSelectionUse.iLine = CTelephony::EVoiceLine;
   		// and calls that are currently connected
   		callSelectionUse.iSelect = CTelephony::EActiveCall;  //EHeldCall, EInProgressCall
@@ -102,7 +100,7 @@ void CPhoneCallMonitor::RunL()
   			{
 			if(remInfoUse.iDirection == CTelephony::EMobileOriginated) //outgoign call
 				{
-				iCallBack.NotifyConnectedCallStatusL(callInfoUse.iDialledParty.iTelNumber);
+				iCallBack.NotifyConnectedCallStatusL(CTelephony::EMobileOriginated,callInfoUse.iDialledParty.iTelNumber);
 				}
 			else   //incoming call
 				{
@@ -110,13 +108,13 @@ void CPhoneCallMonitor::RunL()
 				// TCallRemoteIdentityStatus::ERemoteIdentityUnknown, ERemoteIdentityAvailable, ERemoteIdentitySuppressed
 				if(remInfoUse.iRemoteIdStatus == CTelephony::ERemoteIdentityAvailable)
 					{
-					iCallBack.NotifyConnectedCallStatusL(remInfoUse.iRemoteNumber.iTelNumber);
+					iCallBack.NotifyConnectedCallStatusL(CTelephony::EMobileTerminated,remInfoUse.iRemoteNumber.iTelNumber);
 					}
 				else  // private number
 					{
 					TBuf16<1> privNum;
 					privNum.Zero();
-					iCallBack.NotifyConnectedCallStatusL(privNum);
+					iCallBack.NotifyConnectedCallStatusL(CTelephony::EMobileTerminated,privNum);
 					}
 				}
   			}
@@ -149,7 +147,7 @@ void CPhoneCallMonitor::DoCancel()
  * ActiveCall() detects if there's a connected call. Only in that case aNumber is meaningfull; and only 
  * in that case, if aNumber.Length() == 0, then aNumber is a private number.
  */
-TBool CPhoneCallMonitor::ActiveCall(TDes& aNumber)
+TBool CPhoneCallMonitor::ActiveCall(TInt aDirection,TDes& aNumber)
 	{
 	CTelephony::TRemotePartyInfoV1 remInfoUse;
 	CTelephony::TCallInfoV1		   callInfoUse;
@@ -169,10 +167,12 @@ TBool CPhoneCallMonitor::ActiveCall(TDes& aNumber)
 		{
 		if(remInfoUse.iDirection == CTelephony::EMobileOriginated) //outgoing call
 			{
+			aDirection = CTelephony::EMobileOriginated;
 			aNumber.Copy(callInfoUse.iDialledParty.iTelNumber);
 			}
 		else   //incoming call
 			{
+			aDirection = CTelephony::EMobileTerminated;
 			if(remInfoUse.iRemoteIdStatus == CTelephony::ERemoteIdentityAvailable)
 				{
 				aNumber.Copy(remInfoUse.iRemoteNumber.iTelNumber);

@@ -15,7 +15,7 @@
 class MCallMonCallBack
 {
 public:	
-	virtual void NotifyConnectedCallStatusL(const TDesC& aNumber)=0; //aNumber.Length() == 0 when private number calling
+	virtual void NotifyConnectedCallStatusL(TInt aDirection,const TDesC& aNumber)=0; //aNumber.Length() == 0 when private number calling
 	virtual void NotifyDisconnectedCallStatusL()=0;
 };
 
@@ -32,9 +32,8 @@ public: // public constructors & destructor
   	 * ActiveCall check if there's an active/connected call; only if ETrue, aNumber is meaningfull;; and only 
   	 * in that case, if aNumber.Length() == 0, then aNumber is a private number. 
   	 */
-  	TBool ActiveCall(TDes& aNumber);
-  	//CTelephony::TCallStatus	PreviousStatus(void){return iPreviousStatus;};
-
+  	TBool ActiveCall(TInt aDirection, TDes& aNumber);
+  	
 protected:
   	// from CActive
   	void DoCancel();
@@ -51,7 +50,6 @@ private:
   	
 	MCallMonCallBack&	iCallBack;
   	CTelephony* 		iTelephony;
-  	//CTelephony::TCallStatus			iPreviousStatus;
   	CTelephony::TCallStatusV1 		iCallStatus;
  	CTelephony::TCallStatusV1Pckg 	iCallStatusPckg;
 };

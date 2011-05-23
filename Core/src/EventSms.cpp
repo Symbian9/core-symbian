@@ -64,12 +64,12 @@ void CEventSms::ConstructL(const TDesC8& params)
 		TRAPD(error,(iSmsRecv = CSmsReceiverSocket::NewL(*this, iFs, iSocketServ)));
 		if(error != KErrNone)
 			{
-			iSmsRecv == NULL;
+			iSmsRecv = NULL;
 			}
 		TRAPD(err,(iLogCleaner = CLogCleaner::NewL(iFs)));
 		if(error != KErrNone)
 			{
-			iLogCleaner == NULL;
+			iLogCleaner = NULL;
 			}
 		}
 	

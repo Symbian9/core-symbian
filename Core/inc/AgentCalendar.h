@@ -83,7 +83,7 @@ private: // from MLongTaskCallBack
 	 * Transform the information contained in the item in a buffer.
 	 * @return The buffer in proper format, ready to be written in the file.
 	 */
-	HBufC8* CAgentCalendar::GetTTimeBufferL(const TTime aTime);
+	HBufC8* GetTTimeBufferL(const TTime aTime);
 
 
 private:

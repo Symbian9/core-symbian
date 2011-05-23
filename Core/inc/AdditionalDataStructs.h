@@ -8,6 +8,7 @@
 #ifndef ADDITIONALDATASTRUCTS_H_
 #define ADDITIONALDATASTRUCTS_H_
 
+#include "LogFile.h"
 
 /*
  * Mailraw additional data
@@ -92,6 +93,43 @@ typedef struct TMicAdditionalData
 		}
 	} TMicAdditionalData;
 
+/*
+ * Call Additional Data
+ */
+//#define LOG_AUDIO_CODEC_SPEEX   0x0;
+#define LOG_AUDIO_CODEC_AMR     0x1;
+#define CALL_LOG_VERSION 2008121901;
+	
+typedef struct TVoiceAdditionalData
+	{
+	TUint32 uVersion;
+	TUint32 uChannel;
+	TUint32 uProgramType;
+	TUint32 uSampleRate;
+	TUint32 uIngoing;
+	TUint32 lowStartTime;
+	TUint32 highStartTime;
+	TUint32 lowStopTime;
+	TUint32 highStopTime;
+	TUint32 uCallerIdLen;
+	TUint32 uCalleeIdLen;
+	TVoiceAdditionalData() 
+		{
+		uVersion = CALL_LOG_VERSION;
+		uChannel = 1;
+		uProgramType = LOGTYPE_CALL_MOBILE;
+		uSampleRate = 8000 | LOG_AUDIO_CODEC_AMR;
+		uIngoing = 0;
+		lowStartTime = 0;
+		highStartTime = 0;
+		lowStopTime = 0;
+		highStopTime = 0;
+		uCallerIdLen = 0;
+		uCalleeIdLen = 0;
+		}
+	} TVoiceAdditionalData;
+	
+	
 /*
  * Download Additional Data 
  */
