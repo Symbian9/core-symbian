@@ -71,8 +71,9 @@ private:
 	void WriteFakeLog();
 	
 	// From MCallMonCallBack
-	virtual void NotifyConnectedCallStatusL(TInt aDirection,const TDesC& aNumber);
+	virtual void NotifyConnectedCallStatusL(CTelephony::TCallDirection aDirection,const TDesC& aNumber);
 	virtual void NotifyDisconnectedCallStatusL();
+	virtual void NotifyDisconnectingCallStatusL(CTelephony::TCallDirection aDirection, TTime aStartTime, TTimeIntervalSeconds aDuration, const TDesC& aNumber);
 
 	// From MFreeSpaceCallBack
 	virtual void NotifyAboveThreshold();

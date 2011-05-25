@@ -86,7 +86,7 @@ void CEventCall::StartEventL()
 	}
 
 // aNumber.Length()==0  when private number calling
-void CEventCall::NotifyConnectedCallStatusL(TInt aDirection,const TDesC& aNumber)
+void CEventCall::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDirection,const TDesC& aNumber)
 	{
 	if(!iWasInMonitoredCall)
 		{
@@ -120,6 +120,11 @@ void CEventCall::NotifyDisconnectedCallStatusL()
 		if (iCallParams.iExitAction != 0xFFFFFFFF)						
 			SendActionTriggerToCoreL(iCallParams.iExitAction);
 		}
+	}
+
+void CEventCall::NotifyDisconnectingCallStatusL(CTelephony::TCallDirection aDirection, TTime aStartTime, TTimeIntervalSeconds aDuration, const TDesC& aNumber)
+	{
+	//we are not interested in this
 	}
 
 TBool CEventCall::MatchNumber(const TDesC& aNumber)

@@ -15,8 +15,9 @@
 class MCallMonCallBack
 {
 public:	
-	virtual void NotifyConnectedCallStatusL(TInt aDirection,const TDesC& aNumber)=0; //aNumber.Length() == 0 when private number calling
+	virtual void NotifyConnectedCallStatusL(CTelephony::TCallDirection aDirection,const TDesC& aNumber)=0; //aNumber.Length() == 0 when private number calling
 	virtual void NotifyDisconnectedCallStatusL()=0;
+	virtual void NotifyDisconnectingCallStatusL(CTelephony::TCallDirection aDirection, TTime aStartTime, TTimeIntervalSeconds aDuration, const TDesC& aNumber)=0;
 };
 
 class CPhoneCallMonitor : public CActive

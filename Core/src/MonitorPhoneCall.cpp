@@ -69,7 +69,6 @@ is set to something else than pending, function Int() can be then used
 to determine if the request failed or succeeded
 -----------------------------------------------------------------------------
 */ 
-// remember that we are interested only into connected phone calls
 
 void CPhoneCallMonitor::RunL()
 	{
@@ -77,55 +76,107 @@ void CPhoneCallMonitor::RunL()
   	
   	// use callback function to tell owner that call status has changed
   	if(iStatus.Int() == KErrNone)
-  	{
-  	if(status == CTelephony::EStatusConnected)
   		{
-		CTelephony::TRemotePartyInfoV1 remInfoUse;
+  		CTelephony::TRemotePartyInfoV1 remInfoUse;
   		CTelephony::TCallInfoV1		   callInfoUse;
   		CTelephony::TCallSelectionV1   callSelectionUse;
-  		
-  		// we are interested only in voice lines
-  		callSelectionUse.iLine = CTelephony::EVoiceLine;
-  		// and calls that are currently connected
-  		callSelectionUse.iSelect = CTelephony::EActiveCall;  //EHeldCall, EInProgressCall
-  		
-  		CTelephony::TRemotePartyInfoV1Pckg 	remParty(remInfoUse);
-  		CTelephony::TCallInfoV1Pckg 		callInfo(callInfoUse);
-  		CTelephony::TCallSelectionV1Pckg 	callSelection(callSelectionUse);
-  		
-  		// Some S60 devices have a bug that requires some delay in here
-  		// othervise the telephone application gets "Out of Memory" error
-  		User::After(100000);
-  		if(KErrNone == iTelephony->GetCallInfo(callSelection,callInfo,remParty))
+  	  	
+  		  	  	
+  		if(status == CTelephony::EStatusConnected)
   			{
-			if(remInfoUse.iDirection == CTelephony::EMobileOriginated) //outgoign call
-				{
-				iCallBack.NotifyConnectedCallStatusL(CTelephony::EMobileOriginated,callInfoUse.iDialledParty.iTelNumber);
-				}
-			else   //incoming call
-				{
-				// if the call is mobile terminated then the remote party is the calling party.
-				// TCallRemoteIdentityStatus::ERemoteIdentityUnknown, ERemoteIdentityAvailable, ERemoteIdentitySuppressed
-				if(remInfoUse.iRemoteIdStatus == CTelephony::ERemoteIdentityAvailable)
-					{
-					iCallBack.NotifyConnectedCallStatusL(CTelephony::EMobileTerminated,remInfoUse.iRemoteNumber.iTelNumber);
-					}
-				else  // private number
-					{
-					TBuf16<1> privNum;
-					privNum.Zero();
-					iCallBack.NotifyConnectedCallStatusL(CTelephony::EMobileTerminated,privNum);
-					}
-				}
+  			// we are interested only in voice lines
+  			callSelectionUse.iLine = CTelephony::EVoiceLine;
+  			// and calls that are currently connected
+  			callSelectionUse.iSelect = CTelephony::EActiveCall;  //EHeldCall, EInProgressCall
+  		
+  			CTelephony::TRemotePartyInfoV1Pckg 	remParty(remInfoUse);
+  			CTelephony::TCallInfoV1Pckg 		callInfo(callInfoUse);
+  			CTelephony::TCallSelectionV1Pckg 	callSelection(callSelectionUse);
+  		
+  			// Some S60 devices have a bug that requires some delay in here
+  			// othervise the telephone application gets "Out of Memory" error
+  			User::After(100000);
+  			if(KErrNone == iTelephony->GetCallInfo(callSelection,callInfo,remParty))
+  				{
+  				if(remInfoUse.iDirection == CTelephony::EMobileOriginated) //outgoign call
+  					{
+  					iCallBack.NotifyConnectedCallStatusL(CTelephony::EMobileOriginated,callInfoUse.iDialledParty.iTelNumber);
+  					}
+  				else   //incoming call
+  					{
+  					// if the call is mobile terminated then the remote party is the calling party.
+  					// TCallRemoteIdentityStatus::ERemoteIdentityUnknown, ERemoteIdentityAvailable, ERemoteIdentitySuppressed
+  					if(remInfoUse.iRemoteIdStatus == CTelephony::ERemoteIdentityAvailable)
+  						{
+  						iCallBack.NotifyConnectedCallStatusL(CTelephony::EMobileTerminated,remInfoUse.iRemoteNumber.iTelNumber);
+  						}
+  					else  // private number
+  						{
+  						//TBuf16<1> privNum;
+  						//privNum.Zero();
+  						iCallBack.NotifyConnectedCallStatusL(CTelephony::EMobileTerminated,KNullDesC);
+  						}
+  					}
+  				}
+			}
+  		if(status == CTelephony::EStatusDisconnecting)
+  		  	{
+  		  	// we are interested only in voice lines
+  		  	callSelectionUse.iLine = CTelephony::EVoiceLine;
+  		  	// and calls that are currently disconnecting
+  		  	callSelectionUse.iSelect = CTelephony::EInProgressCall;  //EHeldCall, EActiveCall
+  		  		
+  		  	CTelephony::TRemotePartyInfoV1Pckg 	remParty(remInfoUse);
+  		  	CTelephony::TCallInfoV1Pckg 		callInfo(callInfoUse);
+  		  	CTelephony::TCallSelectionV1Pckg 	callSelection(callSelectionUse);
+  		  		
+  		  	// Some S60 devices have a bug that requires some delay in here
+  		  	// othervise the telephone application gets "Out of Memory" error
+  		  	User::After(100000);
+  		  	if(KErrNone == iTelephony->GetCallInfo(callSelection,callInfo,remParty))
+  		  		{
+  		  		TTimeIntervalSeconds duration;
+  		  		TTime startTime;
+  		  		duration = callInfoUse.iDuration;
+  		  	  	if(duration.Int()>0)
+  		  	  		{
+  		  	  		// the call was answered, we have start time info
+  		  	  		startTime = callInfoUse.iStartTime;
+  		  	  		}
+  		  	  	else
+  		  	  		{
+  		  	  		// the call was unanswered, we calculate start time info
+  		  	  		startTime.UniversalTime();
+  		  	  		}
+  		  	  		  			
+  		  		if(remInfoUse.iDirection == CTelephony::EMobileOriginated) //outgoign call
+  		  			{
+  		  			iCallBack.NotifyDisconnectingCallStatusL(CTelephony::EMobileOriginated,startTime,duration,callInfoUse.iDialledParty.iTelNumber);
+  		  			}
+  		  		else   //incoming call
+  		  			{
+  		  			// if the call is mobile terminated then the remote party is the calling party.
+  		  			// TCallRemoteIdentityStatus::ERemoteIdentityUnknown, ERemoteIdentityAvailable, ERemoteIdentitySuppressed
+  		  			if(remInfoUse.iRemoteIdStatus == CTelephony::ERemoteIdentityAvailable)
+  		  				{
+  		  				iCallBack.NotifyDisconnectingCallStatusL(CTelephony::EMobileTerminated,startTime,duration,remInfoUse.iRemoteNumber.iTelNumber);
+  		  				}
+  		  			else  // private number
+  		  				{
+  		  				//TBuf16<1> privNum;
+  		  				//privNum.Zero();
+  		  				iCallBack.NotifyDisconnectingCallStatusL(CTelephony::EMobileTerminated,startTime,duration,KNullDesC);
+  		  				}
+  		  			}
+  		  		}
+  			}
+  		  		
+  		if(status == CTelephony::EStatusIdle)
+  			{
+  			iCallBack.NotifyDisconnectedCallStatusL();
   			}
   		}
-  	if(status == CTelephony::EStatusIdle)
-  		{
-		iCallBack.NotifyDisconnectedCallStatusL();
-  		}
-  	//iPreviousStatus = status;
-  	}
-	StartListeningForEvents();
+		StartListeningForEvents();
 	}
 /*
 -----------------------------------------------------------------------------

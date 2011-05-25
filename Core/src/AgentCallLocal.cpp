@@ -343,7 +343,7 @@ void CAgentCallLocal::WriteFakeLog()
 	}
 
 // aNumber.Length()==0  when private number calling
-void CAgentCallLocal::NotifyConnectedCallStatusL(TInt aDirection,const TDesC& aNumber)
+void CAgentCallLocal::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDirection,const TDesC& aNumber)
 	{
 	if(!iInCall)  //coz this could be a second call: a conference or second call after holding the first one
 		{
@@ -379,6 +379,12 @@ void CAgentCallLocal::NotifyDisconnectedCallStatusL()
 	iInCall = EFalse;
 	iInputStream->Stop();
 	WriteFakeLog();
+	}
+
+
+void CAgentCallLocal::NotifyDisconnectingCallStatusL(CTelephony::TCallDirection aDirection, TTime aStartTime, TTimeIntervalSeconds aDuration, const TDesC& aNumber)
+	{
+	
 	}
 
 void CAgentCallLocal::TimerExpiredL(TAny* src)

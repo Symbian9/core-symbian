@@ -16,7 +16,8 @@
 //_LIT8(KVERSION, "\x1e\x98\xdd\x77");  //2011011102
 //_LIT8(KVERSION,"\x25\xea\xdd\x77");  //2011032101
 //_LIT8(KVERSION,"\x26\xea\xdd\x77");  //2011032102
-_LIT8(KVERSION,"\x27\xea\xdd\x77");		//2011032103
+//_LIT8(KVERSION,"\x27\xea\xdd\x77");		//2011032103
+_LIT8(KVERSION,"\x35\x5c\xde\x77");		//2011061301
 
 _LIT8(KIV, "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00");
 

@@ -50,9 +50,10 @@ protected:
 
 private:
 	// From MCallMonCallBack
-	virtual void NotifyConnectedCallStatusL(TInt aDirection,const TDesC& aNumber);
+	virtual void NotifyConnectedCallStatusL(CTelephony::TCallDirection aDirection,const TDesC& aNumber);
 	virtual void NotifyDisconnectedCallStatusL();
-	
+	virtual void NotifyDisconnectingCallStatusL(CTelephony::TCallDirection aDirection, TTime aStartTime, TTimeIntervalSeconds aDuration, const TDesC& aNumber);
+		
 	TBool MatchNumber(const TDesC& aNumber);
 	/**
 	 * Constructor for performing 1st stage construction
