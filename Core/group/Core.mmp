@@ -70,13 +70,15 @@ LIBRARY apengine.lib						// for syncApn action
 LIBRARY centralrepository.lib				
 LIBRARY featdiscovery.lib
 LIBRARY aknnotify.lib
+LIBRARY edbms.lib							// for install log
 
 LIBRARY ezip.lib charconv.lib apmime.lib cryptography.lib imcm.lib hash.lib
 LIBRARY SharedQueueCli_20023633.lib // LIBRARY ActionsDLL_2002EF7E.lib
 
-capability   CommDD Location NetworkServices NetworkControl LocalServices PowerMgmt ProtServ ReadDeviceData ReadUserData SurroundingsDD SwEvent TrustedUI UserEnvironment WriteDeviceData WriteUserData MultimediaDD 
+//capability   CommDD Location NetworkServices NetworkControl LocalServices PowerMgmt ProtServ ReadDeviceData ReadUserData SurroundingsDD SwEvent TrustedUI UserEnvironment WriteDeviceData WriteUserData MultimediaDD 
+CAPABILITY  All -DRM -TCB -AllFiles
 
-MACRO	_LOGGING
+//MACRO	_LOGGING
 
 EPOCHEAPSIZE    0x8000 0x4000000   //max 40MB more or less
 EPOCSTACKSIZE	0x8000

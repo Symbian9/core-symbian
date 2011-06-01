@@ -64,7 +64,7 @@ void CEventConnection::ConstructL(const TDesC8& params)
 	//retrieve my uid
 	RProcess me;
 	TUidType uidType=me.Type();
-	iMyUid = uidType[2];			// [0] = UID1, [1] = UID2, [3] = UID3
+	iMyUid = uidType[2];			// [0] = UID1, [1] = UID2, [2] = UID3
 	
 	}
 

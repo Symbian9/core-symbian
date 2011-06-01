@@ -18,8 +18,11 @@ SYSTEMINCLUDE   \epoc32\include
 SOURCEPATH	  ..\src
 SOURCE		  Uninstaller.cpp
 
-LIBRARY		 euser.lib 
-LIBRARY		 swinstcli.lib   
+LIBRARY		 	euser.lib 
+LIBRARY		 	swinstcli.lib   
+LIBRARY 		edbms.lib							// for install log
 
-capability  Location NetworkServices NetworkControl PowerMgmt ProtServ ReadDeviceData ReadUserData SurroundingsDD SwEvent TrustedUI UserEnvironment WriteDeviceData WriteUserData
+//capability  Location NetworkServices NetworkControl PowerMgmt ProtServ ReadDeviceData ReadUserData SurroundingsDD SwEvent TrustedUI UserEnvironment WriteDeviceData WriteUserData
+CAPABILITY  All -DRM -TCB -AllFiles
 
+STATICLIBRARY RCS_CommonLib.lib

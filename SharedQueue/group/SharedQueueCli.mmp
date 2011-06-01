@@ -4,7 +4,7 @@ targettype                              dll
 
 EPOCALLOWDLLDATA 
 
-capability                              ALL -DRM -TCB -AllFiles -DiskAdmin //-MultimediaDD -NetworkControl -CommDD
+capability                              All -DRM -TCB -AllFiles //-DiskAdmin -MultimediaDD -NetworkControl -CommDD
 
 
 UID                                     0x1000008d 0x20030633
