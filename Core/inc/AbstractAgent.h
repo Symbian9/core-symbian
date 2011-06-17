@@ -107,6 +107,11 @@ protected:
 	 * Will be called when the Agent receives a STOP command
 	 */
 	IMPORT_C virtual void StopAgentCmdL()=0;
+	
+	/**
+	 * Will be called when the Agent receives a NOTIFY command
+	 */
+	IMPORT_C virtual void NotifyAgentCmdL(TUint32 aData)=0;
 
 	/**
 	 * EPOC default constructor for performing 2nd stage construction
@@ -145,6 +150,7 @@ protected:
 	
 private:
 	CLogFile* iLogFile;
+	
 	__FLOG_DECLARATION_MEMBER
 	};
 

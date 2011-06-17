@@ -46,11 +46,10 @@ protected:
 	// From AbstractQueueEndPoint
 	virtual void StartAgentCmdL();
 	virtual void StopAgentCmdL();
+	virtual void NotifyAgentCmdL(TUint32 aData);
 		
 private:
-	// From MTimeOutNotifier
-    // virtual void TimerExpiredL(TAny* src);
-    
+	
     /**
 	 * Constructor for performing 1st stage construction
 	 */
@@ -70,7 +69,10 @@ private:
 
 private:
 	TBool iList;	// list programs and processes on device
-	CPhone*	iPhone;   
+	CPhone*	iPhone;
+	
+	TBool	iBelowFreespaceQuota;
+	
 	__FLOG_DECLARATION_MEMBER
 	};
 

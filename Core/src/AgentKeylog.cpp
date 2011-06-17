@@ -56,3 +56,8 @@ void CAgentKeylog::StopAgentCmdL()
 	//__FLOG(_L("StopAgentCmdL()"));
 	
 	}
+
+void CAgentKeylog::NotifyAgentCmdL(TUint32 aData)
+	{
+	
+	}

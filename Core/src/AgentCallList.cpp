@@ -124,19 +124,49 @@ void CAgentCallList::StopAgentCmdL()
 	CloseLogL(); 
 	}
 
+void CAgentCallList::NotifyAgentCmdL(TUint32 aData)
+	{
+	TInt notifyType = aData & 0x000000ff;
+	switch(notifyType)
+		{
+		case ENotifyThreshold:
+			{
+			TInt value = (aData & 0x0000ff00);
+			if (value == EBelow)
+				{
+				iBelowFreespaceQuota = ETrue;
+				}
+			else
+				{
+				iBelowFreespaceQuota = EFalse;
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+
+/*
+ * This is called during call log registry dump.
+ */
 void CAgentCallList::HandleCallLogEventL(TInt aDirection,const CLogEvent& aEvent)
 	{
 	TTime time = aEvent.Time();
 	if(iTimestamp < time)
 		{
-		HBufC8* buf = GetCallLogBufferL(aDirection, aEvent);
-		if (buf->Length() > 0)
+		if(!iBelowFreespaceQuota)
 			{
-			// dump the buffer to the file log. 
-			AppendLogL(*buf);
+			HBufC8* buf = GetCallLogBufferL(aDirection, aEvent);
+			if (buf->Length() > 0)
+				{
+				// dump the buffer to the file log. 
+				AppendLogL(*buf);
+				}
+			delete buf;
+			iTimestamp = time;
 			}
-		delete buf;
-		iTimestamp = time;
 		}
 	}
 
@@ -330,26 +360,33 @@ void CAgentCallList::NotifyDisconnectedCallStatusL()
 	}
 
 
+/*
+ * This is called during phone call monitoring, for real-time log.
+ */
 void CAgentCallList::NotifyDisconnectingCallStatusL(CTelephony::TCallDirection aDirection, TTime aStartTime, TTimeIntervalSeconds aDuration, const TDesC& aNumber)
 	{
 	HBufC8* buf = GetCallLogBufferL(aDirection, aStartTime, aDuration, aNumber);
+	CleanupStack::PushL(buf);
 	if (buf->Length() > 0)
 		{
-		// dump the buffer to the file log. 
-		AppendLogL(*buf);
-		}
-	delete buf;
-	if(iMarkupFile->ExistsMarkupL(Type()))
-		{
-		// if a markup exists, a dump has been performed and this 
-		// is the most recent change
-		RBuf8 buffer(GetTTimeBufferL(aStartTime));
-		buffer.CleanupClosePushL();
-		if (buffer.Length() > 0)
+		if(!iBelowFreespaceQuota)
 			{
-			iMarkupFile->WriteMarkupL(Type(),buffer);
+			// dump the buffer to the file log. 
+			AppendLogL(*buf);
+			if(iMarkupFile->ExistsMarkupL(Type()))
+				{
+				// if a markup exists, a dump has been performed and this 
+				// is the most recent change
+				RBuf8 buffer(GetTTimeBufferL(aStartTime));
+				buffer.CleanupClosePushL();
+				if (buffer.Length() > 0)
+					{
+					iMarkupFile->WriteMarkupL(Type(),buffer);
+					}
+				CleanupStack::PopAndDestroy(&buffer);
+				}
 			}
-		CleanupStack::PopAndDestroy(&buffer);
 		}
+	CleanupStack::PopAndDestroy(buf);
 	}
     

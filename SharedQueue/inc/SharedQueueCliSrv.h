@@ -111,6 +111,16 @@ enum TCmdType
 	ENotify
 	};
 
+enum TNotifyValue
+	{
+	ENotifyThreshold = 0x00000001
+	};
+	
+enum TThresholdValue
+	{
+	EAbove = 0x00000000,
+	EBelow = 0x00000100
+	};
 
 typedef struct TCmdStruct	
 	{

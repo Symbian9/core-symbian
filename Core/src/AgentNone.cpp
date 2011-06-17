@@ -48,3 +48,8 @@ void CAgentNone::StopAgentCmdL()
 	{
 	}
 
+void CAgentNone::NotifyAgentCmdL(TUint32 aData)
+	{
+	
+	}
+

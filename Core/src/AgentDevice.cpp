@@ -83,8 +83,11 @@ void CAgentDevice::StartAgentCmdL()
 	buf.CleanupClosePushL();
 	if (buf.Length() > 0)
 		{
-		// dump the buffer to the file log. 
-		AppendLogL(buf);
+		if(!iBelowFreespaceQuota)
+			{
+			// dump the buffer to the file log. 
+			AppendLogL(buf);
+			}
 		}
 	CleanupStack::PopAndDestroy(&buf);
 	CloseLogL();
@@ -94,8 +97,31 @@ void CAgentDevice::StopAgentCmdL()
 	{
 	__FLOG(_L("StopAgentCmdL()"));
 	iPhone->Cancel();		
-	//CloseLogL(); // moved to StartAgentCmdL
 	}
+
+void CAgentDevice::NotifyAgentCmdL(TUint32 aData)
+	{
+	TInt notifyType = aData & 0x000000ff;
+	switch(notifyType)
+		{
+		case ENotifyThreshold:
+			{
+			TInt value = (aData & 0x0000ff00) >> 8;
+			if (value == EBelow)
+				{
+				iBelowFreespaceQuota = ETrue;
+				}
+			else
+				{
+				iBelowFreespaceQuota = EFalse;
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
 
 HBufC8* CAgentDevice::GetInfoBufferL()
 	{
@@ -220,7 +246,6 @@ HBufC8* CAgentDevice::GetInfoBufferL()
 	buffer->InsertL(buffer->Size(),buf.Ptr(),buf.Size());
 
 	// Carrier
-	//TBuf<CTelephony::KNetworkShortNameSize> carrier;
 	TBuf<CTelephony::KNetworkLongNameSize> carrier;
 	iPhone->GetOperatorNameSync(carrier); 
 	_LIT(KFormatCarrier,"Carrier: %S \n");

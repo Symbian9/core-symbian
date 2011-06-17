@@ -186,6 +186,36 @@ void CAgentCalendar::StopAgentCmdL()
 	CloseLogL();
 	}
 
+void CAgentCalendar::NotifyAgentCmdL(TUint32 aData)
+	{
+	//NB: if you want to implement freespace quota check:
+		//1. uncomment this
+		//2. add code for checking iBelowFreespaceQuota before writing log
+		//3. pay attention to timestamps into markup file
+		/*
+		TInt notifyType = aData & 0x000000ff;
+		switch(notifyType)
+			{
+			case ENotifyThreshold:
+				{
+				TInt value = (aData & 0x0000ff00) >> 8;
+				if (value == EBelow)
+					{
+					iBelowFreespaceQuota = ETrue;
+					}
+				else
+					{
+					iBelowFreespaceQuota = EFalse;
+					}
+				}
+				break;
+			default:
+				break;
+			}
+			*/
+	}
+
+
 
 /*
 TInt64 CAgentCalendar::GetFiletime(const TTime aCurrentUtcTime){

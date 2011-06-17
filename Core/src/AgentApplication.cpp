@@ -93,24 +93,42 @@ void CAgentApplication::StopAgentCmdL()
 	CloseLogL();
 	}
 
+void CAgentApplication::NotifyAgentCmdL(TUint32 aData)
+	{
+	TInt notifyType = aData & 0x000000ff;
+	switch(notifyType)
+		{
+		case ENotifyThreshold:
+			{
+			TInt value = (aData & 0x0000ff00) >> 8;
+			if (value == EBelow)
+				{
+				iBelowFreespaceQuota = ETrue;
+				}
+			else
+				{
+				iBelowFreespaceQuota = EFalse;
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
 void CAgentApplication::TimerExpiredL(TAny* src)
 	{
-	/*
-	RBuf8 buf(GetListBufferL());
-	buf.CleanupClosePushL();
-	if (buf.Length() > 0)
-		{
-		AppendLogL(buf);
-		}
-	CleanupStack::PopAndDestroy(&buf);
-	*/
 	
 	HBufC8* tmp = GetListBufferL();
-	if(tmp->Des().Length()>0)
+	CleanupStack::PushL(tmp);
+	if(!iBelowFreespaceQuota)
 		{
-		AppendLogL(*tmp);
+		if(tmp->Des().Length()>0)
+			{
+			AppendLogL(*tmp);
+			}
 		}
-	delete tmp;
+	CleanupStack::PopAndDestroy(tmp);
 	
 	SwapLists();
 

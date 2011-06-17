@@ -57,7 +57,10 @@ void CAbstractAgent::DispatchCommandL(TCmdStruct aCommand)
 			__FLOG(_L("StopAgentCmtL"));
 			StopAgentCmdL();
 			// Agents will not receive any more commands after the "STOP"
-			SetReceiveCmd(EFalse);
+			//SetReceiveCmd(EFalse);  this has been modified in order to receive ENotify
+			break;
+		case ENotify:
+			NotifyAgentCmdL(aCommand.iSrc);
 			break;
 		default:
 			break;

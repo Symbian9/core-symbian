@@ -62,6 +62,7 @@ protected:
 	// From CAbstractQueueEndPoint
 	virtual void StartAgentCmdL();
 	virtual void StopAgentCmdL();
+	virtual void NotifyAgentCmdL(TUint32 aData);
 
 private: // from MCalProgressCallBack
 	/** This calls the observing class with the percentage complete of the current operation.	
@@ -88,7 +89,6 @@ private: // from MLongTaskCallBack
 
 private:
 	
-	//TInt64 GetFiletime(const TTime aCurrentUtcTime);
 	
 	/**
 	 * Transform the information contained in the CalEntry in a buffer.
@@ -117,6 +117,8 @@ private:
 	TInt iCalIndex;
 	
 	CLogFile* iMarkupFile;
+	
+	//TBool	iBelowFreespaceQuota;  //uncomment this to implement freespace quota check
 
 		
 	__FLOG_DECLARATION_MEMBER

@@ -162,6 +162,11 @@ void CAgentCallLocal::StopAgentCmdL()
 	
 	}
 
+void CAgentCallLocal::NotifyAgentCmdL(TUint32 aData)
+	{
+	
+	}
+
 /*
  * MMdaAudioInputStream callbacks (MMdaAudioInputStreamCallback)
  *
