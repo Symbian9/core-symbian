@@ -117,7 +117,7 @@ private:
 	TTime iTimestamp;		// used for markup
 	CLogFile* iMarkupFile;
 	
-	//TBool   iBelowFreespaceQuota;   //uncomment this to enable freespace quota check
+	TBool   iBelowFreespaceQuota;   
 	
 	__FLOG_DECLARATION_MEMBER
 	};

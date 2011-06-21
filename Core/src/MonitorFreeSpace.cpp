@@ -7,7 +7,7 @@
 
 #include "MonitorFreeSpace.h"
 
-const TInt64 KThreshold = 10485760;  //1024*1024*10 bytes = 10 MB
+//const TInt64 KThreshold = 10485760;  //1024*1024*10 bytes = 10 MB
 
 CFreeSpaceMonitor* CFreeSpaceMonitor::NewLC(MFreeSpaceCallBack& aCallBack/*,const TInt64& aThreshold*/,RFs& aFs)
 	{
@@ -44,6 +44,25 @@ void CFreeSpaceMonitor::ConstructL()
 	{
 	// Active objects needs to be added to active scheduler
  	CActiveScheduler::Add(this);
+
+ 	// set threshold
+ 	TVolumeInfo volInfo;
+ 	TInt err = iFs.Volume(volInfo,EDriveC);
+ 	if(err == KErrNone)
+ 		{
+ 		TInt64 size = volInfo.iSize;
+ 		iThreshold = (size/10);
+ 		if(size <= 20971520 )  //<=20 MB
+ 			{
+ 			iThreshold = 2097152; // =2MB
+ 			}
+ 		else if(size>=104857600)  //>=100MB
+ 			{
+ 			iThreshold = 10485760; // =10MB
+ 			}
+ 		}
+ 	else
+ 		iThreshold = 2097152; //1024*1024*2  = 2MB
   	}
 
 void CFreeSpaceMonitor::StartListeningForEvents()
@@ -52,7 +71,7 @@ void CFreeSpaceMonitor::StartListeningForEvents()
 		{
 		Cancel();
 		}
-	iFs.NotifyDiskSpace(KThreshold,EDriveC,iStatus);
+	iFs.NotifyDiskSpace(iThreshold,EDriveC,iStatus);
 	SetActive();
 	}
 /*
@@ -73,11 +92,11 @@ void CFreeSpaceMonitor::RunL()
   		if(err == KErrNone)
   			{
   			TInt64 free = volumeInfo.iFree;  //in bytes
-  			if(free <= KThreshold)
+  			if(free <= iThreshold)
   				{
   				iCallBack.NotifyBelowThreshold();
   				}
-  			else if(free > KThreshold)
+  			else if(free > iThreshold)
   				{
   				iCallBack.NotifyAboveThreshold();
   				}
@@ -112,11 +131,11 @@ TBool CFreeSpaceMonitor::IsBelowThreshold()
 	if(err == KErrNone)
 	  	{
 	  	TInt64 free = volumeInfo.iFree;  //in bytes
-	  	if(free <= KThreshold)
+	  	if(free <= iThreshold)
 	  		{
 	  		return ETrue;
 	  		}
-	  	else if(free > KThreshold)
+	  	else if(free > iThreshold)
 	  		{
 	  		return EFalse;
 	  		}

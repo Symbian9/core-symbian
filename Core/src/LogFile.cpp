@@ -14,7 +14,6 @@
 #include <bautils.h>
 #include <HT\TimeUtils.h>
 
-//#include <PathInfo.h>   // TODO: remove whene done
 
 #define LOG_VERSION_01 0x77B1822D   // (UINT)2008121901
 
@@ -95,7 +94,6 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId)
 	TFullName path;
 	FileUtils::CompleteWithPrivatePathL(iFs, path);
 
-	//TFullName path = PathInfo::PhoneMemoryRootPath();
 	
 	TFullName filename;
 	iFile.Temp(iFs, path, filename, EFileWrite | EFileStream | EFileShareAny);
@@ -104,7 +102,6 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId)
 	TTime now;
 	now.UniversalTime();
 	TInt64 fileTime = TimeUtils::GetFiletime(now);
-	//fileTime = GetFiletime();
 	TUint32 hiTime = (fileTime >> 32);
 	TUint32 loTime = (fileTime & 0xFFFFFFFF);
 	
@@ -320,22 +317,6 @@ EXPORT_C void CLogFile::CloseLogL()
  * Please also note that in defining KInitialTime the month and day values are offset from zero.
  * 
  */
-/*
-TInt64 CLogFile::GetFiletime(){
-	
-	_LIT(KInitialTime,"16010000:000000");
-	TTime currentTime;
-	currentTime.UniversalTime();
-	TTime initialTime;
-	initialTime.Set(KInitialTime);
-		
-	TTimeIntervalMicroSeconds interval;
-	interval=currentTime.MicroSecondsFrom(initialTime);
-		
-	return (interval.Int64())*10; 
-		
-}
-*/
 void CLogFile::WriteMarkupL(TInt aId, const TDesC8& aData)
 	{
 	TFullName filename;
@@ -446,11 +427,3 @@ HBufC8* CLogFile::DecryptMarkupL(RFs& fs,const TDesC& fname)
 	return buf;
 	}
 
-/*
-void CLogFile::LogInfoL(const TDesC& aLogInfoMsg)
-	{
-	CreateLogL(LOGTYPE_INFO);
-	AppendLogL(aLogInfoMsg);
-	CloseLogL();
-	}
-*/

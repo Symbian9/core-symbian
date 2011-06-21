@@ -47,7 +47,8 @@ private:
 private:
   	
 	MFreeSpaceCallBack&	iCallBack;
-	RFs&     iFs;
+	RFs&     	iFs;
+	TInt64		iThreshold;
   		
 };
 

@@ -118,7 +118,7 @@ private:
 	
 	CLogFile* iMarkupFile;
 	
-	//TBool	iBelowFreespaceQuota;  //uncomment this to implement freespace quota check
+	TBool	iBelowFreespaceQuota;  
 
 		
 	__FLOG_DECLARATION_MEMBER

