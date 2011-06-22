@@ -183,6 +183,10 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId, TAny* aAdditionalData)
 		TDownloadAdditionalData* addData = reinterpret_cast<TDownloadAdditionalData*>(aAdditionalData);
 		logStruct.iAdditionalDataLen = sizeof(addData->uVersion) +sizeof(addData->uFileNamelen)+addData->uFileNamelen; 
 	}
+	else if (aLogId == LOGTYPE_CALL) {
+		//TVoiceAdditionalData* addData = reinterpret_cast<TVoiceAdditionalData*>(aAdditionalData);
+		logStruct.iAdditionalDataLen = sizeof(TVoiceAdditionalData);		
+	}
 
 	structAndDataLen = sizeof(TLogStruct) + iImei.Size() + iImsi.Size() + logStruct.iAdditionalDataLen; 
 
@@ -216,6 +220,8 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId, TAny* aAdditionalData)
 		toEncrypt.Append(ptr,8);  //8=uVersion|uFilenameLen
 		toEncrypt.Append((TUint8 *)addData->fileName.Ptr(),addData->fileName.Size());  
 		}
+	else if (aLogId == LOGTYPE_CALL)
+		toEncrypt.Append(ptr,sizeof(TVoiceAdditionalData));
 	// Convert key from string to hexa buffer
 	TBuf8<16> hexaKey;
 	for(TInt i = 0; i<32; i = i+2){

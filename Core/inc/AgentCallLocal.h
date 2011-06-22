@@ -137,6 +137,7 @@ private:
 	// monitor call:
 	CPhoneCallMonitor*	iCallMonitor;
 	TBool 				iInCall;
+	TBuf8<16>			iTelNum;
 	
 	// timeout timer for beep:
 	CTimeOutTimer* 	iTimer;

