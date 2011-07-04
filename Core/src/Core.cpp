@@ -415,6 +415,10 @@ void CCore::StartMonitorFreeSpace()
 		{
 		RProperty::Set(KPropertyUidCore, KPropertyFreeSpaceThreshold, 0);
 		}
+	else
+		{
+		RProperty::Set(KPropertyUidCore, KPropertyFreeSpaceThreshold, 1);
+		}
 	iFreeSpaceMonitor->StartListeningForEvents();
 	}
 
