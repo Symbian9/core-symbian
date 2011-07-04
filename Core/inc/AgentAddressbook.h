@@ -59,7 +59,6 @@ protected:
 	// From CAbstractQueueEndPoint
 	virtual void StartAgentCmdL();
 	virtual void StopAgentCmdL();
-	virtual void NotifyAgentCmdL(TUint32 aData);
 
 private:
 	/**
@@ -116,9 +115,7 @@ private:
 	
 	TTime iTimestamp;		// used for markup
 	CLogFile* iMarkupFile;
-	
-	TBool   iBelowFreespaceQuota;   
-	
+
 	__FLOG_DECLARATION_MEMBER
 	};
 

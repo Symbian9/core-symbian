@@ -124,33 +124,7 @@ void CCallLogReader::RunL()
             		   }
             	   
                    iCallBack.HandleCallLogEventL(callDirection, iLogView->Event());
-                   /*
-                   TBuf<48> description;
-                   description.Copy(iLogView->Event().Description());
-                   TUid eventType = iLogView->Event().EventType();
-                   //if(eventType == KLogPacketDataEventTypeUid)
-                   if(eventType == KLogCallEventTypeUid)
-                	   {
-					   TInt a = 1;
-                	   }
-                   TBuf<48> subject;
-                   subject.Copy(iLogView->Event().Subject());
-                   TBuf<48> data;
-                   data.Copy(iLogView->Event().Data());
-                   TUint32 duration = iLogView->Event().Duration();  // expressed in seconds
-                   TBuf<48> number;
-                   number.Copy(iLogView->Event().Number());
-                   TBuf<48> remote;
-                   remote.Copy(iLogView->Event().RemoteParty());
-                   TBuf<48> direction;
-                   direction.Copy(iLogView->Event().Direction());
-                   iEngineState = EReadingEntries;
-                   */
-                   /*
-                   iEngineState = EDeletingEntry;
-                   iLogClient->DeleteEvent(iLogView->Event().Id(),iStatus);
-                   SetActive();
-                   */
+                   
                    iEngineState = EReadingEntries;
                    if(iLogView->PreviousL(iStatus))
                        SetActive();

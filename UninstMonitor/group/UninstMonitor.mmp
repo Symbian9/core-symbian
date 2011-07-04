@@ -9,9 +9,10 @@
 
 TARGET		  UninstMonitor.exe
 TARGETTYPE	  exe
-UID			 0 0x200316ED
+UID			 0 0x2000c83e
 
 USERINCLUDE	 ..\inc
+USERINCLUDE  ..\..\Core\inc
 SYSTEMINCLUDE   \epoc32\include
 
 SOURCEPATH	  ..\src

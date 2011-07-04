@@ -45,7 +45,6 @@ public:
 protected:
 	virtual void StartAgentCmdL();
 	virtual void StopAgentCmdL();
-	virtual void NotifyAgentCmdL(TUint32 aData);
 
 private:
 

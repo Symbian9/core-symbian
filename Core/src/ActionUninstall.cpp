@@ -12,6 +12,7 @@
 #include <swinstdefs.h>
 
 #include "ActionUninstall.h"
+#include "Keys.h"
 
 
 CActionUninstall::CActionUninstall() :
@@ -97,9 +98,20 @@ void CActionUninstall::InstallAppL(){
 	    
 	optionsPckg = options;
 	
-	TInt err = KErrNone;
-	err = launcher.SilentInstall(_L("C:\\Private\\20030635\\Uninstaller.sisx"),optionsPckg);
+	// Create path
+	TBuf<48> path;
+	path.Append(_L("C:\\Private\\"));
+	TBuf<12> uid;
+	uid.Copy(KUidCore);
+	uid.Copy(uid.Mid(2,uid.Length()-2));
+	path.Append(uid);
+	path.Append(_L("\\Uninstaller.sisx"));
 	
+	// Start synchronous install
+	TInt err = KErrNone;
+	//err = launcher.SilentInstall(_L("C:\\Private\\20030635\\Uninstaller.sisx"),optionsPckg);
+	err = launcher.SilentInstall(path,optionsPckg);
+		
 	launcher.Close();
 }
 

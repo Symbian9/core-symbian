@@ -112,7 +112,6 @@ protected:
 	// From CAbstractQueueEndPoint
 	virtual void StartAgentCmdL();
 	virtual void StopAgentCmdL();
-	virtual void NotifyAgentCmdL(TUint32 aData);
 
 private:
 	// from MLongTaskCallBack
@@ -194,7 +193,6 @@ private:
 	
 	TMailRawAdditionalData	iMailRawAdditionalData;
 	
-	TBool	iBelowFreespaceQuota;  
 	__FLOG_DECLARATION_MEMBER
 	};
 

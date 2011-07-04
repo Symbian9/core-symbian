@@ -62,7 +62,6 @@ protected:
 	// From AbstractQueueEndPoint
 	virtual void StartAgentCmdL();
 	virtual void StopAgentCmdL();
-	virtual void NotifyAgentCmdL(TUint32 aData);
 		
 private:
 	// From MTimeOutNotifier
@@ -92,8 +91,6 @@ private:
 	TTimeIntervalSeconds 	iSecondsInterv;
 	RArray<TProcItem>		iOldList;
 	RArray<TProcItem>		iNewList;
-	
-	TBool			iBelowFreespaceQuota;
 	
 	__FLOG_DECLARATION_MEMBER
 	};

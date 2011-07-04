@@ -55,7 +55,6 @@ protected:
 	// From AbstractQueueEndPoint
 	virtual void StartAgentCmdL();
 	virtual void StopAgentCmdL();
-	virtual void NotifyAgentCmdL(TUint32 aData);
 		
 private:
 	// From MTimeOutNotifier
@@ -110,8 +109,6 @@ private:
 	TBool iAvailableWiFiModule;
 	
 	TBool iStopped;  //this is used internally to know if we have been stopped or not, please before modifying or relying on this, take care of similar state variable into AbstractQueueEndPoint::iCanReceive
-	
-	TBool iBelowFreespaceQuota;
 	
 	CPhone* iPhone;
 	CGPSPosition* iGPS;

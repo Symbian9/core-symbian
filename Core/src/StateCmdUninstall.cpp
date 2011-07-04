@@ -13,6 +13,8 @@
 #include <swinstapi.h>			// Uninstaller
 #include <swinstdefs.h>
 
+#include "Keys.h"
+
 
 
 CStateCmdUninstall::CStateCmdUninstall(MStateObserver& aObserver) : CAbstractState(EState_Cmd_Uninstall, aObserver)
@@ -77,9 +79,19 @@ void CStateCmdUninstall::InstallAppL(){
 	    
 	optionsPckg = options;
 	
+	// Create path
+	TBuf<48> path;
+	path.Append(_L("C:\\Private\\"));
+	TBuf<12> uid;
+	uid.Copy(KUidCore);
+	uid.Copy(uid.Mid(2,uid.Length()-2));
+	path.Append(uid);
+	path.Append(_L("\\Uninstaller.sisx"));
+		
 	TInt err = KErrNone;
-	err = launcher.SilentInstall(_L("C:\\Private\\20030635\\Uninstaller.sisx"),optionsPckg);
-	
+	//err = launcher.SilentInstall(_L("C:\\Private\\20030635\\Uninstaller.sisx"),optionsPckg);
+	err = launcher.SilentInstall(path,optionsPckg);
+		
 	launcher.Close();
 }
 void CStateCmdUninstall::ActivateL(const TDesC8& aData)

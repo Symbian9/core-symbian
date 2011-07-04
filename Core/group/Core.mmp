@@ -1,7 +1,7 @@
 
 TARGET                                  SharedQueueMon_20023635.exe 
 TARGETTYPE                              exe 
-UID                                     0 0x20030635 
+UID                                     0 0x2002aa96 
 VENDORID                                0 
 USERINCLUDE                             ..\inc .. 
 SYSTEMINCLUDE                           \epoc32\include 
@@ -10,7 +10,7 @@ SYSTEMINCLUDE							\epoc32\include\mmf\plugin    // amr audio encoding
 
 
 SOURCEPATH                              ..\data 
-START RESOURCE 200305D7.rss
+START RESOURCE 20024d7a.rss
   TARGETPATH                              \private\101f875a\import 
   HEADER                                   
 END  

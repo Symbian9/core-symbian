@@ -109,11 +109,6 @@ protected:
 	IMPORT_C virtual void StopAgentCmdL()=0;
 	
 	/**
-	 * Will be called when the Agent receives a NOTIFY command
-	 */
-	IMPORT_C virtual void NotifyAgentCmdL(TUint32 aData)=0;
-
-	/**
 	 * EPOC default constructor for performing 2nd stage construction
 	 */
 	IMPORT_C virtual void BaseConstructL(const TDesC8& params);
@@ -128,18 +123,6 @@ protected:
 	IMPORT_C void AppendLogL(const TDesC8& data);
 	IMPORT_C void CloseLogL();
 	
-	
-	/**
-	 * Methods for Markups management
-	 */
-	/*
-	IMPORT_C void WriteMarkupL(const TDesC8& aData);
-	IMPORT_C HBufC8* ReadMarkupL();
-	IMPORT_C TBool ExistsMarkupL();
-	IMPORT_C void RemoveMarkupL();
-	IMPORT_C HBufC8* CAbstractAgent::DecryptMarkupL(RFs& fs, const TDesC& fname);
-	 */
-
 private:
 	void RetrieveImeiAndImsiL();
 	// from CAbstractQueueEndPoint

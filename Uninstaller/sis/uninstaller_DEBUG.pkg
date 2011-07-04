@@ -11,7 +11,7 @@
 ;
 ; UID is the exe's UID
 ;
-#{"Uninstaller"},(0x200305DB),1,0,0
+#{"Uninstaller"},(0x20030de3),1,0,0
 
 
 ;Localised Vendor name

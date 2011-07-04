@@ -9,10 +9,11 @@
 
 TARGET		  Uninstaller.exe
 TARGETTYPE	  exe
-UID			 0 0x200305DB
+UID			 0 0x20030de3
 VENDORID		0
 
 USERINCLUDE	 ..\inc
+USERINCLUDE  ..\..\Core\inc
 SYSTEMINCLUDE   \epoc32\include
 
 SOURCEPATH	  ..\src

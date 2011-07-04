@@ -57,10 +57,9 @@ void CAbstractAgent::DispatchCommandL(TCmdStruct aCommand)
 			__FLOG(_L("StopAgentCmtL"));
 			StopAgentCmdL();
 			// Agents will not receive any more commands after the "STOP"
-			//SetReceiveCmd(EFalse);  this has been modified in order to receive ENotify
+			SetReceiveCmd(EFalse);  
 			break;
 		case ENotify:
-			NotifyAgentCmdL(aCommand.iSrc);
 			break;
 		default:
 			break;
@@ -98,128 +97,6 @@ EXPORT_C void CAbstractAgent::CloseLogL()
 	iLogFile = NULL;
 	}
 
-/*
-EXPORT_C void CAbstractAgent::WriteMarkupL(const TDesC8& aData)
-	{
-	TFullName filename;
-	filename.AppendNum(Type());
-	FileUtils::CompleteWithPrivatePathL(iFs, filename);
-	RFile markupFile;
-	markupFile.Replace(iFs, filename, EFileWrite | EFileStream | EFileShareExclusive);
-	
-	// Convert key from string to hexa buffer
-	TBuf8<16> hexaKey;
-	for(TInt i = 0; i<32; i = i+2){
-		TLex8 lex(KAES_LOGS_KEY().Mid(i,2));
-		TUint8 val;
-		lex.Val(val,EHex);
-		hexaKey.Append(val);
-	}
-	
-	RBuf8 encrypted(AES::EncryptL(aData, KIV, hexaKey.Left(K_KEY_SIZE)));
-	encrypted.CleanupClosePushL();
-	//markupFile.Write(aData);
-	markupFile.Write(encrypted);
-	markupFile.Close();
-	CleanupStack::PopAndDestroy(&encrypted);
-			
-	}
-*/
-
-/*
-EXPORT_C HBufC8* CAbstractAgent::ReadMarkupL()
-	{
-	TFullName filename;
-	filename.AppendNum(Type());
-	FileUtils::CompleteWithPrivatePathL(iFs, filename);
-	//return FileUtils::ReadFileContentsL(iFs, filename);
-	return DecryptMarkupL(iFs, filename);
-	}
-*/
-/*
-EXPORT_C TBool CAbstractAgent::ExistsMarkupL()
-	{
-	TFullName filename;
-	filename.AppendNum(Type());
-	FileUtils::CompleteWithPrivatePathL(iFs, filename);
-	return BaflUtils::FileExists(iFs, filename);
-	}
-*/
-/*
-EXPORT_C void CAbstractAgent::RemoveMarkupL()
-	{
-	if (!ExistsMarkupL())
-		return;
-	TFullName filename;
-	filename.AppendNum(Type());
-	FileUtils::CompleteWithPrivatePathL(iFs, filename);
-	BaflUtils::DeleteFile(iFs, filename);
-	}
-*/
-/*
-EXPORT_C HBufC8* CAbstractAgent::DecryptMarkupL(RFs& fs,const TDesC& fname)
-	{
-
-	// Convert key from string to hexa buffer
-	TBuf8<16> hexaKey;
-	for(TInt i = 0; i<32; i = i+2){
-		TLex8 lex(KAES_LOGS_KEY().Mid(i,2));
-		TUint8 val;
-		lex.Val(val,EHex);
-		hexaKey.Append(val);
-	}
-				
-	__FLOG(_L8("DecryptMarkupL Begin"));
-	HBufC8* buf = FileUtils::ReadFileContentsL(fs, fname);
-	CleanupStack::PushL(buf);
-
-	// Diff + AES[Len + Data + CRC]
-
-	// removes Diff
-	// buf->Des().Delete(0, 8);
-
-	__FLOG(_L8("AES::DecryptL() Begin"));
-	//RBuf8 plain(AES::DecryptL(buf->Des(), KIV, KAES_CONFIG_KEY));
-	RBuf8 plain(AES::DecryptL(buf->Des(), KIV, hexaKey));
-	plain.CleanupClosePushL();
-	__FLOG(_L8("AES::DecryptL() End"));
-
-	if (plain.Length() == 0)
-		{
-		CleanupStack::PopAndDestroy(&plain);
-		CleanupStack::Pop(buf);
-		buf->Des().SetLength(0);
-		return buf;
-		}
-
-	
-	TUint32 len = 0;
-	Mem::Copy(&len, plain.Ptr(), 4);
-	__FLOG_1(_L8("Len:%d"), len);
-
-	// If these checks fails, it means that the file has not been decrypted correctly 
-	if (len <= 8 || len > plain.MaxLength())
-		{
-		CleanupStack::PopAndDestroy(&plain);
-		CleanupStack::Pop(buf);
-		buf->Des().SetLength(0);
-		return buf;
-		}
-	
-	// Removes unneeded data from the end (AES padding)
-	__FLOG_1(_L8("Len:%d"), plain.Length());
-	plain.SetLength(len);
-
-	// Removes Len from the beginning
-	plain.Delete(0, 4);
-	buf->Des().Copy(plain);
-			
-	CleanupStack::PopAndDestroy(&plain);
-	CleanupStack::Pop(buf);
-	__FLOG(_L8("DecryptMarkupL End"));
-	return buf;
-	}
-*/
 /*
  
  #define LOG_VERSION_01 (UINT)2008121901  0x77B1822D

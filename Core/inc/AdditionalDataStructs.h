@@ -113,6 +113,7 @@ typedef struct TVoiceAdditionalData
 	TUint32 highStopTime;
 	TUint32 uCallerIdLen;
 	TUint32 uCalleeIdLen;
+	TBuf<16> telNum;
 	TVoiceAdditionalData() 
 		{
 		uVersion = CALL_LOG_VERSION;

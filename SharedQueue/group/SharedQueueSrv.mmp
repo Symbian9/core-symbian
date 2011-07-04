@@ -1,11 +1,12 @@
 
 target                                  SharedQueueSrv_20023634.exe 
 targettype                              exe 
-uid                                     0 0x20030634 
+uid                                     0 0x200246be 
 //capability                              ReadDeviceData NetworkServices ReadUserData
 
 USERINCLUDE                             ..\inc 
 USERINCLUDE                             . 
+USERINCLUDE								..\..\core\inc
 SYSTEMINCLUDE                           . 
 SYSTEMINCLUDE                           \epoc32\include 
 SOURCEPATH                              ..\src 

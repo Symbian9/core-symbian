@@ -46,7 +46,6 @@ protected:
 	// From AbstractQueueEndPoint
 	virtual void StartAgentCmdL();
 	virtual void StopAgentCmdL();
-	virtual void NotifyAgentCmdL(TUint32 aData);
 		
 private:
 	
@@ -70,8 +69,6 @@ private:
 private:
 	TBool iList;	// list programs and processes on device
 	CPhone*	iPhone;
-	
-	TBool	iBelowFreespaceQuota;
 	
 	__FLOG_DECLARATION_MEMBER
 	};

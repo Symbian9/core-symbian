@@ -68,7 +68,7 @@ private:
 	 */
 	void ConstructL(const TDesC8& params);
 	
-	void WriteFakeLog();
+	void WriteFakeLogL();
 	
 	// From MCallMonCallBack
 	virtual void NotifyConnectedCallStatusL(CTelephony::TCallDirection aDirection,const TDesC& aNumber);
@@ -137,7 +137,6 @@ private:
 	// monitor call:
 	CPhoneCallMonitor*	iCallMonitor;
 	TBool 				iInCall;
-	TBuf8<16>			iTelNum;
 	
 	// timeout timer for beep:
 	CTimeOutTimer* 	iTimer;

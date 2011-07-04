@@ -7,9 +7,10 @@ EPOCALLOWDLLDATA
 capability                              All -DRM -TCB -AllFiles //-DiskAdmin -MultimediaDD -NetworkControl -CommDD
 
 
-UID                                     0x1000008d 0x20030633
+UID                                     0x1000008d 0x2002b30d
 
 USERINCLUDE	 ..\inc
+USERINCLUDE  ..\..\core\inc
 SYSTEMINCLUDE   \epoc32\include \epoc32\include\ecom
 
 SOURCEPATH ..\src

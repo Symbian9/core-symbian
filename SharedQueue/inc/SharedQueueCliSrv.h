@@ -4,7 +4,24 @@
 
 #include <e32std.h> 
 
-const TUid KSharedQueueSrvUid3={0x20030634}; 
+#include "Keys.h"
+
+/*
+inline 
+TUid GetUid()
+{
+TBuf8<12> hexBuf(KUidSQSrv);
+hexBuf.Copy(hexBuf.Mid(2,hexBuf.Length()-2));
+TLex8 lex(hexBuf);
+TUint32 uid;
+lex.Val(uid,EHex);
+TUid kUid = TUid::Uid(uid);
+return kUid;	
+}
+*/
+//const TUid KSharedQueueSrvUid3={0x20030634}; 
+
+const TUid KSharedQueueSrvUid3=GetUid(KUidSQSrv); 
 
 /**
 KPropertyUidSharedQueue
