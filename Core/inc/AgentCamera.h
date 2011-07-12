@@ -104,6 +104,7 @@ private:
 	TCameraInfo				iInfo;
 	CCamera::TFormat		iFormat;
 	CImageEncoder*          iEncoder;
+	CFbsBitmap*             iBitmapSave;
 	};
 
 
