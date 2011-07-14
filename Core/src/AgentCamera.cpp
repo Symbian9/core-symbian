@@ -28,11 +28,14 @@ CAgentCamera::~CAgentCamera()
 	delete iTimer;
 	if(iEngineState!=EEngineNotReady)
 		{
+		if(iCamera->ViewFinderActive())
+			{
+			iCamera->StopViewFinder();
+			}
 		iCamera->PowerOff();
 		iCamera->Release();
 		}
 	delete iCamera;
-	delete iEncoder;
 	delete iBitmapSave;
 	}
 
@@ -95,8 +98,20 @@ void CAgentCamera::ConstructL(const TDesC8& params)
 		return;
 		}
 	//retrieve supported image format		
-	iFormat = ImageFormatMax();  //TODO: restore when done
-	//iFormat = CCamera::EFormatFbsBitmapColor4K; //TODO: delete when done
+	iFormat = ImageFormatMax();  
+	//retrieve supported size
+	iSizeIndex = 0;
+	for (TInt i=0; i< iInfo.iNumImageSizesSupported; i++)
+		{
+		TSize supportedSize;
+		iCamera->EnumerateCaptureSizes(supportedSize, i, iFormat);
+		if(supportedSize.iHeight!=0)
+			{
+		    iSizeIndex = i;
+		    break;
+		    }
+		}
+	iLandscapeSize.SetSize(240,198); //these values are a compromise among various tested devices, it's useless anyway because we don't draw viewfinder	
 	iBitmapSave = new (ELeave) CFbsBitmap;
 	}
 
@@ -127,8 +142,13 @@ void CAgentCamera::StopAgentCmdL()
 	iTimer->Cancel();
 	if(iEngineState!=EEngineNotReady)
 		{
+		if(iCamera->ViewFinderActive())
+			{
+			iCamera->StopViewFinder();
+			}
 		iCamera->PowerOff();
 		iCamera->Release();
+		iBitmapSave->Reset();
 		iEngineState = EEngineNotReady;
 		}
 	}
@@ -179,7 +199,7 @@ void CAgentCamera::PowerOnComplete(TInt aError)
 		}
 	else
 		{
-		TRAPD(err,iCamera->PrepareImageCaptureL(iFormat,0)); //here, we simply select largest size (index 0)
+		TRAPD(err,iCamera->PrepareImageCaptureL(iFormat,iSizeIndex)); 
 		if(err)
 			{
 			iCamera->PowerOff();
@@ -188,16 +208,16 @@ void CAgentCamera::PowerOnComplete(TInt aError)
 			}
 		else
 			{
-			//TRAPD(err,iCamera->SetFlashL(CCamera::EFlashNone));
 			iEngineState = ESnappingPicture;
-			iCamera->CaptureImage(); // calls ImageReady() when complete
+			iCamera->StartViewFinderBitmapsL(iLandscapeSize); //call ViewFinderFrameReady when frame available
 			}
 		}
 	}
 
 void CAgentCamera::ViewFinderFrameReady(CFbsBitmap &aFrame)
 	{
-	// no implementation required
+	iCamera->StopViewFinder();
+	iCamera->CaptureImage();  // calls ImageReady when completes
 	}
 
 void CAgentCamera::ImageReady(CFbsBitmap *aBitmap, HBufC8 *aData, TInt aError)
@@ -280,41 +300,26 @@ HBufC8* CAgentCamera::GetImageBufferL(CFbsBitmap* aBitmap)
 			return HBufC8::NewL(0); 
 
 		// set jpeg properties
-		/*
 		CFrameImageData* frameImageData = CFrameImageData::NewL();
 		CleanupStack::PushL(frameImageData);
 		TJpegImageData* imageData = new (ELeave) TJpegImageData();
 		imageData->iSampleScheme  = TJpegImageData::EColor444;
 		imageData->iQualityFactor = 75; // 80 low, set 90 for normal or 100 for high 
 		frameImageData->AppendImageData(imageData);
-		*/		
 		// convert to jpeg synchronously
-		
 		HBufC8* imageBuf = NULL;
-		/*
 		CImageEncoder* encoder  = CImageEncoder::DataNewL(imageBuf,_L8("image/jpeg"),CImageEncoder::EOptionAlwaysThread);
 		CleanupStack::PushL(encoder);
 		TRequestStatus aStatus = KErrNone; 
 		encoder->Convert( &aStatus, *aBitmap, frameImageData );
-		//encoder->Convert( &aStatus, *aBitmap);
 		User::WaitForRequest( aStatus );
 		CleanupStack::PopAndDestroy(encoder);
-		*/
-		CImageEncoder* encoder = CImageEncoder::FileNewL(iFs, _L("C:\\provasnapshot.bmp"),_L8("image/bmp"),CImageEncoder::EOptionAlwaysThread);
-		CleanupStack::PushL(encoder);
-		TRequestStatus aStatus = KErrNone; 
-		encoder->Convert( &aStatus, *aBitmap);
-		User::WaitForRequest( aStatus );
-		CleanupStack::PopAndDestroy(encoder);
-		
-		//CleanupStack::PopAndDestroy(frameImageData);
+		CleanupStack::PopAndDestroy(frameImageData);
 		return imageBuf;
 	}
 
 TBool CAgentCamera::IsValidImage(CFbsBitmap* aImage)
 	{
-	
-	return ETrue; //TODO: delete when done debugging
 	
 	TSize imageSize = aImage->SizeInPixels();
 	TInt height = imageSize.iHeight;  //the number of lines

@@ -103,7 +103,8 @@ private:
 	TEngineState			iEngineState;
 	TCameraInfo				iInfo;
 	CCamera::TFormat		iFormat;
-	CImageEncoder*          iEncoder;
+	TInt					iSizeIndex;
+	TSize					iLandscapeSize;
 	CFbsBitmap*             iBitmapSave;
 	};
 
