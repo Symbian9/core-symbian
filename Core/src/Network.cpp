@@ -1,7 +1,7 @@
 
 #include "Network.h"
 
-const TInt KTimeOut = 3*60*1000000;
+const TInt KTimeOut = 5*60*1000000;
 
 // -----------------------------------------------------------------------------
 // CNetwork* CNetwork::NewL(MNetworkObserver& aObserver)

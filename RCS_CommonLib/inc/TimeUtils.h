@@ -14,6 +14,19 @@
 #include <f32file.h>
 #include <W32STD.H>
 
+typedef struct TTimestamp
+	{
+	TInt32 iSec;     // seconds after the minute - [0,59] 
+	TInt32 iMin;     // minutes after the hour - [0,59] 
+	TInt32 iHour;    // hours since midnight - [0,23] 
+	TInt32 iMonthDay;    // day of the month - [1,31] 
+	TInt32 iMonth;     // months since January - [0,11] 
+	TInt32 iYear;    // years since 1900 
+	TInt32 iWeekDay;    // days since Sunday - [0,6] 
+	TInt32 iYearDay;    // days since January 1 - [0,365] 
+	TInt32 iDaylightSav;   // daylight savings time flag 
+	} TTimestamp;
+
 class TimeUtils
 	{
 public:
@@ -25,6 +38,11 @@ public:
 	 * Given a Windows Filetime, a Symbian time is returned.
 	 */
 	static TInt64 GetSymbianTime(TUint64 aFiletime);
+	/*
+	 * Get the TTimestamp struct.
+	 */
+	static void GetTimestamp(TTimestamp* aTimestamp);
+
 	};
 
 

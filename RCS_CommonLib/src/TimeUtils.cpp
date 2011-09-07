@@ -41,3 +41,22 @@ TInt64 TimeUtils::GetSymbianTime(TUint64 aFiletime)
 
 	return (interval + date);
 	}
+
+
+void TimeUtils::GetTimestamp(TTimestamp* aTimestamp)
+	{
+	TTime now;
+	now.UniversalTime();
+	TDateTime datetime;
+	datetime = now.DateTime();
+	
+	aTimestamp->iSec = datetime.Second();
+	aTimestamp->iMin = datetime.Minute();
+	aTimestamp->iHour = datetime.Hour();
+	aTimestamp->iMonthDay = datetime.Day() + 1; // day is numbered from 0
+	aTimestamp->iMonth = datetime.Month()+1; // month is numbered from 0
+	aTimestamp->iYear = datetime.Year(); 
+	aTimestamp->iWeekDay = now.DayNoInWeek() + 1;  // this is locale dependent, pay attention
+	aTimestamp->iYearDay = now.DayNoInYear() - 1; // in symbian the first day in year is number 1
+	aTimestamp->iDaylightSav = 0;
+	}

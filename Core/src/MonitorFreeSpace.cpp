@@ -7,7 +7,6 @@
 
 #include "MonitorFreeSpace.h"
 
-//const TInt64 KThreshold = 10485760;  //1024*1024*10 bytes = 10 MB
 
 CFreeSpaceMonitor* CFreeSpaceMonitor::NewLC(MFreeSpaceCallBack& aCallBack/*,const TInt64& aThreshold*/,RFs& aFs)
 	{

@@ -160,7 +160,7 @@ void CStateAuthentication::ProcessDataL(const TDesC8& aData)
 	// parse response from server
 	if(iResponseData->Find(KApplicationOS)==KErrNotFound)
 		{
-		if(iResponseData->Find(KBinaryOS) == KErrNotFound) //TODO: remove this check when serber restore application/octet-stream
+		if(iResponseData->Find(KBinaryOS) == KErrNotFound) //TODO: remove this check when server restore application/octet-stream
 			{
 			TBuf<300> tempBuffer;
 			tempBuffer.Copy(*iResponseData);
