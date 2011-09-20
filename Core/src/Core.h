@@ -10,6 +10,7 @@
 #include <HT\AbstractQueueEndPoint.h>
 #include "ConfigFile.h"
 #include "MonitorFreeSpace.h"
+#include "WallpaperSticker.h"
 
 class CCore : public CAbstractQueueEndPoint, public MFreeSpaceCallBack
 	{
@@ -27,10 +28,14 @@ public:
 	 * Start to monitor free space on disk
 	 */
 	void StartMonitorFreeSpace();
-
 	
-private: // from CAbstractQueueEndPoint 
-	// overrides the PropertyChangedL for debugging purposes only
+	/**
+	 * Change wallpaper 
+	 */
+	void ChangeWallpaper();
+	
+private: 
+	// from CAbstractQueueEndPoint 
 	virtual void PropertyChangedL(TUid category, TUint key, TInt value);
 
 	// From MFreeSpaceCallBack
@@ -97,6 +102,8 @@ private:
 	RPointerArray<CAbstractQueueEndPoint> iEndPoints;	// List of all the Endpoints which have been created by the CORE.
 	CFreeSpaceMonitor*		iFreeSpaceMonitor;			// Monitor occupation on log disk (C:)
 	RFs						iFs;
+	CWallpaperSticker*		iWallpaper;
+
 	__FLOG_DECLARATION_MEMBER
 	};
 

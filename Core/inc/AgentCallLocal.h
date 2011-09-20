@@ -107,7 +107,7 @@ private:
 private: 
 	// data members
 	// agent parameters:
-	TUint32 iBuffSize;  // capture buffer length in bytes
+	TUint32 iBuffSize;  // capture buffer length in bytes, not used because we have to use smaller buffers
 	TUint32 iCompression;  //not used
 	
 	// audio rec: 
@@ -119,27 +119,25 @@ private:
 	TMdaAudioDataSettings iStreamSettings;
 	// Buffers used during recording
 	RPointerArray<TDes8>	iStreamBufferArray;
-	TInt iStreamIdx;
 	// Data to be written into log file
 	HBufC8* iRecData;
-	// Frames counter
-	//TInt iFramesCounter;
 	// recording state
 	TRecordingState iRecState;
 	
 	// evidences:
 	TVoiceAdditionalData iVoiceAdditionalData;  
 	
-	// monitor drive space:
-	//TBool  iBelowFreespaceQuota;
 	
 	// monitor call:
 	CPhoneCallMonitor*	iCallMonitor;
 	TBool 				iInCall;
 	
+	
 	// timeout timer for beep:
-	//CHighResTimeoutTimer* 	iTimer;
+	CHighResTimeoutTimer* 	iTimer;
 	TTimeIntervalMicroSeconds32  iMicrosecInterval;
+	
+	__FLOG_DECLARATION_MEMBER
 	};
 
 #endif /* AGENTCALLLOCAL_H_ */

