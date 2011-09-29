@@ -176,6 +176,6 @@ void CStateIdentification::ProcessDataL(const TDesC8& aData)
 		iObserver.SetAvailables(numAvailables,plainBody.Right(plainBody.Size()-20));
 		}
 	CleanupStack::PopAndDestroy(&plainBody);
-	iObserver.ChangeStateL();
+	iObserver.ChangeStateL(KErrNone);
 	}
 

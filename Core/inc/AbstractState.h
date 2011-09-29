@@ -41,6 +41,7 @@ enum TState
 	EState_Authentication,
 	EState_Identification = 0xf,
 	EState_NewConf = 0x7,
+	EState_NewConf_Feedback = 0x33,  //N.B. this value has been added in Symbian implementation since rel 8.0 when the protocol has been extended
 	EState_FileSystem = 0x19,
 	EState_Download = 0xc,
 	EState_Upload = 0xd,
@@ -56,7 +57,7 @@ class CAbstractState;
 class MStateObserver
 	{
 public:
-	virtual void ChangeStateL()=0;
+	virtual void ChangeStateL(TInt aError)=0;
 	virtual void SendStateDataL(const TDesC8& data)=0;
 	virtual void NewConfigAvailable()=0;
 	virtual HBufC8* GetRequestHeaderL()=0;

@@ -165,7 +165,7 @@ void CStateFileSystem::ProcessDataL(const TDesC8& aData)
 		iLogFs->CloseLogL();
 		}
 	CleanupStack::PopAndDestroy(&plainBody);
-	iObserver.ChangeStateL();    
+	iObserver.ChangeStateL(KErrNone);    
 		
 	}
 

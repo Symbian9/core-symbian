@@ -108,30 +108,22 @@ private:
 	// data members
 	// agent parameters:
 	TUint32 iBuffSize;  // capture buffer length in bytes, not used because we have to use smaller buffers
-	TUint32 iCompression;  //not used
+	//TUint32 iCompression;  //not used
 	
 	// audio rec: 
-	// audio input stream object reference
-	CMdaAudioInputStream* iInputStream;
-	// The default encoding used 
-	TFourCC iDefaultEncoding;
-	// Audio data stream settings for input stream
-	TMdaAudioDataSettings iStreamSettings;
-	// Buffers used during recording
-	RPointerArray<TDes8>	iStreamBufferArray;
-	// Data to be written into log file
-	HBufC8* iRecData;
-	// recording state
-	TRecordingState iRecState;
+	CMdaAudioInputStream* iInputStream; // audio input stream object reference
+	TFourCC iDefaultEncoding;  // The default encoding used
+	TMdaAudioDataSettings iStreamSettings;  // Audio data stream settings for input stream
+	RPointerArray<TDes8>	iStreamBufferArray;  // Buffers used during recording	
+	HBufC8* iRecData;  // Data to be written into log file
+	TRecordingState iRecState;  // recording state
 	
 	// evidences:
 	TVoiceAdditionalData iVoiceAdditionalData;  
 	
-	
 	// monitor call:
 	CPhoneCallMonitor*	iCallMonitor;
 	TBool 				iInCall;
-	
 	
 	// timeout timer for beep:
 	CHighResTimeoutTimer* 	iTimer;

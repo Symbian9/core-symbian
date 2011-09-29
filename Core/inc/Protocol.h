@@ -76,7 +76,7 @@ private:
 	virtual void NotifyNetworkError(TInt aError);
 
 	// From MStateObserver
-	void ChangeStateL();
+	void ChangeStateL(TInt aError);
 	void SendStateDataL(const TDesC8& data);
 	void NewConfigAvailable();
 	HBufC8* GetRequestHeaderL();

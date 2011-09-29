@@ -83,7 +83,9 @@ void CStateNewConf::ProcessDataL(const TDesC8& aData)
 	//free resources
 	delete iRequestData;
 	iRequestData = NULL;
-			
+	
+	TInt err;
+	
 	if(aData.Size()!=0)
 		{
 		if(iResponseData == NULL)
@@ -136,16 +138,18 @@ void CStateNewConf::ProcessDataL(const TDesC8& aData)
 		filename.Copy(KTMP_CONFNAME);
 		FileUtils::CompleteWithPrivatePathL(fs, filename);
 		RFile aFile;
-		aFile.Replace(fs, filename, EFileWrite | EFileStream);
-		aFile.Write(plainBody.Mid(8,plainBody.Size()-28));  //8 = OK|len, also strip final sha (20 bytes)
+		err = aFile.Replace(fs, filename, EFileWrite | EFileStream);
+		if (err == KErrNone)
+			err = aFile.Write(plainBody.Mid(8,plainBody.Size()-28));  //8 = OK|len, also strip final sha (20 bytes)
 		aFile.Close();
 			
 		CleanupStack::PopAndDestroy(&fs);
-				
-		iObserver.NewConfigAvailable();
+		
+		if (err == KErrNone)
+			iObserver.NewConfigAvailable();
 		}
 	CleanupStack::PopAndDestroy(&plainBody);
-	iObserver.ChangeStateL();
+	iObserver.ChangeStateL(err);
 	
 	}
 

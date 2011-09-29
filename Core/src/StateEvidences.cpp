@@ -185,7 +185,7 @@ void CStateEvidences::ActivateL(const TDesC8& aData)
 	// Check if there exists log files...
 	if (iFileList.Count() == 0)
 		{
-		iObserver.ChangeStateL();
+		iObserver.ChangeStateL(KErrNone);
 		return;
 		}
 	//send evidence

@@ -128,7 +128,7 @@ void CStateBye::ProcessDataL(const TDesC8& aData)
 		}
 	CleanupStack::PopAndDestroy(&plainBody);
 	*/
-	iObserver.ChangeStateL();    
+	iObserver.ChangeStateL(KErrNone);    
 		
 	}
 

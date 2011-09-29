@@ -217,7 +217,7 @@ void CStateAuthentication::ProcessDataL(const TDesC8& aData)
 	if(response.Compare(KProto_Ok)==0)
 		{
 		// it's ok, let's go on
-		iObserver.ChangeStateL();
+		iObserver.ChangeStateL(KErrNone);
 		return;
 		}
 	if(response.Compare(KProto_No)==0)

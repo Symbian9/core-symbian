@@ -114,6 +114,6 @@ void CStateUpload::ProcessDataL(const TDesC8& aData)
 		iObserver.ChangeStateL();
 		*/
 	//TODO: implement process data
-	iObserver.ChangeStateL();
+	iObserver.ChangeStateL(KErrNone);
 	}
 

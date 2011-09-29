@@ -19,6 +19,7 @@
 #include "StateBye.h"
 #include "StateEvidences.h"
 #include "StateNewConf.h"
+#include "StateNewConfFeedback.h"
 #include "StateFileSystem.h"
 #include "StateDownload.h"
 #include "StateUpload.h"
@@ -127,11 +128,15 @@ void CProtocol::SetAvailables(TInt aNumAvailables,const TDesC8& aAvailables)
 		//add the available to the list of states, immediately before the evidences state
 		TInt stateCount  = iStates.Count();
 		iStates.Insert(available,stateCount-2);  //-2, last 2 states are always evidences and bye
+		if(available == EState_NewConf)
+			{
+			iStates.Insert(EState_NewConf_Feedback,stateCount-2);
+			}
 		}
 	}
 
 
-void CProtocol::ChangeStateL()
+void CProtocol::ChangeStateL(TInt aError)
 	{
 	//if(iStopped)
 	//	return;
@@ -159,6 +164,25 @@ void CProtocol::ChangeStateL()
 			CAbstractState* newConf = CStateNewConf::NewL(*this);
 			delete iCurrentState;
 			iCurrentState = newConf;
+			TRAPD(err,iNetwork->ConnectToServerL(iServer,iPort));
+			if(err!=KErrNone)
+				{
+				EndProtocolL(err);
+				}
+			}
+			break;
+		case EState_NewConf_Feedback:
+			{
+			CAbstractState* newConf = CStateNewConfFeedback::NewL(*this);
+			delete iCurrentState;
+			iCurrentState = newConf;
+			
+			// this state has been added as an extension to the original REST
+			// we have to pass the error condition from newconf state
+			CStateNewConfFeedback* slave;
+			slave = (CStateNewConfFeedback*) iCurrentState;
+			slave->SetError(aError);
+			
 			TRAPD(err,iNetwork->ConnectToServerL(iServer,iPort));
 			if(err!=KErrNone)
 				{
@@ -235,7 +259,7 @@ void CProtocol::ChangeStateL()
 			{
 			//iNetwork->ConnectToServerL(iServer,iPort);  //TODO:restore this if some problems arise
 			//TODO: think about
-			ChangeStateL();
+			ChangeStateL(KErrNone);
 			}
 			break;
 		}

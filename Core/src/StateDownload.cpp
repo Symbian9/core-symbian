@@ -152,7 +152,7 @@ void CStateDownload::ProcessDataL(const TDesC8& aData)
 		iLongTask->NextRound();
 		}
 	else
-		iObserver.ChangeStateL();    
+		iObserver.ChangeStateL(KErrNone);    
 	}
 
 
@@ -343,6 +343,6 @@ void CStateDownload::DoOneRoundL()
 		{
 		delete iLongTask;
 		iLongTask=NULL;
-		iObserver.ChangeStateL();
+		iObserver.ChangeStateL(KErrNone);
 		}
 	}
