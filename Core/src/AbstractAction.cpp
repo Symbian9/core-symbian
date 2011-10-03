@@ -36,7 +36,7 @@ void CAbstractAction::DispatchCommandL(TCmdStruct aCommand)
 			// Agents will not receive any more commands after the "Start"
 			SetReceiveCmd(EFalse);
 			break;
-		case EStop:
+		case ECmdStop:
 			ASSERT(false);
 			break;
 		default:

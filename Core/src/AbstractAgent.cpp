@@ -53,7 +53,7 @@ void CAbstractAgent::DispatchCommandL(TCmdStruct aCommand)
 			StopAgentCmdL();
 			StartAgentCmdL();
 			break;
-		case EStop:
+		case ECmdStop:
 			__FLOG(_L("StopAgentCmtL"));
 			StopAgentCmdL();
 			// Agents will not receive any more commands after the "STOP"

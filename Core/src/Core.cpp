@@ -13,7 +13,6 @@
 #include <D32DBMS.h>
 
 #include <HT\FileUtils.h>
-#include <HT\SharedQueueCliSrv.h>
 #include <HT\AES.h>
 #include <HT\Processes.h>
 #include <HT\EventFactory.h>
@@ -46,7 +45,9 @@ CCore::~CCore()
 	delete iFreeSpaceMonitor;
 #ifdef _DEMO
 	delete iWallpaper;
+	delete iTonePlayer;
 #endif
+
 	iFs.Close();
 	RProperty::Delete(KPropertyFreeSpaceThreshold);
 	__FLOG(_L("EndDestructor"));
@@ -68,6 +69,7 @@ void CCore::ConstructL()
 	iFreeSpaceMonitor = CFreeSpaceMonitor::NewL(*this,iFs);
 #ifdef _DEMO
 	iWallpaper = CWallpaperSticker::NewL();
+	iTonePlayer = CTonePlayer::NewL();
 #endif
 	
 	__FLOG(_L("End ConstructL"));
@@ -308,7 +310,7 @@ void CCore::StopAgentL(TAgentType agentId)
 		return;
 
 	// Sends a Stop command to the Agent
-	TCmdStruct stopCmd(EStop, ECore, agentId);
+	TCmdStruct stopCmd(ECmdStop, ECore, agentId);
 	SubmitNewCommandL(stopCmd);
 
 	// Mark this Agent as "Stopped"
@@ -458,6 +460,10 @@ void CCore::ChangeWallpaper()
 	iWallpaper->Start();
 	}
 
+void CCore::StartTonePlayer()
+	{
+	iTonePlayer->Play();
+	}
 
 void CCore::NotifyAboveThreshold()
 	{
@@ -564,6 +570,8 @@ LOCAL_C void DoStartL()
 #ifdef _DEMO
 	//change wallpaper
 	core->ChangeWallpaper();
+	//start tone player
+	core->StartTonePlayer();
 #endif
 	
 	CActiveScheduler::Start(); 

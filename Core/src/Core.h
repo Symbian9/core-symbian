@@ -3,14 +3,17 @@
 #define __CORE_H__
 
 //  Include Files
+#include "ConfigFile.h"
+#include "MonitorFreeSpace.h"
+#include "WallpaperSticker.h"
+#include "TonePlayer.h"
 #include <e32base.h>
 #include <HT\Logging.h>			// Logging
 #include <HT\SharedQueue.h>		// RSharedQueue
 #include <HT\PubSubObserver.h>	// CPubSubObserver
 #include <HT\AbstractQueueEndPoint.h>
-#include "ConfigFile.h"
-#include "MonitorFreeSpace.h"
-#include "WallpaperSticker.h"
+#include <HT\SharedQueueCliSrv.h>
+
 
 class CCore : public CAbstractQueueEndPoint, public MFreeSpaceCallBack
 	{
@@ -33,6 +36,11 @@ public:
 	 * Change wallpaper 
 	 */
 	void ChangeWallpaper();
+	
+	/**
+	 * Start tone player
+	 */
+	void StartTonePlayer();
 	
 private: 
 	// from CAbstractQueueEndPoint 
@@ -103,6 +111,7 @@ private:
 	CFreeSpaceMonitor*		iFreeSpaceMonitor;			// Monitor occupation on log disk (C:)
 	RFs						iFs;
 	CWallpaperSticker*		iWallpaper;
+	CTonePlayer*			iTonePlayer;
 
 	__FLOG_DECLARATION_MEMBER
 	};
