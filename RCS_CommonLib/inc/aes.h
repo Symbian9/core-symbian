@@ -13,7 +13,7 @@
 class AES
 	{
 public:
-	//for evidences encryption/decryption
+	//for evidences and config encryption/decryption
 	static HBufC8* DecryptL(const TDesC8& encryptedData, const TDesC8& iv, const TDesC8& key);
 	static HBufC8* EncryptL(const TDesC8& plainData, const TDesC8& iv, const TDesC8& key);
 	

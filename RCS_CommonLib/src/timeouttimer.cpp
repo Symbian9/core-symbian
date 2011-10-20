@@ -86,8 +86,7 @@ void CTimeOutTimer::RcsAtUTC(const TTime& aTime)
 void CTimeOutTimer::RunL()
     {
     // Timer request has completed, so notify the timer's owner
-    // User::LeaveIfError( iStatus.Int() );
-	TInt status = iStatus.Int();
+    TInt status = iStatus.Int();
 	if(status == KErrAbort)
 		{
 		//time sync has been performed, we must re-issue the request

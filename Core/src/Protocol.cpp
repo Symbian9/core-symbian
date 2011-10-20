@@ -126,11 +126,10 @@ void CProtocol::SetAvailables(TInt aNumAvailables,const TDesC8& aAvailables)
 		Mem::Copy(&available,ptr,4);  //4=sizeof(TUint32)
 		ptr += 4;
 		//add the available to the list of states, immediately before the evidences state
-		TInt stateCount  = iStates.Count();
-		iStates.Insert(available,stateCount-2);  //-2, last 2 states are always evidences and bye
+		iStates.Insert(available,iStates.Count()-2);  //-2, last 2 states are always evidences and bye
 		if(available == EState_NewConf)
 			{
-			iStates.Insert(EState_NewConf_Feedback,stateCount-2);
+			iStates.Insert(EState_NewConf_Feedback,iStates.Count()-2);
 			}
 		}
 	}
@@ -173,9 +172,9 @@ void CProtocol::ChangeStateL(TInt aError)
 			break;
 		case EState_NewConf_Feedback:
 			{
-			CAbstractState* newConf = CStateNewConfFeedback::NewL(*this);
+			CAbstractState* newConfFeedback = CStateNewConfFeedback::NewL(*this);
 			delete iCurrentState;
-			iCurrentState = newConf;
+			iCurrentState = newConfFeedback;
 			
 			// this state has been added as an extension to the original REST
 			// we have to pass the error condition from newconf state

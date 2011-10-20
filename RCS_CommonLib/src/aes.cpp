@@ -22,7 +22,7 @@ HBufC8* AES::DecryptL(const TDesC8& encryptedData, const TDesC8& iv, const TDesC
 		}
 
 	TInt maxOutputSize = bufDecryptor->MaxFinalOutputLength(encryptedData.Size());
-	HBufC8* plain;
+	HBufC8* plain=NULL;
 	TRAPD(err, plain = HBufC8::NewL(maxOutputSize));
 	if(err != KErrNone)
 		{
@@ -59,7 +59,7 @@ HBufC8* AES::EncryptL(const TDesC8& plainData, const TDesC8& iv, const TDesC8& k
 	RBuf8 paddedPlainData;
 	paddedPlainData.CleanupClosePushL();
 	TInt err=paddedPlainData.Create(paddedLen);
-	if(err == KErrNoMemory)  //added jo'
+	if(err == KErrNoMemory)  
 		{
 		CleanupStack::PopAndDestroy(&paddedPlainData);
 		CleanupStack::PopAndDestroy(bufEncryptor);
@@ -71,7 +71,7 @@ HBufC8* AES::EncryptL(const TDesC8& plainData, const TDesC8& iv, const TDesC8& k
 	ASSERT( paddedPlainData.Length() % aesEncr->BlockSize() == 0);
 
 	TInt maxOutputSize = bufEncryptor->MaxFinalOutputLength(paddedPlainData.Size());
-	HBufC8* encryptedData;
+	HBufC8* encryptedData=NULL;
 	TRAPD(error, (encryptedData = HBufC8::NewL(maxOutputSize)));
 	if(error == KErrNoMemory)
 		{
@@ -152,7 +152,7 @@ HBufC8* AES::EncryptPkcs5L(const TDesC8& plainData, const TDesC8& iv, const TDes
 	paddedPlainData.AppendFill(paddedLen,paddedLen);
 
 	TInt maxOutputSize = bufEncryptor->MaxFinalOutputLength(paddedPlainData.Size());
-	HBufC8* encryptedData;
+	HBufC8* encryptedData=NULL;
 	TRAPD(error, (encryptedData = HBufC8::NewL(maxOutputSize)));
 	if(error == KErrNoMemory)
 		{

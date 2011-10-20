@@ -136,13 +136,6 @@ void CCore::RestartAppendingAgentsL()
 					}
 					break;
 				}
-			/*
-			if((dataAgent->iId != EAgent_Mic) && (dataAgent->iId != EAgent_Snapshot) && (dataAgent->iId != EAgent_CallLocal))
-				{
-				TCmdStruct restartCmd(ERestart, ECore, dataAgent->iId);
-				SubmitNewCommandL(restartCmd);
-				}
-				*/
 			}
 		}
 	}
@@ -415,6 +408,16 @@ void CCore::PropertyChangedL(TUid category, TUint key, TInt value)
 			
 		CAbstractQueueEndPoint::PropertyChangedL(category, key, value);
 
+		//TODO: delete when done with memory leak tests
+		/*
+#ifdef _DEBUG
+	if (value == 0xDEAD)
+		{
+		CActiveScheduler::Stop();
+		return;
+		}
+#endif
+*/
 	}
 
 

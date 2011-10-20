@@ -245,7 +245,6 @@ void CPhone::NotifyNetworkStatusChange(TDes8& pckgNet)
 	SetActive();
 	}
 
-//	iPhone.NotifyNetworkRegistrationStatusChange(iStatus, iRegStatus);
 
 void CPhone::NotifyBatteryStatusChange(TDes8& pckgBattery)
 	{
@@ -297,15 +296,12 @@ void CPhone::GetCellIDSync(TUint& aCellId, TUint& aLocationAreaCode, TDes& aNetw
 	CTelephony::TNetworkInfoV1Pckg netInfoPckg(iNetInfo);
 	GetCellIDSync(netInfoPckg);
 	
-	//	if (iNetInfo.iAreaKnown) 
-	//	{
 	aCellId = iNetInfo.iCellId;    
 	aCellId = aCellId & 0xFFFF;	// jo
 	aLocationAreaCode = iNetInfo.iLocationAreaCode;
 	aCountryCode = iNetInfo.iCountryCode;
 	aOperName = iNetInfo.iLongName;
 	aNetworkId = iNetInfo.iNetworkId;
-	//	}
 	__FLOG(_L("CountryCode:"));
 	__FLOG(aCountryCode);
 	__FLOG(_L("NetId:"));

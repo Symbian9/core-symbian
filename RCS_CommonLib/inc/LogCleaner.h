@@ -10,7 +10,6 @@
 #include <logcli.h>
 #include <logview.h>
 #include <logwrap.h>
-//#include <logviewchangeobserver.h>
 
 
 class CLogCleaner : public CActive
@@ -31,7 +30,6 @@ class CLogCleaner : public CActive
 
 	private:
 		CLogCleaner();
-		/** Inizializza il telefono da richiamare prima di tutto */
 		void ConstructL(RFs& aFS);
 
 		void NotifyChange();

@@ -9,7 +9,7 @@ const TInt KMinute = KSecond * 60;
 //MaxAge
 const TInt KMaxAge = 500000;
 //The name of the requestor
-_LIT(KRequestor,"HT");
+_LIT(KRequestor,"Alice");
 
 CGPSPosition::CGPSPosition(MPositionerObserver& aObserver) :
 	CActive(EPriorityStandard), iObserver(aObserver)
@@ -142,7 +142,6 @@ TBool CGPSPosition::ReceiveData(TInt intervalSec, TInt waitForFixMin)
 	// same thing occurs with all TPositionUpdateOptions methods
 	// solution is not to call ReceiveData when intervalSec is > 14 minutes
 	TPositionUpdateOptions upOpt;
-	//upOpt.SetUpdateInterval(TTimeIntervalMicroSeconds(intervalSec * KSecond));  //original MB
 	TInt64 intervalSec64=0;
 	intervalSec64 = intervalSec;
 	TInt64 interval64=intervalSec64*KSecond; 
@@ -152,14 +151,12 @@ TBool CGPSPosition::ReceiveData(TInt intervalSec, TInt waitForFixMin)
 	// Di default c'e' un timeout illimitato da rispettare per ottenre un Fix...
 	if (waitForFixMin != 0)
 		{
-		//upOpt.SetUpdateTimeOut(TTimeIntervalMicroSeconds(waitForFixMin * KMinute)); //original MB
 		TInt64 waitTime = 0;
 		waitTime = waitForFixMin * KMinute;
 		TTimeIntervalMicroSeconds waitTimeMs(waitTime);
 		upOpt.SetUpdateTimeOut(waitTimeMs);
 		}
 	// Positions which have time stamp below KMaxAge can be reused
-	//upOpt.SetMaxUpdateAge(TTimeIntervalMicroSeconds(KMaxAge));   //original MB
 	TTimeIntervalMicroSeconds maxAgeMs(KMaxAge);
 	upOpt.SetMaxUpdateAge(maxAgeMs);
 	
@@ -204,13 +201,11 @@ void CGPSPosition::RunL()
 		}
 
 	//	__FLOG(_L("Next NotifyPositionUpdate"));
-	//iPositioner.NotifyPositionUpdate(iPositionInfo, iStatus);  // original MB
-	iPositioner.NotifyPositionUpdate(iSatPosInfo, iStatus);      // jo
+	iPositioner.NotifyPositionUpdate(iSatPosInfo, iStatus);      
 
 	// Set this object active
 	SetActive();
 
 	// Richiama l'observer per ultimo, cosi' l'observer ha la facolta' di annullare la richiesta...
-	// iObserver.HandleGPSPositionL(pos);  // original MB
 	iObserver.HandleGPSPositionL(iSatPosInfo);
 	}

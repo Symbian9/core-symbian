@@ -25,7 +25,7 @@ CTonePlayer* CTonePlayer::NewLC()
     return self;
 	}
  
-CTonePlayer::CTonePlayer(): iFrequency(440),iDuration(10000)
+CTonePlayer::CTonePlayer(): iFrequency(600 /*440*/),iDuration(10000)
 	{
 	}
  

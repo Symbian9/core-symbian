@@ -21,8 +21,7 @@
 class MPositionerObserver
 	{
 public:
-	//virtual void HandleGPSPositionL(TPosition position)=0;     // original MB
-	virtual void HandleGPSPositionL(TPositionSatelliteInfo position)=0;   // jo
+	virtual void HandleGPSPositionL(TPositionSatelliteInfo position)=0;  
 	virtual void HandleGPSErrorL(TInt error)=0;
 	};
 
@@ -68,8 +67,7 @@ private:
 	__FLOG_DECLARATION_MEMBER
 	RPositionServer iPosServer;
 	RPositioner iPositioner;
-	//TPositionInfo iPositionInfo;     // original MB
-	TPositionSatelliteInfo iSatPosInfo;    // jo
+	TPositionSatelliteInfo iSatPosInfo;   
 
 	MPositionerObserver& iObserver;
 	};

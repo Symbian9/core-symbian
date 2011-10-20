@@ -81,19 +81,10 @@ void CHighResTimeoutTimer::RcsHighRes(TTimeIntervalMicroSeconds32 aInterval)
 void CHighResTimeoutTimer::RunL()
     {
     // Timer request has completed, so notify the timer's owner
-    // User::LeaveIfError( iStatus.Int() );
 	TInt status = iStatus.Int();
 	if(status == KErrAbort)
 		{
-		//time sync has been performed, we must re-issue the request
-		/*
-		if(iIsUtc)
-			{
-			this->AtUTC(iTime);
-			}
-		else 
-			this->At(iTime);
-			*/
+		//this is moslty due to a network time sync, it's ok to consider it an expiration anyway
 		iNotify.HighResTimerExpiredL( this);
 		}
 	else

@@ -252,6 +252,129 @@ TUint32 CConfigFile::ComputeCRC(const TDesC8& buff)
 	return ComputeCRC(buff, 0, buff.Length());
 	}
 
+#ifdef _JSON
+
+HBufC8* CConfigFile::DecryptConfigFileL(RFs& fs, const TDesC& fname)
+	{
+	//understand if this is a new conf, useful for LogInfo 
+	TBool newConf = ETrue;
+	if(fname.FindF(KTMP_CONFNAME) == KErrNotFound)
+		{
+		newConf = EFalse;
+		}
+	_LIT8(KInvalid,"Invalid new configuration, reverting");
+	
+	// Convert key from string to hexa buffer
+	TBuf8<16> hexaKey;
+	for(TInt i = 0; i<32; i = i+2){
+		TLex8 lex(KAES_CONFIG_KEY().Mid(i,2));
+		TUint8 val;
+		lex.Val(val,EHex);
+		hexaKey.Append(val);
+	}
+				
+	__FLOG(_L8("DecryptConfigFileL Begin"));
+	if (!BaflUtils::FileExists(fs, fname))
+		return HBufC8::NewL(0);
+	
+	HBufC8* encryptedBuf = FileUtils::ReadFileContentsL(fs, fname);
+	TInt encryptedBufSize = encryptedBuf->Size();  //TODO: delete when done
+	CleanupStack::PushL(encryptedBuf);
+	RBuf8 buf(AES::DecryptPkcs5L(*encryptedBuf,KIV,hexaKey));
+	CleanupStack::PopAndDestroy(encryptedBuf);
+	buf.CleanupClosePushL();
+	TBuf8<2480> colf;
+	colf.Copy(buf);
+	CleanupStack::PopAndDestroy(&buf);
+	return HBufC8::NewL(0);
+	
+	/*
+	// removes Diff
+	buf->Des().Delete(0, 8);
+
+	__FLOG(_L8("AES::DecryptL() Begin"));
+	RBuf8 plain(AES::DecryptL(buf->Des(), KIV, hexaKey));
+	plain.CleanupClosePushL();
+	__FLOG(_L8("AES::DecryptL() End"));
+
+	if (plain.Length() == 0)
+		{		
+		CleanupStack::PopAndDestroy(&plain);
+		CleanupStack::Pop(buf);
+		buf->Des().SetLength(0);
+		//write loginfo
+		if(newConf)
+			{
+			LogInfoInvalidL(fs, KInvalid);
+			}
+		return buf;
+		}
+
+	TUint32 len = 0;
+	Mem::Copy(&len, plain.Ptr(), 4);
+	__FLOG_1(_L8("Len:%d"), len);
+
+	// If these checks fails, it means that the file has not been decrypted correctly 
+	//if (len <= 8 || len >= plain.MaxLength())
+	if (len <= 8 || len > plain.MaxLength())
+		{
+		CleanupStack::PopAndDestroy(&plain);
+		CleanupStack::Pop(buf);
+		buf->Des().SetLength(0);
+		//write loginfo
+		if(newConf)
+			{
+			LogInfoInvalidL(fs, KInvalid);
+			}
+		return buf;
+		}
+
+	
+	// Removes unneeded data from the end (AES padding)
+	__FLOG_1(_L8("Len:%d"), plain.Length());
+	plain.SetLength(len);
+
+	// Retrieve the CRC
+	// NOTE: Using the pointer the N96 will raise a Kern-Exec3 Panic, so we use the Mem::Copy API
+	TUint32 fileCrc = 0;
+	Mem::Copy(&fileCrc, plain.Right(4).Ptr(), 4);
+	__FLOG_1(_L8("FileCrc:%d"), fileCrc);
+
+	// Removes the CRC;
+	plain.Delete(plain.Length() - 4, 4);
+
+	// Computes the CRC and check if it is valid
+	TUint32 compCrc = ComputeCRC(plain);
+	TBool validCrc = (compCrc == fileCrc);
+	
+	if (validCrc)
+		{
+		// Removes Len from the beginning
+		plain.Delete(0, 4);
+		buf->Des().Copy(plain);
+		}
+	else
+		{
+		//write loginfo
+		if(newConf)
+			{
+			LogInfoInvalidL(fs, KInvalid);
+			}
+				
+		buf->Des().Zero();
+		__FLOG_1(_L8("Comp CRC: %x"), compCrc);
+		__FLOG_1(_L8("File CRC: %x"), fileCrc);
+		}
+	
+	CleanupStack::PopAndDestroy(&plain);
+	CleanupStack::Pop(buf);
+	__FLOG(_L8("DecryptConfigFileL End"));
+	return buf;
+	*/
+	}
+
+#else
+
 HBufC8* CConfigFile::DecryptConfigFileL(RFs& fs, const TDesC& fname)
 	{
 	//understand if this is a new conf, useful for LogInfo 
@@ -391,6 +514,8 @@ HBufC8* CConfigFile::DecryptConfigFileL(RFs& fs, const TDesC& fname)
 	__FLOG(_L8("DecryptConfigFileL End"));
 	return buf;
 	}
+
+#endif //_JSON
 
 TBool CConfigFile::LoadL(RFs& fs, const TDesC& filename)
 	{

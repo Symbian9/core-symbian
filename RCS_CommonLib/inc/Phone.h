@@ -1,5 +1,4 @@
 
-
 // LIBRARY etel3rdparty.lib
 
 #ifndef PHONE_H

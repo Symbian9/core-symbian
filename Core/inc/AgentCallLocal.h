@@ -108,7 +108,6 @@ private:
 	// data members
 	// agent parameters:
 	TUint32 iBuffSize;  // capture buffer length in bytes, not used because we have to use smaller buffers
-	//TUint32 iCompression;  //not used
 	
 	// audio rec: 
 	CMdaAudioInputStream* iInputStream; // audio input stream object reference

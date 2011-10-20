@@ -62,8 +62,6 @@ class CHighResTimeoutTimer : public CTimer
         
         
         void RcsHighRes(TTimeIntervalMicroSeconds32 aInterval);
-        //void RcsAt(const TTime& aTime);
-        //void RcsAtUTC(const TTime& aTime);
 
     protected: // Functions from base classes
 
