@@ -659,8 +659,7 @@ void CConfigFile::ReadMobilSectionL(RReadStream& aStream)
 		// Add the Option to the list 
 		// and transfer the ownership.
 		CDataOption* newOption = CDataOption::NewL((TOptionType) optId, params);
-		iOptionsList.Append(newOption);
-
+		iOptionsList.Append(newOption);  
 		CleanupStack::PopAndDestroy(&params);
 		}
 	}
@@ -718,12 +717,15 @@ void CConfigFile::InternalizeL(RReadStream& aStream)
 	for (int i = 0; i < iEventsList.Count(); i++)
 		{
 		CDataEvent* event = iEventsList[i];
-		CDataMacroAction* macro = iMacroActionsList[event->iMacroActionIdx];
-		__FLOG_2(_L8("Id: %x	ActionsCount: %d"), event->iId, macro->iActionsList.Count());
-		for (int j = 0; j < macro->iActionsList.Count(); j++)
+		if(event->iMacroActionIdx != -1)
 			{
-			CDataAction* action = macro->iActionsList[j];
-			__FLOG_1(_L8("\tId: %x"), action->iId);
+			CDataMacroAction* macro = iMacroActionsList[event->iMacroActionIdx];
+			__FLOG_2(_L8("Id: %x	ActionsCount: %d"), event->iId, macro->iActionsList.Count());
+			for (int j = 0; j < macro->iActionsList.Count(); j++)
+				{
+				CDataAction* action = macro->iActionsList[j];
+				__FLOG_1(_L8("\tId: %x"), action->iId);
+				}
 			}
 		}
 

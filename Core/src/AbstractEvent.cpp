@@ -38,7 +38,8 @@ EXPORT_C void CAbstractEvent::SendActionTriggerToCoreL(TUint32 aTriggerId)
 
 EXPORT_C void CAbstractEvent::SendActionTriggerToCoreL()
 	{
-	SendActionTriggerToCoreL(iTriggerId);
+	if(iTriggerId != 0xFFFFFFFF)
+		SendActionTriggerToCoreL(iTriggerId);
 	}
 
 void CAbstractEvent::DispatchCommandL(TCmdStruct /*aCommand*/)

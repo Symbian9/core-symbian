@@ -11,5 +11,5 @@ SOURCEPATH ..\src
 SOURCE fileutils.cpp aes.cpp processes.cpp LogCleaner.cpp GPSPosition.cpp Phone.cpp timeouttimer.cpp longruntask.cpp
 SOURCE RESTUtils.cpp ShaUtils.cpp TimeUtils.cpp HighResTimeoutTimer.cpp
 
-//MACRO _LOGGING
+MACRO _LOGGING
 
