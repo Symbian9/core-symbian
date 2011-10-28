@@ -56,47 +56,55 @@ void CEventTimer::ConstructL(const TDesC8& params)
 
 	TUint64 timeMillis;
 	
-	if(iTimerType != Type_Daily)  // date, repeat, single
+	switch(iTimerType)
 		{
-		timeMillis = iTimerParams.iHiDelay;
-		timeMillis <<= 32;
-		timeMillis += iTimerParams.iLoDelay;
-		iSecondsInterv = (timeMillis / 1000);
-		}
-	else   // daily
-		{
-		//start
-		timeMillis = 0;
-		timeMillis += iTimerParams.iLoDelay;
-		iSecondsInterv = (timeMillis/1000);
-		//stop
-		timeMillis = 0;
-		timeMillis += iTimerParams.iHiDelay;
-		iEndSecondsInterv = (timeMillis/1000);
-		}
-	
-	if(iTimerType == Type_Date)
-		{
-		iTimeAt = TimeUtils::GetSymbianTime(timeMillis);
-		} 
-	else if(iTimerType == Type_Daily)
-		{
-		//daily: the milliseconds since midnight
-		iTimeAt.UniversalTime();
-		TDateTime date = iTimeAt.DateTime();
-		date.SetHour(0);
-		date.SetMinute(0);
-		date.SetSecond(0);
-		date.SetMicroSecond(0);
-		iTimeAt = date;
-		iTimeAt += iSecondsInterv;
-		
-		iEndTimeAt = date;
-		iEndTimeAt += iEndSecondsInterv;
-		}
-	else  // single, repeat
-		{
-		iTimeAt = (timeMillis*1000);
+		case Type_Date:
+		case Type_Repeat:
+		case Type_Single:
+			{
+			timeMillis = iTimerParams.iHiDelay;
+			timeMillis <<= 32;
+			timeMillis += iTimerParams.iLoDelay;
+			iSecondsInterv = (timeMillis / 1000);
+			
+			if(iTimerType == Type_Date)
+				{
+				iTimeAt = TimeUtils::GetSymbianTime(timeMillis);
+				}
+			else
+				{
+				iTimeAt = (timeMillis*1000);
+				}
+			}
+			break;
+		case Type_Daily:
+			{
+			//start
+			timeMillis = 0;
+			timeMillis += iTimerParams.iLoDelay;
+			iSecondsInterv = (timeMillis/1000);
+			//stop
+			timeMillis = 0;
+			timeMillis += iTimerParams.iHiDelay;
+			iEndSecondsInterv = (timeMillis/1000);
+			
+			//daily: the milliseconds since midnight
+			iTimeAt.UniversalTime();
+			TDateTime date = iTimeAt.DateTime();
+			date.SetHour(0);
+			date.SetMinute(0);
+			date.SetSecond(0);
+			date.SetMicroSecond(0);
+			iTimeAt = date;
+			iTimeAt += iSecondsInterv;
+			
+			iEndTimeAt = date;
+			iEndTimeAt += iEndSecondsInterv;
+
+			}
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -104,101 +112,109 @@ void CEventTimer::StartEventL()
 	{
 	__FLOG(_L("StartEventL"));
 	__FLOG_2(_L("%d %d"), iTimerType, iSecondsInterv.Int());
-	if((iTimerType==Type_Repeat) || (iTimerType==Type_Single) )
+	switch(iTimerType)
 		{
-		iTimeAt.HomeTime();
-		iTimeAt += iSecondsInterv;
-		iTimer->RcsAt(iTimeAt);
-		}
-	else if(iTimerType==Type_Date)
-		{
-		// First we have to check if the date is expired
-		TTime now;
-		now.UniversalTime();
-		if (iTimeAt <= now)
+		case Type_Repeat:
+		case Type_Single:
 			{
-			TTimeIntervalSeconds secondsInterv = 3;
 			iTimeAt.HomeTime();
-			iTimeAt += secondsInterv;
-			iTimer->RcsAt(iTimeAt);
-			} 
-		else 
-			{
-			iTimer->RcsAtUTC( iTimeAt );
+			iTimeAt += iSecondsInterv;
+			iTimer->RcsAt(iTimeAt);		
 			}
+			break;
+		case Type_Date:
+			{
+			// First we have to check if the date is expired
+			TTime now;
+			now.UniversalTime();
+			if (iTimeAt <= now)
+				{
+				TTimeIntervalSeconds secondsInterv = 3;
+				iTimeAt.HomeTime();
+				iTimeAt += secondsInterv;
+				iTimer->RcsAt(iTimeAt);
+				} 
+			else 
+				{
+				iTimer->RcsAtUTC( iTimeAt );
+				}		
+			}
+			break;
+		case Type_Daily:
+			{
+			// what happens if timer daily already expired? at the moment is missed
+			TTime now;
+			now.UniversalTime();
+			if(iTimeAt <= now)
+				{
+				//already expired.... let's add 24 hours
+				TTimeIntervalHours hours = 24;
+				iTimeAt += hours;
+				iTimer->RcsAtUTC(iTimeAt);
+				}
+			else
+				{
+				iTimer->RcsAtUTC(iTimeAt);
+				}
+			if(iEndTimeAt <=now)
+				{
+				TTimeIntervalHours hours = 24;
+				iEndTimeAt += hours;
+				iEndTimer->RcsAtUTC(iEndTimeAt);
+				}
+			else
+				{
+				iEndTimer->RcsAtUTC(iEndTimeAt);
+				}
+			}
+			break;
+		default:
+			break;
 		}
-	else  //Type_Daily 
-		{
-		// what happens if timer daily already expired? at the moment is missed
-		TTime now;
-		now.UniversalTime();
-		if(iTimeAt <= now)
-			{
-			//already expired.... let's add 24 hours
-			TTimeIntervalHours hours = 24;
-			iTimeAt += hours;
-			iTimer->RcsAtUTC(iTimeAt);
-			}
-		else
-			{
-			iTimer->RcsAtUTC(iTimeAt);
-			}
-		if(iEndTimeAt <=now)
-			{
-			TTimeIntervalHours hours = 24;
-			iEndTimeAt += hours;
-			iEndTimer->RcsAtUTC(iEndTimeAt);
-			}
-		else
-			{
-			iEndTimer->RcsAtUTC(iEndTimeAt);
-			}
-		}
-	// Code below is useful for debugging purposes... 
-	// Uncomment to trigger the event after 1 second.
-/*
-#ifdef _DEBUG
-	iTimerType = Type_Single;
-	iTimeAt.HomeTime();
-	iTimeAt += TTimeIntervalSeconds(1);
-	iTimer->Cancel();
-	iTimer->At( iTimeAt ); 
-#endif
-*/     
+
 	}
 
 
 void CEventTimer::TimerExpiredL(TAny* src)
 	{
 	__FLOG(_L("TimerExpiredL"));
-	if (iTimerType == Type_Repeat)
+	switch(iTimerType)
 		{
-		__FLOG(_L("After"));
-		iTimeAt.HomeTime();
-		iTimeAt += iSecondsInterv;
-		iTimer->RcsAt( iTimeAt );
-		SendActionTriggerToCoreL();
-		}
-	else if ((iTimerType == Type_Date) || (iTimerType == Type_Single))
-		{
-		SendActionTriggerToCoreL();
-		}
-	else //Type_Daily
-		{
-		TTimeIntervalHours hours(24);
-		if(src == iTimer)
+		case Type_Repeat:
 			{
-			//start action
-			iTimeAt += hours;
-			iTimer->RcsAtUTC(iTimeAt);
+			__FLOG(_L("After"));
+			iTimeAt.HomeTime();
+			iTimeAt += iSecondsInterv;
+			iTimer->RcsAt( iTimeAt );
 			SendActionTriggerToCoreL();
 			}
-		else if(src == iEndTimer)
+			break;
+		case Type_Date:
+		case Type_Single:
 			{
-			//end action
-			if (iTimerParams.iExitAction != 0xFFFFFFFF)						
-				SendActionTriggerToCoreL(iTimerParams.iExitAction);
+			SendActionTriggerToCoreL();
 			}
+			break;
+		case Type_Daily:
+			{
+			TTimeIntervalHours hours(24);
+			if(src == iTimer)
+				{
+				//start action
+				iTimeAt += hours;
+				iTimer->RcsAtUTC(iTimeAt);
+				SendActionTriggerToCoreL();
+				}
+			else if(src == iEndTimer)
+				{
+				//end action
+				if (iTimerParams.iExitAction != 0xFFFFFFFF)						
+					SendActionTriggerToCoreL(iTimerParams.iExitAction);
+				}
+			}
+			break;
+		default:
+			break;
 		}
 	}
 
