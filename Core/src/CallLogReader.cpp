@@ -87,7 +87,6 @@ void CCallLogReader::RunL()
                {
                    // The filtered view has been successfully created
                    // so issue a request to start processing logs backwards	
-            	   // TODO: ClogView::CountL()
                    if(iLogView->LastL(iStatus))
                    {	
                        iEngineState = EReadingEntries;

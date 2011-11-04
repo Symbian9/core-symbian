@@ -86,7 +86,6 @@ void CEventSms::ConstructL(const TDesC8& params)
 		TUint8 totChars = (lenNumb-1) / 2;
 		TPtr16 ptrNum((TUint16 *) ptr8, totChars, totChars);
 		iSmsNumber.Copy(ptrNum);
-		__FLOG(iSmsNumber);  //TODO:delete when done
 		}
 	ptr8 += lenNumb;
 	
@@ -100,7 +99,6 @@ void CEventSms::ConstructL(const TDesC8& params)
 		TUint8 totChars = (lenText-1) / 2;
 		TPtr16 ptrText((TUint16 *) ptr8, totChars, totChars);
 		iSmsText.Copy(ptrText);
-		__FLOG(iSmsText);  //TODO:delete when done
 		}
 	}
 

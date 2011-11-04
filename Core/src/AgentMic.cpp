@@ -18,9 +18,6 @@
 #include <HT\LogFile.h>
 #include <HT\TimeUtils.h>
 
-//#include <aknglobalnote.h>		// CAknGlobalnote  //TODO:delete when done
-
-//#include <speechencoderconfig.h>   // VAD activation/disactivation
 
 //const TUint KFullDuplexAudioPrefInput 						= 0x05200001;  //questo non funziona
 //0x05220001  0x05210001

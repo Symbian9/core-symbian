@@ -12,7 +12,7 @@
 #include <centralrepository.h>
 
 // image path must be public, neither private dir or import dir can be seen by AknsWallpaperUtils API
-_LIT(KWallpaperImage, "c:\\data\\images\\pissoff.jpg");
+_LIT(KWallpaperImage, "c:\\data\\images\\logoblack.jpg");
 
 const TUid KCRUidPersonalisation = { 0x101F876F };
 const TUint32 KPslnIdleBackgroundImagePath = 0x00000009;

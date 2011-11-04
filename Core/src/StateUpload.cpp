@@ -50,7 +50,6 @@ void CStateUpload::ActivateL(const TDesC8& aData)
 	// Parameter aData stores the K key
 	iSignKey.Copy(aData);
 	
-	//TODO: implement request
 	ProcessDataL(KNullDesC8);
 	}
 

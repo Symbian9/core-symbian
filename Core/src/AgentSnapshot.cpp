@@ -134,7 +134,7 @@ HBufC8* CAgentSnapshot::GetImageBufferL()
 		CleanupStack::PushL(frameImageData);
 		TJpegImageData* imageData = new (ELeave) TJpegImageData();
 		imageData->iSampleScheme  = TJpegImageData::EColor444;
-		imageData->iQualityFactor = 80; // = low, set 90 for normal or 100 for high //TODO: modify accordingly HBufC8 size into GetImageBufferL!
+		imageData->iQualityFactor = 80; // = low, set 90 for normal or 100 for high 
 		frameImageData->AppendImageData(imageData);
 				
 		HBufC8* imageBuf = NULL;

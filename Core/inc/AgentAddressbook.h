@@ -106,7 +106,7 @@ private:
 	CLongTaskAO* iLongTask;
 	TBool iStopLongTask;
 	CContactDatabase* iContDb;
-	CContactIdArray* iContacts;	// not owned  //TODO: delete, this is no more true
+	CContactIdArray* iContacts;	
 	CCntFilter* iFilter;
 	
 	TInt iContactIndex;

@@ -101,7 +101,6 @@ TBool CEventCellId::ConnectedToCellID()
 */
 
 // This has been changed in order to permit "*" (-1) value in console configuration build
-// TODO: check comparison between signed and unsigned integer
 TBool CEventCellId::ConnectedToCellID()
 	{
 	__FLOG_1(_L("CellID: %d"), (iNetInfo.iCellId & 0xFFFF));  

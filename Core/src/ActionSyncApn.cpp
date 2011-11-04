@@ -240,7 +240,7 @@ void CActionSyncApn::DispatchStartCommandL()
 	pref.SetDirection(ECommDbConnectionDirectionOutgoing);
 	pref.SetIapId(iapId);   
 	
-	err = iConnection.Start(pref);   //TODO: find a way to try once more to connect
+	err = iConnection.Start(pref);   
 	
 	if (err != KErrNone)
 		{

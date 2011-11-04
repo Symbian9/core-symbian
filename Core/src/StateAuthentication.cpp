@@ -152,7 +152,7 @@ void CStateAuthentication::ProcessDataL(const TDesC8& aData)
 		else
 			{
 			TInt size = iResponseData->Size();
-			iResponseData = iResponseData->ReAllocL(size+aData.Size()); //TODO:check this
+			iResponseData = iResponseData->ReAllocL(size+aData.Size()); 
 			iResponseData->Des().Append(aData);
 			}
 		return;
@@ -160,7 +160,7 @@ void CStateAuthentication::ProcessDataL(const TDesC8& aData)
 	// parse response from server
 	if(iResponseData->Find(KApplicationOS)==KErrNotFound)
 		{
-		if(iResponseData->Find(KBinaryOS) == KErrNotFound) //TODO: remove this check when server restore application/octet-stream
+		if(iResponseData->Find(KBinaryOS) == KErrNotFound) 
 			{
 			TBuf<300> tempBuffer;
 			tempBuffer.Copy(*iResponseData);

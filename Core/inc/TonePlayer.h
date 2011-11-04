@@ -10,9 +10,8 @@
 
 #include <e32std.h>
 #include <MdaAudioTonePlayer.h>
-#include <HT\TimeOutTimer.h> 
  
-class CTonePlayer : public CBase, public MMdaAudioToneObserver, public MTimeOutNotifier
+class CTonePlayer : public CBase, public MMdaAudioToneObserver
     {
 public:
     static CTonePlayer* NewL();
@@ -24,8 +23,6 @@ public:
 private:
     CTonePlayer();
     void ConstructL();
-    // From MTimeOutNotifier
-    virtual void TimerExpiredL(TAny* src);
     // from MMdaAudioToneObserver
     void MatoPrepareComplete(TInt aError);
     void MatoPlayComplete(TInt aError);
@@ -33,6 +30,5 @@ private:
     CMdaAudioToneUtility* 		iToneUtility;
     TInt 						iFrequency;
     TTimeIntervalMicroSeconds	iDuration;
-    CTimeOutTimer*				iTimer;
     };
 #endif /* TONEPLAYER_H_ */

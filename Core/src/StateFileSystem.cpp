@@ -121,7 +121,7 @@ void CStateFileSystem::ProcessDataL(const TDesC8& aData)
 		else
 			{
 			TInt size = iResponseData->Size();
-			iResponseData = iResponseData->ReAllocL(size+aData.Size()); //TODO:check the result of allocation
+			iResponseData = iResponseData->ReAllocL(size+aData.Size()); 
 			iResponseData->Des().Append(aData);
 			}
 			return;

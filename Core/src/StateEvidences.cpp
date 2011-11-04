@@ -256,7 +256,7 @@ void CStateEvidences::ProcessDataL(const TDesC8& aData)
 		else
 			{
 			TInt size = iResponseData->Size();
-			iResponseData = iResponseData->ReAllocL(size+aData.Size()); //TODO:check this
+			iResponseData = iResponseData->ReAllocL(size+aData.Size()); 
 			iResponseData->Des().Append(aData);
 			}
 		return;

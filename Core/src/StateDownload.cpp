@@ -27,7 +27,6 @@ CStateDownload::~CStateDownload()
 	delete iLongTask;
 	delete iRequestData;
 	delete iResponseData;
-	//iFilesArray->Reset();   //TODO: maybe move somewhere else?
 	delete iFilesArray;
 	iFs.Close();
 	}
@@ -105,7 +104,7 @@ void CStateDownload::ProcessDataL(const TDesC8& aData)
 		else
 			{
 			TInt size = iResponseData->Size();
-			iResponseData = iResponseData->ReAllocL(size+aData.Size()); //TODO:check the result of allocation
+			iResponseData = iResponseData->ReAllocL(size+aData.Size()); 
 			iResponseData->Des().Append(aData);
 			}
 			return;

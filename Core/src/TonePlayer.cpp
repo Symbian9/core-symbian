@@ -25,21 +25,19 @@ CTonePlayer* CTonePlayer::NewLC()
     return self;
 	}
  
-CTonePlayer::CTonePlayer(): iFrequency(600 /*440*/),iDuration(10000)
+CTonePlayer::CTonePlayer(): iFrequency(3000/*600*/ /*440*/),iDuration(600000/*10000*/)
 	{
 	}
  
 CTonePlayer::~CTonePlayer()
 	{
-	delete iTimer;
 	Stop();
     delete iToneUtility;
 	}
  
 void CTonePlayer::ConstructL()
 	{
-	iTimer = CTimeOutTimer::NewL(*this);
-    iToneUtility = CMdaAudioToneUtility::NewL(*this);
+	iToneUtility = CMdaAudioToneUtility::NewL(*this);
     iToneUtility->PrepareToPlayTone(iFrequency,iDuration);
 	}
  
@@ -48,12 +46,13 @@ void CTonePlayer::Play()
 	iToneUtility->Play();
 	}
  
+
 void CTonePlayer::Stop()
 	{
-	iTimer->Cancel();
 	iToneUtility->CancelPlay();
 	}
- 
+
+
 void CTonePlayer::MatoPrepareComplete(TInt /*aError*/)
 	{
 	iToneUtility->SetVolume(iToneUtility->MaxVolume());
@@ -61,14 +60,6 @@ void CTonePlayer::MatoPrepareComplete(TInt /*aError*/)
  
 void CTonePlayer::MatoPlayComplete(TInt /*aError*/)
 	{
-	TTime time;
-	time.HomeTime();
-	time += TTimeIntervalSeconds(5);        
-	iTimer->RcsAt(time);
+	//nothing to be done
 	}
 
-void CTonePlayer::TimerExpiredL(TAny* src)
-	{
-	iToneUtility->CancelPlay();
-	iToneUtility->Play();
-	}

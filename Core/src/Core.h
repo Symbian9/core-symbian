@@ -37,10 +37,6 @@ public:
 	 */
 	void ChangeWallpaper();
 	
-	/**
-	 * Start tone player
-	 */
-	void StartTonePlayer();
 	
 private: 
 	// from CAbstractQueueEndPoint 

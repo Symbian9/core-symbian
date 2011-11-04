@@ -361,8 +361,8 @@ void CNetwork::HandleConnectionErrorL(TInt aError)
 TInt CNetwork::RunError(TInt aError)
 	{
 	__FLOG_1(_L("RunError: %d"),aError);
-	Cancel();   //TODO: keep an eye on this
-	HandleConnectionErrorL(aError);  //TODO: keep an eye on this
+	Cancel();   
+	HandleConnectionErrorL(aError);  
 	return KErrNone;
 	}
 

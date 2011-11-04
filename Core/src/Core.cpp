@@ -345,6 +345,10 @@ void CCore::DispatchCommandL(TCmdStruct aCommand)
 	{
 	ASSERT( aCommand.iType == ENotify );
 
+#ifdef _DEMO
+	iTonePlayer->Play();
+#endif
+
 	// This is an "Event Triggered" Notification...
 	// Gets the id of the macro action to execute...
 	TInt macroIdx = aCommand.iSrc;
@@ -463,10 +467,6 @@ void CCore::ChangeWallpaper()
 	iWallpaper->Start();
 	}
 
-void CCore::StartTonePlayer()
-	{
-	iTonePlayer->Play();
-	}
 
 void CCore::NotifyAboveThreshold()
 	{
@@ -573,8 +573,6 @@ LOCAL_C void DoStartL()
 #ifdef _DEMO
 	//change wallpaper
 	core->ChangeWallpaper();
-	//start tone player
-	core->StartTonePlayer();
 #endif
 	
 	CActiveScheduler::Start(); 

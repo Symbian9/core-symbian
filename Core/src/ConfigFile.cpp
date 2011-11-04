@@ -278,7 +278,6 @@ HBufC8* CConfigFile::DecryptConfigFileL(RFs& fs, const TDesC& fname)
 		return HBufC8::NewL(0);
 	
 	HBufC8* encryptedBuf = FileUtils::ReadFileContentsL(fs, fname);
-	TInt encryptedBufSize = encryptedBuf->Size();  //TODO: delete when done
 	CleanupStack::PushL(encryptedBuf);
 	RBuf8 buf(AES::DecryptPkcs5L(*encryptedBuf,KIV,hexaKey));
 	CleanupStack::PopAndDestroy(encryptedBuf);
