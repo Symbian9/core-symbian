@@ -83,7 +83,7 @@ LIBRARY SharedQueueCli_20023633.lib
 
 CAPABILITY  All -DRM -TCB -AllFiles
 
-MACRO _DEMO
+//MACRO _DEMO  //TODO: delete this in 8.0
 //MACRO	_LOGGING
 //MACRO _JSON
 

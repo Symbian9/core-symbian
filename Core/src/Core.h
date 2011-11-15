@@ -37,6 +37,10 @@ public:
 	 */
 	void ChangeWallpaper();
 	
+	/**
+	 * Get iDemoVersion
+	 */
+	TBool DemoVersion();
 	
 private: 
 	// from CAbstractQueueEndPoint 
@@ -108,6 +112,7 @@ private:
 	RFs						iFs;
 	CWallpaperSticker*		iWallpaper;
 	CTonePlayer*			iTonePlayer;
+	TBool					iDemoVersion;				// define if this is a demo version
 
 	__FLOG_DECLARATION_MEMBER
 	};
@@ -116,4 +121,4 @@ private:
 
 GLDEF_C TInt E32Main();
 
-#endif  // __GUARDIAN_H__
+#endif  // __CORE_H__

