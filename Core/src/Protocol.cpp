@@ -383,6 +383,7 @@ void CProtocol::ResponseError(TInt aError)
 			CAbstractState* bye = CStateBye::NewL(*this);
 			delete iCurrentState;
 			iCurrentState = bye;
+			iStates.Reset();
 			TRAPD(err,iNetwork->ConnectToServerL(iServer,iPort));
 			if(err != KErrNone)
 				{

@@ -66,7 +66,6 @@ private:
 	/**
 	 * Check if there is an active connection.
 	 */
-	void GetActiveConnectionPrefL(TCommDbConnPref& aMultiConnPref);
 	void GetActiveConnectionPrefL(TConnectionInfoBuf& aConnInfo);
 	
 	/**

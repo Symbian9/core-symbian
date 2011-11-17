@@ -283,87 +283,6 @@ TBool CActionSync::HasProxyL(TUint aIapId,CommsDat::CMDBSession *aDbSession)
 	
 }
 
-/*
- * GetActiveConnectionPrefL
- */
-void CActionSync::GetActiveConnectionPrefL(TCommDbConnPref& connectPref)
-{
-	RConnectionMonitor connMonitor;
-	TUint connCount;
-	TRequestStatus status;
-	TUint connId;
-	TUint subConnCount;
-	TInt bearerType;
-	TUint iapId;
-	
-	// RConnectionMonitor can monitor state of connections 
-	connMonitor.ConnectL();
-	
-	// Get active connections count
-	connMonitor.GetConnectionCount(connCount,status);
-	User::WaitForRequest(status);
-	if ((status.Int() != KErrNone) || (connCount == 0)){
-		connMonitor.Close();
-		return;
-	}
-	
-	for (TUint i=1 ; i<= connCount; i++)
-	{
-		// Gather connection info
-		TInt err = connMonitor.GetConnectionInfo(i,connId,subConnCount);
-		if(err != KErrNone)
-			{
-			continue;
-			}
-		connMonitor.GetIntAttribute(connId,0,KBearer,bearerType,status);
-		User::WaitForRequest(status);
-		// for bearer type:
-		// http://library.forum.nokia.com/topic/S60_3rd_Edition_Cpp_Developers_Library/GUID-759FBC7F-5384-4487-8457-A8D4B76F6AA6/html/rconnmon_8h.html?resultof=%22%45%42%65%61%72%65%72%57%6c%61%6e%22%20%22%65%62%65%61%72%65%72%77%6c%61%6e%22%20
-		// rconnmon.h
-		if (bearerType == EBearerWLAN){
-			//if(iUseWiFi){
-				// we have found a WiFi connection and we were asked to use WiFi
-				iActiveConn = ETrue;
-				iUsableActiveConn = ETrue;
-				connMonitor.GetUintAttribute(connId,0,KIAPId,iapId,status);
-				User::WaitForRequest(status);
-				connectPref.SetDialogPreference(ECommDbDialogPrefDoNotPrompt);
-				connectPref.SetDirection(ECommDbConnectionDirectionOutgoing);
-				connectPref.SetIapId(iapId);
-				
-			//} else {
-			//	iActiveConn = ETrue;
-			//	iUsableActiveConn = EFalse;
-			//}
-		}
-		else if (bearerType == EBearerGPRS || bearerType == EBearerEdgeGPRS || bearerType == EBearerWCDMA){
-			//if(iUseGPRS){
-				// we have found a packet data connection and we were asked for it
-				iActiveConn=ETrue;
-				
-				connMonitor.GetUintAttribute(connId,0,KIAPId,iapId,status);
-				User::WaitForRequest(status);
-				//TBool isWap;
-				//isWap = IsWapAccessPointL(iapId);
-				//iUsableActiveConn = !isWap;
-				//if(iUsableActiveConn){
-					connectPref.SetDialogPreference(ECommDbDialogPrefDoNotPrompt);
-					connectPref.SetDirection(ECommDbConnectionDirectionOutgoing);
-					connectPref.SetIapId(iapId);
-				//}
-			//} else {
-			//	iActiveConn = ETrue;
-			//	iUsableActiveConn = EFalse;
-			//}
-			
-		}
-		
-	}
-
-	connMonitor.Close();
-		
-}
-
 
 void CActionSync::GetActiveConnectionPrefL(TConnectionInfoBuf& aConnBuf)
 {
@@ -421,7 +340,7 @@ void CActionSync::GetActiveConnectionPrefL(TConnectionInfoBuf& aConnBuf)
 			//if(iUseGPRS){
 				// we have found a packet data connection and we were asked for it
 				iActiveConn=ETrue;
-				
+				iUsableActiveConn = ETrue;
 				connMonitor.GetUintAttribute(connId,0,KIAPId,iapId,status);
 				User::WaitForRequest(status);
 				connMonitor.GetUintAttribute(connId,0,KNetworkIdentifier,ntwId,status);
@@ -480,11 +399,9 @@ void CActionSync::DispatchStartCommandL()
 	// Let's search for an already active connection
 	// iActiveConn means that there is an active connection ongoing
 	// iUsableConn means that is what requested (WiFi or GPRS not WAP)
-	//TCommDbConnPref	pref;
 	TConnectionInfoBuf connInfo;
 	iActiveConn = EFalse;
 	iUsableActiveConn = EFalse;
-	//GetActiveConnectionPrefL(pref);
 	GetActiveConnectionPrefL(connInfo);
 	
 	
