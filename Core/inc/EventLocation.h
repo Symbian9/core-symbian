@@ -22,8 +22,11 @@
 
 typedef struct TLocationStruct
 	{
-	TUint32 iExitAction;
-	TUint32	iConfDistance;
+	TInt iExitAction;
+	TInt iRepeatAction;
+	TInt iIter;
+	TInt iDelay;
+	TInt	iConfDistance;
 	TReal64 iLatOrigin;	
 	TReal64	iLonOrigin;	
 	} TLocationStruct;

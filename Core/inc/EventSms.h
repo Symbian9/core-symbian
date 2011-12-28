@@ -78,6 +78,11 @@ private:
 	void ConstructL(const TDesC8& params);
 
 private:
+	
+	TInt iRepeatAction;
+	TInt iIter;
+	TInt iDelay;
+		
 	CTelephony::TTelNumber iSmsNumber;
 	TBuf<140> iSmsText;
 	CSmsReceiverSocket* iSmsRecv;

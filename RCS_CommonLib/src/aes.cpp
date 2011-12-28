@@ -93,7 +93,9 @@ HBufC8* AES::EncryptL(const TDesC8& plainData, const TDesC8& iv, const TDesC8& k
 
 HBufC8* AES::DecryptPkcs5L(const TDesC8& encryptedData, const TDesC8& iv, const TDesC8& key)
 	{
-	// takes in consideration only the first 16bytes of the key
+		if(encryptedData.Size() == 0)
+			return HBufC8::NewL(0);
+		// takes in consideration only the first 16bytes of the key
 		TPtrC8 keyPtr = key.Left(key.Length());
 		if (key.Length() > 16)
 			keyPtr.Set( key.Left(16) );

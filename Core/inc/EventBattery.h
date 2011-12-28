@@ -15,9 +15,12 @@
 
 typedef struct TBatteryStruct 
 	{
-	TUint32 iExitAction;	// action triggered when exiting range
-	TUint32	iMinLevel;		// min range level (0..100)
-	TUint32	iMaxlevel;		// max range level (0..100)
+	TInt iExitAction;	// action triggered when exiting range
+	TInt iRepeatAction;
+	TInt iIter;
+	TInt iDelay;
+	TInt	iMinLevel;		// min range level (0..100)
+	TInt	iMaxlevel;		// max range level (0..100)
 	}TBatteryStruct;
 
 /**

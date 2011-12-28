@@ -13,8 +13,10 @@
 
 typedef struct TCallStruct 
 	{
-	TUint32 iExitAction;	// action triggered when call ends
-	TUint32	iNumLen;		// length of telephone number NULL ended (2 bytes)
+	TInt iExitAction;	// action triggered when call ends
+	TInt iRepeatAction;
+	TInt iIter;
+	TInt iDelay;
 	}TcallStruct;
 
 /**

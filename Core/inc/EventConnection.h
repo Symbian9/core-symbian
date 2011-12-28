@@ -13,7 +13,10 @@
 
 typedef struct TConnectionStruct 
 	{
-	TUint32 iExitAction;	// action triggered when connection closed
+	TInt iExitAction;	// action triggered when connection closed
+	TInt iRepeatAction;
+	TInt iIter;
+	TInt iDelay;
 	}TConnectionStruct;
 
 /**

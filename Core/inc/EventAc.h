@@ -15,7 +15,10 @@
 
 typedef struct TAcStruct 
 	{
-	TUint32 iExitAction;
+	TInt iExitAction;
+	TInt iRepeatAction;
+	TInt iIter;
+	TInt iDelay;
 	}TAcStruct;
 
 /**

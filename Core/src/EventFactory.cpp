@@ -22,7 +22,9 @@
 #include "EventSimChange.h"
 #include "EventCall.h"
 #include "EventConnection.h"
+#include "EventDate.h"
 
+//jo: aTriggerId contains the macro action index
 EXPORT_C CAbstractEvent* EventFactory::CreateEventL(TEventType aId, const TDesC8& params, TInt aTriggerId)
 	{
 	CAbstractEvent* event=NULL;
@@ -60,6 +62,9 @@ EXPORT_C CAbstractEvent* EventFactory::CreateEventL(TEventType aId, const TDesC8
 			break;
 		case EEvent_Connection:
 			event = CEventConnection::NewL(params,aTriggerId);
+			break;
+		case EEvent_Date:
+			event = CEventDate::NewL(params,aTriggerId);
 			break;
 			// TODO: add new events here...
 		default:

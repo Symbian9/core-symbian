@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>rcs-symbian</name>
+	<name>rcs-symbian-json</name>
 	<comment></comment>
 	<projects>
 	</projects>
 	<buildSpec>
 		<buildCommand>
 			<name>com.nokia.carbide.cdt.builder.carbideCPPBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
-			<name>com.nokia.carbide.cpp.codescanner.CSBuilder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>

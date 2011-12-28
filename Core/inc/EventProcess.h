@@ -17,9 +17,12 @@
 
 typedef struct TProcessStruct 
 	{
-	TUint32 iExitAction;
-	TUint32 iType;           // 0=process name; 1=window name
-	TUint32 iNameLen;
+	TInt iExitAction;
+	TInt iRepeatAction;
+	TInt iIter;
+	TInt iDelay;
+	TInt iType;           // 0=process name; 1=window name
+	TBuf<32> iName;
 	}TProcessStruct;
 	
 /**
@@ -72,12 +75,15 @@ private:
     
     
 private:
+    
+    TProcessStruct iProcessParams;
+    	
+    // timer for process check
 	CTimeOutTimer* iTimer;
 	TTime iTimeAt;
 	TTimeIntervalSeconds iSecondsInterv;
 	
-	TProcessStruct iProcessParams;
-	HBufC* iName;
+	// vars for process check
 	TInt	iOldCount;
 	TInt	iNewCount;
 	RWsSession iWsSession;

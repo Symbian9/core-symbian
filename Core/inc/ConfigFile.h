@@ -10,6 +10,8 @@
 #include <HT\logging.h>
 #include <HT\SharedQueueCliSrv.h>
 
+#include "Json.h"
+
 
 
 /**
@@ -120,21 +122,20 @@ public:
 	// Constructors and destructor
 
 	~CConfigFile();
-	TUint32 ComputeCRC(const TDesC8& buff, TInt start, TInt len);
-	TUint32 ComputeCRC(const TDesC8& buff);
 	static CConfigFile* NewL();
 	static CConfigFile* NewLC();
 
 	TBool LoadL(RFs& fs, const TDesC& filename);
 
-	void InternalizeL(RReadStream& aStream);
-
 	CDataAgent* FindDataAgent(TAgentType aAgentId);
 
 private:
-	void ReadAgentSectionL(RReadStream& aStream);
-	void ReadEventSectionL(RReadStream& aStream);
-	void ReadMobilSectionL(RReadStream& aStream);
+	void ReadModulesSectionL(CJsonArray* aModulesArray);  
+	void ReadEventsSectionL(const CJsonArray* aEventsArray);  
+	void ReadActionsSectionL(CJsonArray* aActionsArray); 
+	TInt GetModuleId(CJsonObject* aObject);   
+	TInt GetEventId(const CJsonObject* aObject);    
+	TInt GetActionId(CJsonObject* aObject); 
 
 	HBufC8* DecryptConfigFileL(RFs& fs, const TDesC& filename);
 	

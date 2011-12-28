@@ -17,9 +17,10 @@ HBufC8* CRestUtils::GetRestHeaderL(const TDesC8& aHost, const TDesC8& aCookie)
 	buffer->InsertL(buffer->Size(),KPost().Ptr(),KPost().Size());
 	//insert Host
 	buffer->InsertL(buffer->Size(),KHost().Ptr(),KHost().Size());
-	buffer->InsertL(buffer->Size(),aHost.Ptr(),aHost.Size());
-	buffer->InsertL(buffer->Size(),KNewLine().Ptr(),KNewLine().Size());
-	//insert Cookie
+	buffer->InsertL(buffer->Size(),aHost.Ptr(),aHost.Size()); 
+	buffer->InsertL(buffer->Size(),KNewLine().Ptr(),KNewLine().Size());  
+	//insert Cookie2
+	//buffer->InsertL(buffer->Size(),KCookie2().Ptr(),KCookie2().Size()); //TODO: delete when done
 	if(aCookie.Size()!=0)
 		{
 		buffer->InsertL(buffer->Size(),KCookie().Ptr(),KCookie().Size());
@@ -27,8 +28,7 @@ HBufC8* CRestUtils::GetRestHeaderL(const TDesC8& aHost, const TDesC8& aCookie)
 		buffer->InsertL(buffer->Size(),KNewLine().Ptr(),KNewLine().Size());
 		}
 	//insert ContentType
-	buffer->InsertL(buffer->Size(),KContentType().Ptr(),KContentType().Size());
-			
+	buffer->InsertL(buffer->Size(),KContentType().Ptr(),KContentType().Size());   //TODO: restore when done
 	HBufC8* result = buffer->Ptr(0).AllocL();
 	CleanupStack::PopAndDestroy(buffer);
 	return result;
@@ -83,8 +83,19 @@ HBufC8* CRestUtils::GetCookieL(const TDesC8& aRestHeader)
 		if(line.Find(KSetCookie) != KErrNotFound)
 			{
 			//this is the Set-Cookie line
-			TInt size=line.Size();
-			TBuf8<32> cookieBuf(line.Right(size-KSetCookie().Size()));
+			TInt cPos=line.Find(_L8(":"));  //colon position
+			TInt scPos=line.Find(_L8(";"));  //semicolon position
+			TBuf8<32> cookieBuf;
+			if(scPos!=KErrNotFound)
+				{
+				//there's only the cookie
+				cookieBuf.Copy(line.Mid((cPos+1),((scPos-cPos)-1)));
+				}
+			else
+				{
+				//there are cookie params
+				cookieBuf.Copy(line.Mid((cPos+1),((pos-cPos)-1)));
+				}
 			HBufC8* cookie = HBufC8::NewL(cookieBuf.Size());
 			cookie->Des().Copy(cookieBuf);
 			CleanupStack::PopAndDestroy(&header);

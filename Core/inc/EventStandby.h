@@ -15,7 +15,10 @@
 
 typedef struct TStandbyStruct 
 	{
-	TUint32 iExitAction;	// action triggered when exiting standby
+	TInt iExitAction;	// action triggered when exiting standby
+	TInt iRepeatAction;
+	TInt iIter;
+	TInt iDelay;
 	}TStandbyStruct;
 
 /**

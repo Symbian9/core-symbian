@@ -66,6 +66,11 @@ private:
     
     
 private:
+    
+    TInt iRepeatAction;
+    TInt iIter;
+    TInt iDelay;
+    	
 	CTimeOutTimer* iTimer;
 	TTime iTimeAt;
 	TTimeIntervalSeconds iSecondsInterv;

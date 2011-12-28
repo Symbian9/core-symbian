@@ -126,7 +126,7 @@ void CStateAuthentication::ActivateL(const TDesC8& aData)
     length.Append(KContentLength);
     length.AppendNum(buff.Size());
     length.Append(KNewLine);
-    iRequestData = HBufC8::NewL(header->Size()+length.Size()+KNewLine().Size()+buff.Size());
+    iRequestData = HBufC8::NewL(header->Size()+length.Size()+KNewLine().Size()+buff.Size());  
     iRequestData->Des().Append(*header);
     delete header;
     iRequestData->Des().Append(length);
@@ -162,8 +162,6 @@ void CStateAuthentication::ProcessDataL(const TDesC8& aData)
 		{
 		if(iResponseData->Find(KBinaryOS) == KErrNotFound) 
 			{
-			TBuf<300> tempBuffer;
-			tempBuffer.Copy(*iResponseData);
 			//server answered with a redirect
 			delete iResponseData;
 			iResponseData = NULL;
@@ -173,7 +171,7 @@ void CStateAuthentication::ProcessDataL(const TDesC8& aData)
 		}
 	//retrieve cookie
 	HBufC8* cookie = CRestUtils::GetCookieL(*iResponseData);
-	iObserver.SetCookie(*cookie);
+	iObserver.SetCookie(*cookie);  
 	delete cookie;
 	
 	//extract body from response

@@ -9,6 +9,7 @@
 #define EVENTSIMCHANGE_CPP_
 
 #include "EventSimChange.h"
+#include "Json.h"
 
 CEventSimChange::CEventSimChange(TUint32 aTriggerId) :
 	CAbstractEvent(EEvent_Sim_Change, aTriggerId),iSecondsInterv(300)
@@ -47,9 +48,49 @@ void CEventSimChange::ConstructL(const TDesC8& params)
 	//__FLOG_OPEN_ID("HT", "EventTimer.txt");
 	//__FLOG(_L("-------------"));
 	
-	// This event has no parameters
 	BaseConstructL(params);
 	
+	RBuf paramsBuf;
+		
+	TInt err = paramsBuf.Create(2*params.Size());
+	if(err == KErrNone)
+		{
+		paramsBuf.Copy(params);
+		}
+	else
+		{
+		//TODO: not enough memory
+		}
+		
+	paramsBuf.CleanupClosePushL();
+	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+	CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	if(rootObject)
+		{
+		CleanupStack::PushL(rootObject);
+			
+		//retrieve repeat action
+		if(rootObject->Find(_L("repeat")) != KErrNotFound)
+			{
+			rootObject->GetIntL(_L("repeat"), iRepeatAction);
+			rootObject->GetIntL(_L("iter"), iIter);
+			rootObject->GetIntL(_L("delay"), iDelay);
+			}
+		else
+			{
+			iRepeatAction = -1;
+			iIter = 0;
+			iDelay = 0;
+			}
+		CleanupStack::PopAndDestroy(rootObject);
+		}
+
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
+
 	User::LeaveIfError(iFs.Connect());
 	iLogFile = CLogFile::NewL(iFs);
 	iPhone = CPhone::NewL();

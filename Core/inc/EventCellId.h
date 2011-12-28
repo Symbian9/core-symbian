@@ -23,11 +23,14 @@
 
 typedef struct TCellIdStruct
 	{
-	TUint32 iExitAction;
-	TUint32	iMCC;	// Mobile Country Code
-	TUint32 iMNC;	// Mobile Network Code
-	TUint32	iLAC;	// Location Area Code
-	TUint32 iCell;
+	TInt iExitAction;
+	TInt iRepeatAction;
+	TInt iIter;
+	TInt iDelay;
+	TInt iMCC;	// Mobile Country Code
+	TInt iMNC;	// Mobile Network Code
+	TInt iLAC;	// Location Area Code  TUint32
+	TInt iCell;
 	} TCellIdStruct;
 
 

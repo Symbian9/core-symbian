@@ -10,7 +10,7 @@
 
 #include "EventTimer.h"
 #include <HT\TimeUtils.h>
-
+#include "json.h"
 	
 CEventTimer::CEventTimer(TUint32 aTriggerId) :
 	CAbstractEvent(EEvent_Timer, aTriggerId)
@@ -50,57 +50,109 @@ void CEventTimer::ConstructL(const TDesC8& params)
 	BaseConstructL(params);
 	iTimer = CTimeOutTimer::NewL(*this);
 	iEndTimer = CTimeOutTimer::NewL(*this);
-	Mem::Copy( &iTimerParams, iParams.Ptr(), sizeof(TTimerStruct));
-		
-	iTimerType = (TTimerType) iTimerParams.iType;
 
-	TUint64 timeMillis;
-	
-	switch(iTimerType)
+	RBuf paramsBuf;
+				
+	TInt err = paramsBuf.Create(2*params.Size());
+	if(err == KErrNone)
 		{
-		case Type_Date:
-		case Type_Repeat:
-		case Type_Single:
+		paramsBuf.Copy(params);
+		}
+	else
+		{
+		//TODO: not enough memory
+		}
+				
+	paramsBuf.CleanupClosePushL();
+	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+	CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	if(rootObject)
+		{
+		CleanupStack::PushL(rootObject);
+		//retrieve subtype
+		TBuf<32> subtype;
+		rootObject->GetStringL(_L("subtype"),subtype);
+		if(subtype.Compare(_L("loop")) == 0)
 			{
-			timeMillis = iTimerParams.iHiDelay;
-			timeMillis <<= 32;
-			timeMillis += iTimerParams.iLoDelay;
-			iSecondsInterv = (timeMillis / 1000);
+			//loop timer
+			iTimerParams.iType = Type_Loop;
+			}
+		else if(subtype.Compare(_L("daily")) == 0)
+			{
+			//daily timer
+			iTimerParams.iType = Type_Daily;
+			}
+		else if(subtype.Compare(_L("startup")) == 0)
+			{
+			//single timer
+			iTimerParams.iType = Type_Startup;
+			//TODO: this is not translated correctly now by console
+			}
+		
+		//retrieve exit action
+		if(rootObject->Find(_L("end")) != KErrNotFound)
+			{
+			rootObject->GetIntL(_L("end"),iTimerParams.iExitAction);
+			}
+		else
+			iTimerParams.iExitAction = -1;
 			
-			if(iTimerType == Type_Date)
-				{
-				iTimeAt = TimeUtils::GetSymbianTime(timeMillis);
-				}
-			else
-				{
-				iTimeAt = (timeMillis*1000);
-				}
+		//retrieve repeat action
+		if(rootObject->Find(_L("repeat")) != KErrNotFound)
+			{
+			rootObject->GetIntL(_L("repeat"),iTimerParams.iRepeatAction);
+			rootObject->GetIntL(_L("iter"),iTimerParams.iIter);
+			rootObject->GetIntL(_L("delay"),iTimerParams.iDelay);
+			}
+		else
+			{
+			iTimerParams.iRepeatAction = -1;
+			iTimerParams.iIter = 0;
+			iTimerParams.iDelay = 0;
+			}
+		
+		//retrieve start time, end time
+		TBuf<16> timeBuf;
+		rootObject->GetStringL(_L("ts"),timeBuf);
+		iTimerParams.iTs.Parse(timeBuf);
+		rootObject->GetStringL(_L("te"),timeBuf);
+		iTimerParams.iTe.Parse(timeBuf);
+		
+		CleanupStack::PopAndDestroy(rootObject);
+		}
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
+
+	switch(iTimerParams.iType)
+		{
+		case Type_Loop:
+		case Type_Startup:
+			{
+			iSecondsInterv = iTimerParams.iDelay;
+			//iTimeAt = iSecondsInterv * 1000000;
 			}
 			break;
 		case Type_Daily:
 			{
 			//start
-			timeMillis = 0;
-			timeMillis += iTimerParams.iLoDelay;
-			iSecondsInterv = (timeMillis/1000);
-			//stop
-			timeMillis = 0;
-			timeMillis += iTimerParams.iHiDelay;
-			iEndSecondsInterv = (timeMillis/1000);
-			
-			//daily: the milliseconds since midnight
+			TDateTime dateTs = iTimerParams.iTs.DateTime();
 			iTimeAt.UniversalTime();
 			TDateTime date = iTimeAt.DateTime();
-			date.SetHour(0);
-			date.SetMinute(0);
-			date.SetSecond(0);
-			date.SetMicroSecond(0);
+			date.SetHour(dateTs.Hour());
+			date.SetMinute(dateTs.Minute());
+			date.SetSecond(dateTs.Second());
 			iTimeAt = date;
-			iTimeAt += iSecondsInterv;
-			
-			iEndTimeAt = date;
-			iEndTimeAt += iEndSecondsInterv;
-
+			//stop
+			TDateTime dateTe  = iTimerParams.iTe.DateTime();
+			iEndTimeAt.UniversalTime();
+			date = iEndTimeAt.DateTime();
+			date.SetHour(dateTe.Hour());
+			date.SetMinute(dateTe.Minute());
+			date.SetSecond(dateTe.Second());
+			iEndTimeAt = date;			
 			}
 			break;
 		default:
@@ -111,33 +163,15 @@ void CEventTimer::ConstructL(const TDesC8& params)
 void CEventTimer::StartEventL()
 	{
 	__FLOG(_L("StartEventL"));
-	__FLOG_2(_L("%d %d"), iTimerType, iSecondsInterv.Int());
-	switch(iTimerType)
+	//__FLOG_2(_L("%d %d"), iTimerType, iSecondsInterv.Int());  // no more valid
+	switch(iTimerParams.iType)
 		{
-		case Type_Repeat:
-		case Type_Single:
+		case Type_Loop:
+		case Type_Startup:
 			{
 			iTimeAt.HomeTime();
 			iTimeAt += iSecondsInterv;
 			iTimer->RcsAt(iTimeAt);		
-			}
-			break;
-		case Type_Date:
-			{
-			// First we have to check if the date is expired
-			TTime now;
-			now.UniversalTime();
-			if (iTimeAt <= now)
-				{
-				TTimeIntervalSeconds secondsInterv = 3;
-				iTimeAt.HomeTime();
-				iTimeAt += secondsInterv;
-				iTimer->RcsAt(iTimeAt);
-				} 
-			else 
-				{
-				iTimer->RcsAtUTC( iTimeAt );
-				}		
 			}
 			break;
 		case Type_Daily:
@@ -171,26 +205,29 @@ void CEventTimer::StartEventL()
 		default:
 			break;
 		}
-
 	}
 
 
 void CEventTimer::TimerExpiredL(TAny* src)
 	{
 	__FLOG(_L("TimerExpiredL"));
-	switch(iTimerType)
+
+	switch(iTimerParams.iType)
 		{
-		case Type_Repeat:
+		case Type_Loop:
 			{
 			__FLOG(_L("After"));
 			iTimeAt.HomeTime();
 			iTimeAt += iSecondsInterv;
 			iTimer->RcsAt( iTimeAt );
-			SendActionTriggerToCoreL();
+			if (iTimerParams.iRepeatAction != -1)
+				{
+				SendActionTriggerToCoreL(iTimerParams.iRepeatAction);
+				}
+			//SendActionTriggerToCoreL();
 			}
 			break;
-		case Type_Date:
-		case Type_Single:
+		case Type_Startup:
 			{
 			SendActionTriggerToCoreL();
 			}
@@ -208,7 +245,7 @@ void CEventTimer::TimerExpiredL(TAny* src)
 			else if(src == iEndTimer)
 				{
 				//end action
-				if (iTimerParams.iExitAction != 0xFFFFFFFF)						
+				if (iTimerParams.iExitAction != -1)						
 					SendActionTriggerToCoreL(iTimerParams.iExitAction);
 				}
 			}

