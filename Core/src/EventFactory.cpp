@@ -72,7 +72,10 @@ EXPORT_C CAbstractEvent* EventFactory::CreateEventL(TEventType aId, const TDesC8
 			event = CEventNone::NewL(aId, params, aTriggerId);
 			break;
 		}
-	event->StartEventL();
+	if(event->Enabled())
+		{
+		event->StartEventL();
+		}
 	return event;
 	}
 

@@ -31,6 +31,8 @@ public:
 	 */
 	IMPORT_C ~CAbstractEvent();
 
+	IMPORT_C TBool Enabled();
+	
 	/**
 	 * Events MUST implement this method to start their task.
 	 */
@@ -68,6 +70,8 @@ private:
 private:
 	// When this Event will happen it will send a notifcation to the CORE using the Trigger Id as source
 	TUint32 iTriggerId;
+protected:
+	TBool iEnabled;
 	};
 
 #endif // ABSTRACTEVENT_H

@@ -286,14 +286,14 @@ HBufC8* CConfigFile::DecryptConfigFileL(RFs& fs, const TDesC& fname)
 	buf.Close();
 	
 	//TODO: delete when done with testing
-
+/*
 	RFile file;
 	TFullName filename(_L("C:\\Data\\Installs\\json.txt"));
 	TInt err = file.Create(fs, filename, EFileWrite | EFileStream | EFileShareAny);
 	file.Write(*encryptedBuf);
 	file.Flush();
 	file.Close();
-	
+	*/
 	//TODO: end delete when done
 	CleanupStack::Pop(encryptedBuf);
 	return encryptedBuf;

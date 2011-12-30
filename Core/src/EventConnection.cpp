@@ -93,6 +93,16 @@ void CEventConnection::ConstructL(const TDesC8& params)
 			iConnParams.iIter = 0;
 			iConnParams.iDelay = 0;
 			}
+		
+		//retrieve enable flag
+		iEnabled = EFalse;
+		TBuf<8> enableBuf;
+		rootObject->GetStringL(_L("enabled"),enableBuf);
+		if(enableBuf.Compare(_L("true")) == 0)
+			{
+			iEnabled = ETrue;
+			}
+				
 		CleanupStack::PopAndDestroy(rootObject);
 		}
 

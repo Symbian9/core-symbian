@@ -47,3 +47,8 @@ void CAbstractEvent::DispatchCommandL(TCmdStruct /*aCommand*/)
 	// Should never be called, since Events doesn't receive any commands from the Queue
 	ASSERT(EFalse);
 	}
+
+EXPORT_C TBool CAbstractEvent::Enabled()
+	{
+	return iEnabled;
+	}

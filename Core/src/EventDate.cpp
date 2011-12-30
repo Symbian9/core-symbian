@@ -113,6 +113,15 @@ void CEventDate::ConstructL(const TDesC8& params)
 		//retrieve date to
 		// TODO. when available
 		
+		//retrieve enable flag
+		iEnabled = EFalse;
+		TBuf<8> enableBuf;
+		rootObject->GetStringL(_L("enabled"),enableBuf);
+		if(enableBuf.Compare(_L("true")) == 0)
+			{
+			iEnabled = ETrue;
+			}
+				
 		CleanupStack::PopAndDestroy(rootObject);
 		}
 	CleanupStack::PopAndDestroy(jsonBuilder);

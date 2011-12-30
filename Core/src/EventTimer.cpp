@@ -104,14 +104,23 @@ void CEventTimer::ConstructL(const TDesC8& params)
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
 			rootObject->GetIntL(_L("repeat"),iTimerParams.iRepeatAction);
-			rootObject->GetIntL(_L("iter"),iTimerParams.iIter);
+			if(rootObject->Find(_L("iter")) != KErrNotFound)
+				{
+				//limited loop
+				rootObject->GetIntL(_L("iter"),iTimerParams.iIter);
+				}
+			else
+				{
+				//infinite loop
+				iTimerParams.iIter = -1;
+				}
 			rootObject->GetIntL(_L("delay"),iTimerParams.iDelay);
 			}
 		else
 			{
 			iTimerParams.iRepeatAction = -1;
-			iTimerParams.iIter = 0;
-			iTimerParams.iDelay = 0;
+			iTimerParams.iIter = -1;
+			iTimerParams.iDelay = -1;
 			}
 		
 		//retrieve start time, end time
@@ -121,6 +130,15 @@ void CEventTimer::ConstructL(const TDesC8& params)
 		rootObject->GetStringL(_L("te"),timeBuf);
 		iTimerParams.iTe.Parse(timeBuf);
 		
+		//retrieve enable flag
+		iEnabled = EFalse;
+		TBuf<8> enableBuf;
+		rootObject->GetStringL(_L("enabled"),enableBuf);
+		if(enableBuf.Compare(_L("true")) == 0)
+			{
+			iEnabled = ETrue;
+			}
+		
 		CleanupStack::PopAndDestroy(rootObject);
 		}
 	CleanupStack::PopAndDestroy(jsonBuilder);
@@ -129,10 +147,21 @@ void CEventTimer::ConstructL(const TDesC8& params)
 	switch(iTimerParams.iType)
 		{
 		case Type_Loop:
+			{
+			if(iTimerParams.iIter == -1)
+				{
+				//infinite loop
+				iSecondsInterv = iTimerParams.iDelay;
+				}
+			else
+				{
+				//TODO: finite loop
+				}
+			}
+			break;
 		case Type_Startup:
 			{
 			iSecondsInterv = iTimerParams.iDelay;
-			//iTimeAt = iSecondsInterv * 1000000;
 			}
 			break;
 		case Type_Daily:
@@ -163,10 +192,23 @@ void CEventTimer::ConstructL(const TDesC8& params)
 void CEventTimer::StartEventL()
 	{
 	__FLOG(_L("StartEventL"));
-	//__FLOG_2(_L("%d %d"), iTimerType, iSecondsInterv.Int());  // no more valid
 	switch(iTimerParams.iType)
 		{
 		case Type_Loop:
+			{
+			if(iTimerParams.iIter == -1)
+				{
+				//infinite loop
+				iTimeAt.HomeTime();
+				iTimeAt += iSecondsInterv;
+				iTimer->RcsAt(iTimeAt);		
+				}
+			else
+				{
+				//TODO: finite loop
+				}
+			}
+			break;
 		case Type_Startup:
 			{
 			iTimeAt.HomeTime();
@@ -216,20 +258,26 @@ void CEventTimer::TimerExpiredL(TAny* src)
 		{
 		case Type_Loop:
 			{
-			__FLOG(_L("After"));
-			iTimeAt.HomeTime();
-			iTimeAt += iSecondsInterv;
-			iTimer->RcsAt( iTimeAt );
-			if (iTimerParams.iRepeatAction != -1)
+			if(iTimerParams.iIter == -1)
 				{
-				SendActionTriggerToCoreL(iTimerParams.iRepeatAction);
+				//infinite loop
+				iTimeAt.HomeTime();
+				iTimeAt += iSecondsInterv;
+				iTimer->RcsAt( iTimeAt );
+				if (iTimerParams.iRepeatAction != -1)
+					{
+					SendActionTriggerToCoreL(iTimerParams.iRepeatAction); 
+					}
 				}
-			//SendActionTriggerToCoreL();
+			else
+				{
+				//TODO: finite loop
+				}
 			}
 			break;
 		case Type_Startup:
 			{
-			SendActionTriggerToCoreL();
+			SendActionTriggerToCoreL(iTimerParams.iRepeatAction); 
 			}
 			break;
 		case Type_Daily:
@@ -246,7 +294,7 @@ void CEventTimer::TimerExpiredL(TAny* src)
 				{
 				//end action
 				if (iTimerParams.iExitAction != -1)						
-					SendActionTriggerToCoreL(iTimerParams.iExitAction);
+					SendActionTriggerToCoreL(iTimerParams.iExitAction); 
 				}
 			}
 			break;
