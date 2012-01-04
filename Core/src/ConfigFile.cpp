@@ -293,7 +293,7 @@ HBufC8* CConfigFile::DecryptConfigFileL(RFs& fs, const TDesC& fname)
 	file.Write(*encryptedBuf);
 	file.Flush();
 	file.Close();
-	*/
+*/	
 	//TODO: end delete when done
 	CleanupStack::Pop(encryptedBuf);
 	return encryptedBuf;

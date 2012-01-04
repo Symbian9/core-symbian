@@ -42,6 +42,10 @@ public:
 	 * Get the TTimestamp struct.
 	 */
 	static void GetTimestamp(TTimestamp* aTimestamp);
+	/*
+	 * Given a date string "2012-01-03 00:00:00", a Symbian TDateTime is returned
+	 */
+	static TDateTime GetSymbianDate(const TDesC& aDate);
 
 	};
 

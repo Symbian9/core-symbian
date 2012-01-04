@@ -128,12 +128,13 @@ public:
 	TBool LoadL(RFs& fs, const TDesC& filename);
 
 	CDataAgent* FindDataAgent(TAgentType aAgentId);
+	TInt GetModuleId(CJsonObject* aObject);   
+		
 
 private:
 	void ReadModulesSectionL(CJsonArray* aModulesArray);  
 	void ReadEventsSectionL(const CJsonArray* aEventsArray);  
 	void ReadActionsSectionL(CJsonArray* aActionsArray); 
-	TInt GetModuleId(CJsonObject* aObject);   
 	TInt GetEventId(const CJsonObject* aObject);    
 	TInt GetActionId(CJsonObject* aObject); 
 

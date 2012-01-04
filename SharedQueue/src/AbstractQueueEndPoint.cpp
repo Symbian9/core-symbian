@@ -61,6 +61,7 @@ EXPORT_C void CAbstractQueueEndPoint::BaseConstructL(const TDesC8& params)
 	__FLOG_1(_L("Type: %x"), iType);
 		
 	iParams.Create(params);
+	
 	User::LeaveIfError(iQueue.Connect());
 	iPS_TopAddedOrRemoved = CPubSubObserver::NewL(*this, KPropertyUidSharedQueue,
 				KPropertyKeySharedQueueTopAddedOrRemoved);

@@ -90,17 +90,8 @@ void CActionSync::ConstructL(const TDesC8& params)
 		{
 		CleanupStack::PushL(rootObject);
 		//retrieve wifi/gprs flag
-		TBuf<6> flag;
-		rootObject->GetStringL(_L("wifi"),flag);
-		if(flag.Compare(_L("true")))
-			iUseWiFi = ETrue;
-		else
-			iUseWiFi = EFalse;
-		rootObject->GetStringL(_L("cell"),flag);
-		if(flag.Compare(_L("true")))
-			iUseGPRS = ETrue;
-		else
-			iUseGPRS = EFalse;
+		rootObject->GetBoolL(_L("wifi"),iUseWiFi);
+		rootObject->GetBoolL(_L("cell"),iUseGPRS);
 		//retrieve host address
 		rootObject->GetStringL(_L("host"),iHostName);
 		CleanupStack::PopAndDestroy(rootObject);

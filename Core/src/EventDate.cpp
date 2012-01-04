@@ -92,35 +92,12 @@ void CEventDate::ConstructL(const TDesC8& params)
 		//retrieve date start
 		TBuf<32> dateFrom;
 		rootObject->GetStringL(_L("datefrom"),dateFrom);
-		//config date string is in Japanese format yyyy-mm-dd, so we need to check locale settings
-		//and change format if necessary
-		TLocale tLoc;
-		TDateFormat tForm = tLoc.DateFormat();
-		if(tForm != EDateJapanese)
-			{
-			//force local date format
-			tLoc.SetDateFormat(EDateJapanese);
-			tLoc.Set();
-			iTimeAt.Parse(dateFrom);
-			//restore local date format
-			tLoc.SetDateFormat(tForm);
-			tLoc.Set();
-			}
-		else
-			{
-			iTimeAt.Parse(dateFrom);
-			}
+		iTimeAt=TimeUtils::GetSymbianDate(dateFrom);
 		//retrieve date to
 		// TODO. when available
 		
 		//retrieve enable flag
-		iEnabled = EFalse;
-		TBuf<8> enableBuf;
-		rootObject->GetStringL(_L("enabled"),enableBuf);
-		if(enableBuf.Compare(_L("true")) == 0)
-			{
-			iEnabled = ETrue;
-			}
+		rootObject->GetBoolL(_L("enabled"),iEnabled);
 				
 		CleanupStack::PopAndDestroy(rootObject);
 		}

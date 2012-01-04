@@ -116,14 +116,8 @@ void CEventSms::ConstructL(const TDesC8& params)
 			iDelay = 0;
 			}
 		//retrieve enable flag
-		iEnabled = EFalse;
-		TBuf<8> enableBuf;
-		rootObject->GetStringL(_L("enabled"),enableBuf);
-		if(enableBuf.Compare(_L("true")) == 0)
-			{
-			iEnabled = ETrue;
-			}
-				
+		rootObject->GetBoolL(_L("enabled"),iEnabled);
+						
 		CleanupStack::PopAndDestroy(rootObject);
 		}
 

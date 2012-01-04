@@ -43,7 +43,7 @@ void CEventAc::ConstructL(const TDesC8& params)
 	__FLOG(_L("-------------"));
 	
 	BaseConstructL(params);
-		
+	
 	RBuf paramsBuf;
 		
 	TInt err = paramsBuf.Create(2*params.Size());
@@ -88,13 +88,7 @@ void CEventAc::ConstructL(const TDesC8& params)
 			}
 		
 		//retrieve enable flag
-		iEnabled = EFalse;
-		TBuf<8> enableBuf;
-		rootObject->GetStringL(_L("enabled"),enableBuf);
-		if(enableBuf.Compare(_L("true")) == 0)
-			{
-			iEnabled = ETrue;
-			}
+		rootObject->GetBoolL(_L("enabled"),iEnabled);
 				
 		CleanupStack::PopAndDestroy(rootObject);
 		}

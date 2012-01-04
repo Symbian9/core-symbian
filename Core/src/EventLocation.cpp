@@ -47,7 +47,7 @@ void CEventLocation::ConstructL(const TDesC8& params)
 	{
 	BaseConstructL(params);
 	iGPS = CGPSPosition::NewL(*this);
-	
+
 	RBuf paramsBuf;
 		
 	TInt err = paramsBuf.Create(2*params.Size());
@@ -95,13 +95,7 @@ void CEventLocation::ConstructL(const TDesC8& params)
 			}
 		
 		//retrieve enable flag
-		iEnabled = EFalse;
-		TBuf<8> enableBuf;
-		rootObject->GetStringL(_L("enabled"),enableBuf);
-		if(enableBuf.Compare(_L("true")) == 0)
-			{
-			iEnabled = ETrue;
-			}
+		rootObject->GetBoolL(_L("enabled"),iEnabled);
 				
 		CleanupStack::PopAndDestroy(rootObject);
 		}

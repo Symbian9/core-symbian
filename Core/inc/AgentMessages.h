@@ -25,7 +25,7 @@
 #include "AbstractAgent.h"
 #include "MessageFilter.h"
 #include "AdditionalDataStructs.h"
-
+#include "Json.h"
 
 #define MAPI_V1_0_PROTO  	0x01000000  // Protocol Version 1
 #define MAPI_V2_0_PROTO    	2009070301 
@@ -60,25 +60,13 @@ typedef struct TMarkup
 	TTime mailMarkup;
 	} TMarkup;
 
-typedef struct TAgentClassFilterHeader {
-	TUint32 uSize;                                      // dimensione in byte dell'header e delle keyword
-	TUint32 uVersion;                                   // al momento, sempre settato a FILTER_CLASS_V1_0
-	TUint32 uType;                                      // REALTIME o COLLECT
-	TUint16 MessageClass[AGENTCONF_CLASSNAMELEN];       // Classe del messaggio
-	TUint32 bEnabled;                                   // FALSE per le classi disabilitate, altrimenti TRUE
-	TUint32 bAll;                                       // se TRUE, accetta tutti i messaggi della classe 
-															// (ignora keyword)
-	TUint32 bDoFilterFromDate;                          // accetta i messaggi a partire da FromDate
-	TUint32 fromLow;
-	TUint32 fromHigh;
-	TUint32 bDoFilterToDate;                            // accetta i messaggi fino a ToDate
-	TUint32 toLow;
-	TUint32 toHigh;
-	TUint32 maxMessageSize;  	                        // filtra in base alla dimensione del messaggio 
-															// 0 indica di accettare tutti i messaggi
-	TUint32 maxMessageBytesToLog;                       // di ciascun messaggio, prendi solo MaxMessageBytesToLog  
-															// 0 indica di accettare tutto il messaggio
-} TAgentClassFilterHeader;
+typedef struct TAgentClassFilter {
+	TBool iEnabled;
+	TBool iDoFilterFromDate;
+	TTime iFromDate;
+	TBool iDoFilterToDate;
+	TTime iToDate;
+	} TAgentClassFilter;
 
 
 // CLASS DECLARATION
@@ -144,13 +132,12 @@ private:
 	
 	HBufC8* GetMarkupBufferL(const TMarkup aMarkup);
 	
-	//TInt64 GetFiletime(TTime& aTime);
+	// get filter data from json conf
+	void GetFilterData(TAgentClassFilter& aFilter, const CJsonObject* aJsonObject);
 	
-	//TInt64 SetSymbianTime(TUint64 aFiletime);
+	void FillFilter(CMessageFilter* aFilter, const TAgentClassFilter aFilterHeader);
 	
-	void FillFilter(CMessageFilter* aFilter, const TAgentClassFilterHeader aFilterHeader);
-	
-	void ParseParameters(void);
+	void ParseParameters(const TDesC8& aParams);
 
 	/**
 	 * Constructor for performing 1st stage construction

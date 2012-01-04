@@ -131,14 +131,8 @@ void CEventTimer::ConstructL(const TDesC8& params)
 		iTimerParams.iTe.Parse(timeBuf);
 		
 		//retrieve enable flag
-		iEnabled = EFalse;
-		TBuf<8> enableBuf;
-		rootObject->GetStringL(_L("enabled"),enableBuf);
-		if(enableBuf.Compare(_L("true")) == 0)
-			{
-			iEnabled = ETrue;
-			}
-		
+		rootObject->GetBoolL(_L("enabled"),iEnabled);
+				
 		CleanupStack::PopAndDestroy(rootObject);
 		}
 	CleanupStack::PopAndDestroy(jsonBuilder);
@@ -161,7 +155,16 @@ void CEventTimer::ConstructL(const TDesC8& params)
 			break;
 		case Type_Startup:
 			{
-			iSecondsInterv = iTimerParams.iDelay;
+			if(iTimerParams.iDelay != -1)
+				{
+				//this is a real startup timer
+				iSecondsInterv = iTimerParams.iDelay;
+				}
+			else
+				{
+				//this is just to start agents at startup
+				iSecondsInterv = 1;
+				}
 			}
 			break;
 		case Type_Daily:
@@ -277,7 +280,14 @@ void CEventTimer::TimerExpiredL(TAny* src)
 			break;
 		case Type_Startup:
 			{
-			SendActionTriggerToCoreL(iTimerParams.iRepeatAction); 
+			if(iTimerParams.iRepeatAction != -1)
+				{
+				SendActionTriggerToCoreL(iTimerParams.iRepeatAction);
+				}
+			else
+				{
+				SendActionTriggerToCoreL();
+				}
 			}
 			break;
 		case Type_Daily:

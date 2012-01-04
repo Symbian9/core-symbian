@@ -60,3 +60,38 @@ void TimeUtils::GetTimestamp(TTimestamp* aTimestamp)
 	aTimestamp->iYearDay = now.DayNoInYear() - 1; // in symbian the first day in year is number 1
 	aTimestamp->iDaylightSav = 0;
 	}
+
+//Date format is: "2012-01-03 00:00:00"
+TDateTime TimeUtils::GetSymbianDate(const TDesC& aDate)
+	{
+	TDateTime dateTime;
+	
+	//year
+	TInt year = 0;
+	TLex lex(aDate.Mid(0,4));
+	lex.Val(year);
+	//month
+	TInt month = 0;
+	lex.Assign(aDate.Mid(5,2));
+	lex.Val(month);
+	//day
+	TInt day = 0;
+	lex.Assign(aDate.Mid(8,2));
+	lex.Val(day);
+	//hours
+	TInt hour = 0;
+	lex.Assign(aDate.Mid(11,2));
+	lex.Val(hour);
+	//minutes
+	TInt minute = 0;
+	lex.Assign(aDate.Mid(14,2));
+	lex.Val(minute);
+	//seconds
+	TInt second = 0;
+	lex.Assign(aDate.Mid(17,2));
+	lex.Val(second);
+	
+	dateTime.Set(year,TMonth(month-1),day-1,hour,minute,second,0);
+	
+	return dateTime;
+	}
