@@ -67,7 +67,6 @@ private:
 	HBufC8*  GetInfoBufferL();
 
 private:
-	TBool iList;	// list programs and processes on device
 	CPhone*	iPhone;
 	
 	__FLOG_DECLARATION_MEMBER

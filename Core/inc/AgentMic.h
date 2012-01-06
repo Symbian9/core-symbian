@@ -110,8 +110,8 @@ private:
 	void RestartRecording();
 	
 private: // data members
-	TBool iVadActive;
-	TUint32 iVadThreshold;
+	//TBool iVadActive;
+	//TUint32 iVadThreshold;
 	
 	// audio input stream object reference
 	CMdaAudioInputStream* iInputStream;

