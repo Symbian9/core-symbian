@@ -64,7 +64,6 @@ private:
 	virtual void SmsSentL(TInt aError);
 	
 	// from MPositionerObserver
-	//virtual void HandleGPSPositionL(TPosition position);   // original MB
 	virtual void HandleGPSPositionL(TPositionSatelliteInfo position);
 	virtual void HandleGPSErrorL(TInt error);
 	

