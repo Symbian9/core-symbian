@@ -121,6 +121,11 @@ void CAgentSnapshot::StopAgentCmdL()
 	{
 	}
 
+void CAgentSnapshot::CycleAgentCmdL()
+	{
+	//nothing to be done this is not an appending agent
+	}
+
 void CAgentSnapshot::DoCaptureL()
     {
 	TPixelsTwipsAndRotation sizeAndRotation;

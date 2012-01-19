@@ -186,6 +186,11 @@ void CAgentCalendar::StopAgentCmdL()
 	CloseLogL();
 	}
 
+void CAgentCalendar::CycleAgentCmdL()
+	{
+	CycleLogL(LOGTYPE_CALENDAR);
+	}
+
 
 
 HBufC8* CAgentCalendar::GetCalEntryBufferL(const CCalEntry& calEntry)

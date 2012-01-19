@@ -78,7 +78,6 @@ void CAgentCallList::ConstructL(const TDesC8& params)
 	BaseConstructL(params);
 	__FLOG_OPEN("HT", "Agent_CallList.txt");
 	__FLOG(_L("-------------"));
-		
 	iMarkupFile = CLogFile::NewL(iFs);
 	iCallLogReader = CCallLogReader::NewL(*this,iFs);
 	iCallMonitor = CPhoneCallMonitor::NewL(*this);
@@ -124,6 +123,10 @@ void CAgentCallList::StopAgentCmdL()
 	CloseLogL(); 
 	}
 
+void CAgentCallList::CycleAgentCmdL()
+	{
+	CycleLogL(LOGTYPE_CALLLIST);
+	}
 
 
 /*

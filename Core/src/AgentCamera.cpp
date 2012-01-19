@@ -172,6 +172,11 @@ void CAgentCamera::StopAgentCmdL()
 		}
 	}
 
+void CAgentCamera::CycleAgentCmdL()
+	{
+	//nothing to be done, this is an appending agent
+	}
+
 
 void CAgentCamera::ReserveComplete(TInt aError)
 	{

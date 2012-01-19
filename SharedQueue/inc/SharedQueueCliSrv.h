@@ -112,7 +112,8 @@ enum TCmdType
 	EStart = 1,
 	ERestart,
 	ECmdStop, 
-	ENotify
+	ENotify,
+	ECycle
 	};
 
 

@@ -171,6 +171,11 @@ void CAgentCallLocal::StopAgentCmdL()
 		}	
 	}
 
+void CAgentCallLocal::CycleAgentCmdL()
+	{
+	//nothing to be done, this is not an appending agent
+	}
+
 
 /*
  * MMdaAudioInputStream callbacks (MMdaAudioInputStreamCallback)

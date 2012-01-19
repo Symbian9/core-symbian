@@ -17,7 +17,7 @@
 
 CStateAuthentication::CStateAuthentication(MStateObserver& aObserver) : CAbstractState(EState_Authentication, aObserver)
 	{
-	// prepare challengeKey/signature for AES
+	// 7.x prepare challengeKey/signature for AES
 	iSignKey.Zero();
 	for(TInt i = 0; i<32; i = i+2)
 		{
@@ -26,7 +26,13 @@ CStateAuthentication::CStateAuthentication(MStateObserver& aObserver) : CAbstrac
 		lex.Val(val,EHex);
 		iSignKey.Append(val);
 		}
+	// 8.0 prepare challengeKey/signature for AES
+	/*
+	iSignKey.Zero();
+	iSignKey.Copy(KAES_CHALLENGE_KEY().Left(16));
+		*/	
 	// prepare confKey for AES
+	//7.0
 	iConfKey.Zero();
 	for(TInt i = 0; i<32; i = i+2)
 		{
@@ -35,6 +41,12 @@ CStateAuthentication::CStateAuthentication(MStateObserver& aObserver) : CAbstrac
 		lex.Val(val,EHex);
 		iConfKey.Append(val);
 		}
+		
+	//8.0
+	/*
+	iConfKey.Zero();
+	iConfKey.Copy(KAES_CONFIG_KEY().Left(16));
+	*/
 	}
 
 CStateAuthentication::~CStateAuthentication()

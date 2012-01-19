@@ -1,7 +1,7 @@
 /*
  ============================================================================
  Name		: EventTimer.cpp
- Author	  : Marco Bellino
+ Author	  : (Marco Bellino) Jo'
  Version	 : 1.0
  Copyright   : Your copyright notice
  Description : CEventTimer implementation
@@ -89,7 +89,6 @@ void CEventTimer::ConstructL(const TDesC8& params)
 			{
 			//single timer
 			iTimerParams.iType = Type_Startup;
-			//TODO: this is not translated correctly now by console
 			}
 		
 		//retrieve exit action

@@ -109,23 +109,29 @@ CAgentMessages* CAgentMessages::NewL(const TDesC8& params)
 void CAgentMessages::FillFilter(CMessageFilter* aFilter, const TAgentClassFilter aFilterHeader)
 	{
 	aFilter->iLog = aFilterHeader.iEnabled;
-	aFilter->iSinceFilter = aFilterHeader.iDoFilterFromDate;
-	aFilter->iUntilFilter = aFilterHeader.iDoFilterToDate;
-	if (aFilter->iSinceFilter)
+	if(aFilter->iLog)
 		{
-		aFilter->SetStartDate(aFilterHeader.iFromDate);
-		}
-	else 
-		{
-		_LIT(KInitialTime,"16010000:000000");
+		aFilter->iSinceFilter = aFilterHeader.iDoFilterFromDate;
+		aFilter->iUntilFilter = aFilterHeader.iDoFilterToDate;
+		if (aFilter->iSinceFilter)
+			{
+			aFilter->SetStartDate(aFilterHeader.iFromDate);
+			}
+		else 
+			{
+			_LIT(KInitialTime,"16010000:000000");
 
-		TTime initialFiletime;
-		initialFiletime.Set(KInitialTime);
+			TTime initialFiletime;
+			initialFiletime.Set(KInitialTime);
+			}
+		if (aFilter->iUntilFilter) 
+			{
+			aFilter->SetEndDate(aFilterHeader.iToDate);
+			}
 		}
-	if (aFilter->iUntilFilter) 
-		{
-		aFilter->SetEndDate(aFilterHeader.iToDate);
-		}
+	//message size, meaningful only for email messages
+	aFilter->iMaxMessageBytesToLog = 0;  //TODO: complete when conf ready
+	aFilter->iMaxMessageSize = 0;  //TODO: complete when conf ready
 	}
 
 void CAgentMessages::GetFilterData(TAgentClassFilter& aFilter, const CJsonObject* aJsonObject)
@@ -135,6 +141,8 @@ void CAgentMessages::GetFilterData(TAgentClassFilter& aFilter, const CJsonObject
 		{
 		CJsonObject* filterObject;
 		aJsonObject->GetObjectL(_L("filter"),filterObject);
+		//check history
+		filterObject->GetBoolL(_L("history"),aFilter.iHistory);
 		//check date "0000-00-00 00:00:00" 
 		TBuf<24> dateFrom;
 		filterObject->GetStringL(_L("datefrom"),dateFrom);
@@ -302,11 +310,12 @@ void CAgentMessages::StopAgentCmdL()
 	__FLOG(_L("STOP AGENT CMD"));
 	iLogNewMessages = EFalse;
 	iStopLongTask = ETrue;
-	// We close the file log, just in case....
-	//CloseLogL();    // TODO: verify this              
 	}
 
-
+void CAgentMessages::CycleAgentCmdL()
+	{
+	//nothign to be done, this is not an appending agent
+	}
 
 HBufC8* CAgentMessages::GetSMSBufferL(TMsvEntry& aMsvEntryIdx, const TMsvId& aMsvId)
 {

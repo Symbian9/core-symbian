@@ -109,6 +109,11 @@ protected:
 	IMPORT_C virtual void StopAgentCmdL()=0;
 	
 	/**
+	 * Will be called when the Agent receive a CYCLE command
+	 */
+	IMPORT_C virtual void CycleAgentCmdL()=0;
+	
+	/**
 	 * EPOC default constructor for performing 2nd stage construction
 	 */
 	IMPORT_C virtual void BaseConstructL(const TDesC8& params);
@@ -122,9 +127,10 @@ protected:
 	IMPORT_C void CreateLogL(TInt aLogId, TAny* aAdditionalData);
 	IMPORT_C void AppendLogL(const TDesC8& data);
 	IMPORT_C void CloseLogL();
+	IMPORT_C void CycleLogL(TInt aLogId);
 	
 private:
-	void RetrieveImeiAndImsiL();
+	//void RetrieveImeiAndImsiL();
 	// from CAbstractQueueEndPoint
 	virtual void DispatchCommandL(TCmdStruct aCommand);
 

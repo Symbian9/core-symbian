@@ -1,7 +1,7 @@
 /*
  ============================================================================
  Name		: EventTimer.h
- Author	  : Marco Bellino
+ Author	  : (Marco Bellino) Jo'
  Version	 : 1.0
  Copyright   : Your copyright notice
  Description : CEventTimer declaration

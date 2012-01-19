@@ -57,6 +57,7 @@ protected:
 	// From AbstractQueueEndPoint
 	virtual void StartAgentCmdL();
 	virtual void StopAgentCmdL();
+	virtual void CycleAgentCmdL();
 		
 private:
 	

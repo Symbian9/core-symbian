@@ -59,6 +59,9 @@ void CAbstractAgent::DispatchCommandL(TCmdStruct aCommand)
 			// Agents will not receive any more commands after the "STOP"
 			SetReceiveCmd(EFalse);  
 			break;
+		case ECycle:
+			CycleAgentCmdL();
+			break;
 		default:
 			break;
 		}
@@ -83,7 +86,7 @@ EXPORT_C void CAbstractAgent::CreateLogL(TInt aLogId,TAny* aAdditionalData)
 
 EXPORT_C void CAbstractAgent::AppendLogL(const TDesC8& data)
 	{
-	if (iLogFile)
+	if (iLogFile != NULL)
 		iLogFile->AppendLogL(data);
 	}
 
@@ -93,6 +96,16 @@ EXPORT_C void CAbstractAgent::CloseLogL()
 		iLogFile->CloseLogL();
 	delete iLogFile;
 	iLogFile = NULL;
+	}
+
+EXPORT_C void CAbstractAgent::CycleLogL(TInt aLogId)
+	{
+	if(iLogFile)
+		iLogFile->CloseLogL();
+	delete iLogFile;
+	iLogFile = NULL;
+	iLogFile = CLogFile::NewL(iFs);
+	iLogFile->CreateLogL(aLogId);
 	}
 
 /*

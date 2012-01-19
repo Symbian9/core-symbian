@@ -68,9 +68,9 @@ private:
 	void RestartAllAgentsL();
 	
 	/*
-	 * Sends a "Restart" command to all agents working in append mode
+	 * Sends a "Cycle" command to all agents working in append mode
 	 */
-	void RestartAppendingAgentsL();
+	void CycleAppendingAgentsL();
 	
 	/**
 	 * Stops all the running Agents and the Events

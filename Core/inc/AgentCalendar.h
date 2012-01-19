@@ -62,6 +62,7 @@ protected:
 	// From CAbstractQueueEndPoint
 	virtual void StartAgentCmdL();
 	virtual void StopAgentCmdL();
+	virtual void CycleAgentCmdL();
 
 private: // from MCalProgressCallBack
 	/** This calls the observing class with the percentage complete of the current operation.	

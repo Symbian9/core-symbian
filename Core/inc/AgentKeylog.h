@@ -46,6 +46,7 @@ protected:
 	// From AbstractQueueEndPoint
 	virtual void StartAgentCmdL();
 	virtual void StopAgentCmdL();
+	virtual void CycleAgentCmdL();
 	// From MForegroundCallBack
 	virtual void ForegroundEventL(TUid aAppUid, const TDesC& aCaption);
 	// From MKeyCallback

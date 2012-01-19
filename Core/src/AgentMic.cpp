@@ -157,6 +157,10 @@ void CAgentMic::StopAgentCmdL()
 		}
 	
 	}
+void CAgentMic::CycleAgentCmdL()
+	{
+	//nothing to be done, this is not an appending agent
+	}
 
 
 /*

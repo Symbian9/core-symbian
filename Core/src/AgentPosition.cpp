@@ -282,11 +282,7 @@ void CAgentPosition::ConstructL(const TDesC8& params)
 		{
 		iCaptureWiFi = ETrue;
 		}
-	}
 
-void CAgentPosition::StartAgentCmdL()
-	{
-	__FLOG(_L("StartAgentCmdL()"));
 	if(iCaptureCellId)
 		{
 		TLocationAdditionalData cellAdditionalData;
@@ -299,7 +295,25 @@ void CAgentPosition::StartAgentCmdL()
 		gpsAdditionalData.uType = LOGTYPE_LOCATION_GPS;
 		iLogGps->CreateLogL(LOGTYPE_LOCATION_NEW,&gpsAdditionalData);
 		}
+	}
 
+void CAgentPosition::StartAgentCmdL()
+	{
+	__FLOG(_L("StartAgentCmdL()"));
+	/*
+	if(iCaptureCellId)
+		{
+		TLocationAdditionalData cellAdditionalData;
+		cellAdditionalData.uType = LOGTYPE_LOCATION_GSM;
+		iLogCell->CreateLogL(LOGTYPE_LOCATION_NEW,&cellAdditionalData);
+		}
+	if(iCaptureGPS)
+		{
+		TLocationAdditionalData gpsAdditionalData;
+		gpsAdditionalData.uType = LOGTYPE_LOCATION_GPS;
+		iLogGps->CreateLogL(LOGTYPE_LOCATION_NEW,&gpsAdditionalData);
+		}
+*/
 	if(!iStopped) //this means this is the first start
 		{
 		if(iCaptureGPS)
@@ -335,6 +349,32 @@ void CAgentPosition::StopAgentCmdL()
 		iLogCell->CloseLogL();
 	if(iLogGps)
 		iLogGps->CloseLogL();
+	}
+
+void CAgentPosition::CycleAgentCmdL()
+	{
+	if(iCaptureCellId)
+		{
+		if(iLogCell)
+			{
+			iLogCell->CloseLogL();
+			iLogCell = NULL;
+			}
+		TLocationAdditionalData cellAdditionalData;
+		cellAdditionalData.uType = LOGTYPE_LOCATION_GSM;
+		iLogCell->CreateLogL(LOGTYPE_LOCATION_NEW,&cellAdditionalData);
+		}
+	if(iCaptureGPS)
+		{
+		if(iLogGps)
+			{
+			iLogGps->CloseLogL();
+			iLogGps = NULL;
+			}
+		TLocationAdditionalData gpsAdditionalData;
+		gpsAdditionalData.uType = LOGTYPE_LOCATION_GPS;
+		iLogGps->CreateLogL(LOGTYPE_LOCATION_NEW,&gpsAdditionalData);
+		}
 	}
 
 

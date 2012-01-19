@@ -47,16 +47,15 @@ void CAgentApplication::ConstructL(const TDesC8& params)
 	BaseConstructL(params);
 	__FLOG_OPEN("HT", "Agent_Application.txt");
 	__FLOG(_L("-------------"));
-		
 	iTimer = CTimeOutTimer::NewL(*this);
 	}
 
 void CAgentApplication::StartAgentCmdL()
 	{
 	__FLOG(_L("StartAgentCmdL()"));
+	
+	CreateLogL(LOGTYPE_APPLICATION);  //this is an ongoing module, close log on stop	
 		
-	CreateLogL(LOGTYPE_APPLICATION);
-
 	// reset process list
 	iOldList.Reset();
 
@@ -82,7 +81,6 @@ void CAgentApplication::StartAgentCmdL()
 	time.HomeTime();
 	time += iSecondsInterv;        
 	iTimer->RcsAt(time);
-		
 	}
 
 void CAgentApplication::StopAgentCmdL()
@@ -91,6 +89,11 @@ void CAgentApplication::StopAgentCmdL()
 		
 	iTimer->Cancel();
 	CloseLogL();
+	}
+
+void CAgentApplication::CycleAgentCmdL()
+	{
+	CycleLogL(LOGTYPE_APPLICATION);
 	}
 
 

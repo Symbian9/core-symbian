@@ -48,4 +48,8 @@ void CAgentNone::StopAgentCmdL()
 	{
 	}
 
+void CAgentNone::CycleAgentCmdL()
+	{
+	}
+
 

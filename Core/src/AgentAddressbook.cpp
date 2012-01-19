@@ -192,6 +192,10 @@ void CAgentAddressbook::StopAgentCmdL()
 	CloseLogL();
 	}
 
+void CAgentAddressbook::CycleAgentCmdL()
+	{
+	CycleLogL(LOGTYPE_ADDRESSBOOK);
+	}
 
 TBool CAgentAddressbook::ContainsEmptyField(const CContactItemFieldSet& fields)
 	{
