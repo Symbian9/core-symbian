@@ -67,38 +67,38 @@ EXPORT_C TInt RSharedQueue::Connect()
 	return errno;
 	}
 
-EXPORT_C void RSharedQueue::Enqueue(TCmdType aType, TInt aSrc, TInt aDest, const TDesC8& params)
+EXPORT_C void RSharedQueue::Enqueue(TInt aQueueId, TCmdType aType, TInt aSrc, TInt aDest, const TDesC8& params)
 	{
 	TCmdStruct cmd(aType, aSrc, aDest);
-	Enqueue(cmd, params);
+	Enqueue(aQueueId, cmd, params);
 	}
 
-EXPORT_C void RSharedQueue::Enqueue(TCmdStruct aCmd, const TDesC8& params)
+EXPORT_C void RSharedQueue::Enqueue(TInt aQueueId, TCmdStruct aCmd, const TDesC8& params)
 	{
 	TPckgBuf<TCmdStruct> pckg(aCmd);
-	TIpcArgs args(&pckg, &params);
+	TIpcArgs args(&pckg, &params, aQueueId);
 	SendReceive(EEnqueue, args);
 	}
 
-EXPORT_C TCmdStruct RSharedQueue::Dequeue()
+EXPORT_C TCmdStruct RSharedQueue::Dequeue(TInt aQueueId)
 	{
 	TPckgBuf<TCmdStruct> pckg;
-	TIpcArgs args(&pckg);
+	TIpcArgs args(&pckg, aQueueId);
 	SendReceive(EDequeue, args);
 	TCmdStruct cmd = pckg();
 	return cmd;
 	}
 
-EXPORT_C TCmdStruct RSharedQueue::Top()
+EXPORT_C TCmdStruct RSharedQueue::Top(TInt aQueueId)
 	{
 	TPckgBuf<TCmdStruct> pckg;
-	TIpcArgs args(&pckg);
+	TIpcArgs args(&pckg,aQueueId);
 	SendReceive(ETop, args);
 	TCmdStruct cmd = pckg();
 	return cmd;
 	}
 
-EXPORT_C HBufC8* RSharedQueue::TopParamL()
+EXPORT_C HBufC8* RSharedQueue::TopParamL(TInt aQueueId)
 	{
 	HBufC8* buffer = HBufC8::NewLC(500);
 	buffer->Des().Zero();
@@ -106,7 +106,7 @@ EXPORT_C HBufC8* RSharedQueue::TopParamL()
 	TInt err = KErrNone;
 	do
 		{
-		TIpcArgs args(&buffer->Des());
+		TIpcArgs args(&buffer->Des(),aQueueId);
 		err = SendReceive(ETopParam, args);
 		if (err == KErrUnderflow)
 			{
@@ -122,10 +122,10 @@ EXPORT_C HBufC8* RSharedQueue::TopParamL()
 	return buffer;
 	}
 
-EXPORT_C TBool RSharedQueue::IsEmpty()
+EXPORT_C TBool RSharedQueue::IsEmpty(TInt aQueueId)
 	{
 	TPckgBuf<TBool> pckg;
-	TIpcArgs args(&pckg);
+	TIpcArgs args(&pckg, aQueueId);
 	SendReceive(EIsEmpty, args);
 	TBool res = pckg();
 	return res;
@@ -133,10 +133,10 @@ EXPORT_C TBool RSharedQueue::IsEmpty()
 
 
 
-EXPORT_C TBool RSharedQueue::LockTop()
+EXPORT_C TBool RSharedQueue::LockTop(TInt aQueueId)
 	{
 	TPckgBuf<TBool> pckg;
-	TIpcArgs args(&pckg);
+	TIpcArgs args(&pckg, aQueueId);
 	SendReceive(ELockTop, args);
 	TBool res = pckg();
 	return res;

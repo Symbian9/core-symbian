@@ -148,7 +148,8 @@ void CEventTimer::ConstructL(const TDesC8& params)
 				}
 			else
 				{
-				//TODO: finite loop
+				//finite loop
+				iSecondsInterv = iTimerParams.iDelay;
 				}
 			}
 			break;
@@ -207,7 +208,11 @@ void CEventTimer::StartEventL()
 				}
 			else
 				{
-				//TODO: finite loop
+				//finite loop
+				iSteps = iTimerParams.iIter;
+				iTimeAt.HomeTime();
+				iTimeAt += (TTimeIntervalSeconds) 1;
+				iTimer->RcsAt(iTimeAt);
 				}
 			}
 			break;
@@ -273,7 +278,18 @@ void CEventTimer::TimerExpiredL(TAny* src)
 				}
 			else
 				{
-				//TODO: finite loop
+				//finite loop
+				iSteps--;
+				if(iSteps>0)
+					{
+					iTimeAt.HomeTime();
+					iTimeAt += iSecondsInterv;
+					iTimer->RcsAt( iTimeAt );
+					}
+				if (iTimerParams.iRepeatAction != -1)
+					{
+					SendActionTriggerToCoreL(iTimerParams.iRepeatAction); 
+					}
 				}
 			}
 			break;

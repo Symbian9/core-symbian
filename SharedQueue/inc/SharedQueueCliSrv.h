@@ -17,13 +17,18 @@ const TUid KPropertyUidSharedQueue = KSharedQueueSrvUid3;
 
 
 /**
-KPropertyKeySharedQueueTopAddedOrRemoved
-The key to observe changes in the top element of the Shared Queue
-Will be updated when there's a new element on the top of the queue
+KPropertyKeyPrimarySharedQueueTopAddedOrRemoved
+The key to observe changes in the top element of the Primary Shared Queues
+Will be updated when there's a change on the top of the primary queue
 */
-const TUint KPropertyKeySharedQueueTopAddedOrRemoved = 2; 
+const TUint KPropertyKeyPrimarySharedQueueTopAddedOrRemoved = 2;
 
-
+/**
+KPropertyKeySecondarySharedQueueTopAddedOrRemoved
+The key to observe changes in the top element of the Secondary Shared Queues
+Will be updated when there's a change on the top of the secondary queue
+*/
+const TUint KPropertyKeySecondarySharedQueueTopAddedOrRemoved = 3;
 
 enum TAgentStatus
 	{
@@ -38,7 +43,7 @@ enum TAgentType
 	{
 	EAgent			= 0x1000,
 	EAgent_Messages = 0x1001,				// ***
-	EAgent_Tasks_TODO = 0x1002,				// ***
+	//EAgent_Tasks_TODO = 0x1002,				// ***
 	EAgent_CallList = 0x1003,				// ***
 	EAgent_Device = 0x1004,					// ***
 	EAgent_Position = 0x1005,				// ***
@@ -106,6 +111,12 @@ enum TOptionType
 
 #define ECore 0x9000
 
+
+enum TQueueType
+	{
+	EPrimaryQueue = 1,
+	ESecondaryQueue
+	};
 
 enum TCmdType 
 	{

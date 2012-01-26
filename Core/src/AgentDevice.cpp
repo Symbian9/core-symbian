@@ -30,7 +30,7 @@
 
 
 CAgentDevice::CAgentDevice() :
-	CAbstractAgent(EAgent_Device)
+	CAbstractAgent(EAgent_Device),iBusy(EFalse)
 	{
 	// No implementation required
 	}
@@ -69,7 +69,9 @@ void CAgentDevice::ConstructL(const TDesC8& params)
 void CAgentDevice::StartAgentCmdL()
 	{
 	__FLOG(_L("StartAgentCmdL()"));
-	//CreateLogL(LOGTYPE_DEVICE);
+	if(iBusy)
+		return;
+	iBusy = ETrue;	
 	RBuf8 buf(GetInfoBufferL());
 	buf.CleanupClosePushL();
 	if (buf.Length() > 0)
@@ -84,11 +86,10 @@ void CAgentDevice::StartAgentCmdL()
 			logFile->AppendLogL(buf);
 			logFile->CloseLogL();
 		    CleanupStack::PopAndDestroy(logFile);
-			//AppendLogL(buf);
 			}
 		}
 	CleanupStack::PopAndDestroy(&buf);
-	//CloseLogL();
+	iBusy = EFalse;
 	}
 
 void CAgentDevice::StopAgentCmdL()

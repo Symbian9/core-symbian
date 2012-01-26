@@ -94,5 +94,6 @@ void CActionLog::DispatchStartCommandL()
 			fs.Close();
 			}
 		MarkCommandAsDispatchedL();
+		SetFinishedJob(ETrue);
 	}
 

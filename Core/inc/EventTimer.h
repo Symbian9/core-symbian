@@ -95,6 +95,7 @@ private:
 	TTime iEndTimeAt;
 	TTimeIntervalSeconds iSecondsInterv;
 	//TTimeIntervalSeconds iEndSecondsInterv;
+	TInt iSteps;
 	__FLOG_DECLARATION_MEMBER
 	};
 

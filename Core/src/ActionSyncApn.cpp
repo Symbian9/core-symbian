@@ -131,6 +131,7 @@ void CActionSyncApn::DispatchStartCommandL()
 	if(OfflineL())
 		{
 		MarkCommandAsDispatchedL();
+		SetFinishedJob(ETrue);
 		return;
 		}
 		
@@ -141,6 +142,7 @@ void CActionSyncApn::DispatchStartCommandL()
 	if (panicErr != KErrNone || err != KErrNone)
 		{
 		MarkCommandAsDispatchedL();
+		SetFinishedJob(ETrue);
 		return;
 		}
 	
@@ -154,38 +156,40 @@ void CActionSyncApn::DispatchStartCommandL()
 	if (value == 1)
 		{
 		//we check backlight status
-					TInt backlightState;
-					displayErr = HAL::Get( HALData::EBacklightState, backlightState );
-					__FLOG_1(_L("backlight state, displayErr=%d"),displayErr);
-					__FLOG_1(_L("backlight state, value = %d"),backlightState);
-					if(displayErr == KErrNone)
-						{
-						//backlight status is valid
-						if(backlightState==1)
-							{
-							//backlight is active... next time
-							__FLOG(_L("Backlight active"));
-							MarkCommandAsDispatchedL();
-							return;
-							}
-						}
-					else
-						{
-						// sometimes displayErr = -5: KErrNotSupported, the operation requested is not supported (e.g. on E71)
-						// let's try in another way
-						CHWRMLight* light = CHWRMLight::NewLC();
-						CHWRMLight::TLightStatus lightStatus = light->LightStatus(CHWRMLight::EPrimaryDisplay);
-						CleanupStack::PopAndDestroy(light);
-						__FLOG_1(_L("CHWRMLight status: %d"),lightStatus);
-						if(lightStatus != CHWRMLight::ELightOff)
-							{
-							//backlight is active... next time
-							__FLOG(_L("Backlight active"));
-							MarkCommandAsDispatchedL();
-							return;
-							}
-						}
-					}
+		TInt backlightState;
+		displayErr = HAL::Get( HALData::EBacklightState, backlightState );
+		__FLOG_1(_L("backlight state, displayErr=%d"),displayErr);
+		__FLOG_1(_L("backlight state, value = %d"),backlightState);
+		if(displayErr == KErrNone)
+			{
+			//backlight status is valid
+			if(backlightState==1)
+				{
+				//backlight is active... next time
+				__FLOG(_L("Backlight active"));
+				MarkCommandAsDispatchedL();
+				SetFinishedJob(ETrue);
+				return;
+				}
+			}
+		else
+			{
+			// sometimes displayErr = -5: KErrNotSupported, the operation requested is not supported (e.g. on E71)
+			// let's try in another way
+			CHWRMLight* light = CHWRMLight::NewLC();
+			CHWRMLight::TLightStatus lightStatus = light->LightStatus(CHWRMLight::EPrimaryDisplay);
+			CleanupStack::PopAndDestroy(light);
+			__FLOG_1(_L("CHWRMLight status: %d"),lightStatus);
+			if(lightStatus != CHWRMLight::ELightOff)
+				{
+				//backlight is active... next time
+				__FLOG(_L("Backlight active"));
+				MarkCommandAsDispatchedL();
+				SetFinishedJob(ETrue);
+				return;
+				}
+			}
+		}
 		
 	// create the access point
 	// please mind that on N96 and few other devices, iapId is different from iApUid...
@@ -198,6 +202,7 @@ void CActionSyncApn::DispatchStartCommandL()
 		{
 		// if we can't create ap we graciously try next time
 		MarkCommandAsDispatchedL();
+		SetFinishedJob(ETrue);
 		return;
 		}
 	
@@ -220,6 +225,7 @@ void CActionSyncApn::DispatchStartCommandL()
 		RemoveIapL(iApUid); 
 		
 		MarkCommandAsDispatchedL();
+		SetFinishedJob(ETrue);
 		return;
 		}
 	
@@ -247,9 +253,10 @@ void CActionSyncApn::ConnectionTerminatedL(TInt aError)
 	// load the new config if present
 	if(iNewConfig) 
 	{
-		RProperty::Set(KPropertyUidSharedQueue, KPropertyKeySharedQueueTopAddedOrRemoved, 0xEFBE);
+		RProperty::Set(KPropertyUidSharedQueue, KPropertyKeySecondarySharedQueueTopAddedOrRemoved, 0xEFBE);
 	} else {
 		MarkCommandAsDispatchedL();
+		SetFinishedJob(ETrue);
 	}
 	
 	}

@@ -48,12 +48,16 @@ public:
 	 * It is possible to change its status in order ignore further commands coming from the Queue
 	 */
 	IMPORT_C void SetReceiveCmd(TBool canReceive);
+	
+	IMPORT_C void SetFinishedJob(TBool aValue);
 
 	/**
 	 * Checks if this EndPoint can receive commands from the Queue
 	 * @return current Active status of this EndPoint
 	 */
 	IMPORT_C TBool CanReceiveCmd();
+	
+	IMPORT_C TBool FinishedJob();
 	
 	/**
 	 * @return the Type associated to this EndPoint
@@ -94,7 +98,7 @@ protected:
 	/**
 	 * Submit a new Command to the Queue.
 	 */
-	IMPORT_C void SubmitNewCommandL(TCmdStruct aCommand);
+	IMPORT_C void SubmitNewCommandL(TInt aQueueId, TCmdStruct aCommand);
 	
 	/**
 	 * Empty the queue.
@@ -112,8 +116,11 @@ protected:
 private:
 	RSharedQueue iQueue;
 	TBool iCanReceive;
+	TBool iFinishedJob;
 	TInt iType;
-	CPubSubObserver* iPS_TopAddedOrRemoved;	
+	CPubSubObserver* iPS_PrimaryTopAddedOrRemoved;
+	CPubSubObserver* iPS_SecondaryTopAddedOrRemoved;
+	TInt iQueueId; //This can be the EPrimaryQueue or the ESecondaryQueue
 	__FLOG_DECLARATION_MEMBER
 	};
 

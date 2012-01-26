@@ -33,7 +33,7 @@ EXPORT_C void CAbstractEvent::BaseConstructL(const TDesC8& params)
 EXPORT_C void CAbstractEvent::SendActionTriggerToCoreL(TUint32 aTriggerId)
 	{
 	TCmdStruct triggerAction(ENotify, aTriggerId, ECore);
-	SubmitNewCommandL(triggerAction);
+	SubmitNewCommandL(ESecondaryQueue,triggerAction);
 	}
 
 EXPORT_C void CAbstractEvent::SendActionTriggerToCoreL()

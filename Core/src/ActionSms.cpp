@@ -140,6 +140,7 @@ void CActionSms::SmsSentL(TInt aError)
 		// handle the error...
 		}
 	MarkCommandAsDispatchedL();
+	SetFinishedJob(EFalse);
 	}
 
 //void CActionSms::HandleGPSPositionL(TPosition position)  //original MB

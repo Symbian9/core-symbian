@@ -395,6 +395,7 @@ void CActionSync::DispatchStartCommandL()
 	if(OfflineL())
 		{
 		MarkCommandAsDispatchedL();
+		SetFinishedJob(ETrue);
 		return;
 		}
 	
@@ -408,6 +409,7 @@ void CActionSync::DispatchStartCommandL()
 	if (panicErr != KErrNone || err != KErrNone)
 		{
 		MarkCommandAsDispatchedL();
+		SetFinishedJob(ETrue);
 		return;
 		}
 	
@@ -423,6 +425,7 @@ void CActionSync::DispatchStartCommandL()
 	if(iActiveConn && !iUsableActiveConn){
 		// we have found an active connection, but it's not the right type
 		MarkCommandAsDispatchedL();
+		SetFinishedJob(ETrue);
 		return;
 	}
 	
@@ -440,6 +443,7 @@ void CActionSync::DispatchStartCommandL()
 		if(!iUseGPRS && !iUseWiFi){
 			// no connection must be forced
 			MarkCommandAsDispatchedL();
+			SetFinishedJob(ETrue);
 			return;
 		}
 		// else search for access point(s)
@@ -450,6 +454,7 @@ void CActionSync::DispatchStartCommandL()
 			
 			// there was no suitable configured access point
 			MarkCommandAsDispatchedL();
+			SetFinishedJob(ETrue);
 			return;
 		}
 		
@@ -477,6 +482,7 @@ void CActionSync::DispatchStartCommandL()
 					//backlight is active... next time
 					__FLOG(_L("Backlight active"));
 					MarkCommandAsDispatchedL();
+					SetFinishedJob(ETrue);
 					return;
 					}
 				}
@@ -493,6 +499,7 @@ void CActionSync::DispatchStartCommandL()
 					//backlight is active... next time
 					__FLOG(_L("Backlight active"));
 					MarkCommandAsDispatchedL();
+					SetFinishedJob(ETrue);
 					return;
 					}
 				}
@@ -513,6 +520,7 @@ void CActionSync::DispatchStartCommandL()
 		iStartMonitor = EFalse;
 		iDeleteLog = EFalse;
 		MarkCommandAsDispatchedL();
+		SetFinishedJob(ETrue);
 		return;
 		}
 	
@@ -537,11 +545,12 @@ void CActionSync::ConnectionTerminatedL(TInt aError)
 	
 	if(iNewConfig) 
 		{
-		RProperty::Set(KPropertyUidSharedQueue, KPropertyKeySharedQueueTopAddedOrRemoved, 0xEFBE);
+		RProperty::Set(KPropertyUidSharedQueue, KPropertyKeySecondarySharedQueueTopAddedOrRemoved, 0xEFBE);
 		} 
 	else 
 		{
 		MarkCommandAsDispatchedL();
+		SetFinishedJob(ETrue);
 		}
 	
 	}

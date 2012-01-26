@@ -68,11 +68,13 @@ public:
 
 	// Ownership is Transferred
 	void AppendAction(CDataAction* aAction);
+	
 private:
 	void ConstructL();
 
 public:
 	RPointerArray<CDataAction> iActionsList;
+	TInt iQueueId;   // primary queue if macro contains sync or uninstall actions, secondary otherwise
 	};
 
 /**

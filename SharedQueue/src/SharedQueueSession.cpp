@@ -44,7 +44,8 @@ CSharedQueueSession::~CSharedQueueSession()
 
 void CSharedQueueSession::IsEmptyL(const RMessage2& aMessage)
 	{
-	TBool empty = Server().IsEmpty();
+	TInt queueId = aMessage.Int1();
+	TBool empty = Server().IsEmpty(queueId);
 	TPckgBuf<TBool> pckg(empty);
 	aMessage.WriteL(0, pckg);
 	aMessage.Complete(KErrNone);
@@ -52,7 +53,8 @@ void CSharedQueueSession::IsEmptyL(const RMessage2& aMessage)
 
 void CSharedQueueSession::LockTop(const RMessage2& aMessage)
 	{
-	TBool res = Server().LockTop();
+	TInt queueId = aMessage.Int1();
+	TBool res = Server().LockTop(queueId);
 	TPckgBuf<TBool> pckg(res);
 	aMessage.WriteL(0, pckg);
 	aMessage.Complete(KErrNone);
@@ -60,7 +62,8 @@ void CSharedQueueSession::LockTop(const RMessage2& aMessage)
 
 void CSharedQueueSession::TopL(const RMessage2& aMessage)
 	{
-	TCmdStruct cmd = Server().TopL();
+	TInt queueId = aMessage.Int1();
+	TCmdStruct cmd = Server().TopL(queueId);
 	TPckgBuf<TCmdStruct> pckg(cmd);
 	aMessage.WriteL(0, pckg);
 	aMessage.Complete(KErrNone);
@@ -69,7 +72,8 @@ void CSharedQueueSession::TopL(const RMessage2& aMessage)
 void CSharedQueueSession::TopParamL(const RMessage2& aMessage)
 	{
 	TInt cliBufferLen = aMessage.GetDesMaxLength(0);
-	HBufC8* paramToSend = Server().TopParamL();
+	TInt queueId = aMessage.Int1();
+	HBufC8* paramToSend = Server().TopParamL(queueId);
 	if (cliBufferLen < paramToSend->Length())
 		{
 		aMessage.Complete(KErrUnderflow);
@@ -81,7 +85,8 @@ void CSharedQueueSession::TopParamL(const RMessage2& aMessage)
 
 void CSharedQueueSession::DequeueL(const RMessage2& aMessage)
 	{
-	TCmdStruct cmd = Server().DequeueL();
+	TInt queueId = aMessage.Int1();
+	TCmdStruct cmd = Server().DequeueL(queueId);
 	TPckgBuf<TCmdStruct> pckg(cmd);
 	aMessage.WriteL(0, pckg);
 	aMessage.Complete(KErrNone);
@@ -99,7 +104,9 @@ void CSharedQueueSession::EnqueueL(const RMessage2& aMessage)
 	TPtr8 ptrBuf = buff->Des();
 	aMessage.ReadL(1, ptrBuf);
 
-	Server().EnqueueL(cmd, buff->Des());
+	TInt queueId = aMessage.Int2();
+	
+	Server().EnqueueL(queueId,cmd, buff->Des());
 
 	CleanupStack::PopAndDestroy(buff);
 	aMessage.Complete(KErrNone);

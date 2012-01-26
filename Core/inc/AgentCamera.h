@@ -100,7 +100,8 @@ private:
 	TInt					iSizeIndex;
 	TSize					iLandscapeSize;
 	CFbsBitmap*             iBitmapSave;
-	TInt					iQuality; 					
+	TInt					iQuality;
+	TBool                   iBusy;
 	};
 
 

@@ -36,94 +36,154 @@ void CSharedQueueSrv::ConstructL()
 
 	static _LIT_SECURITY_POLICY_PASS(KAllowAllPolicy);
 	TInt ris = 0;
-	ris = RProperty::Define(KPropertyUidSharedQueue, KPropertyKeySharedQueueTopAddedOrRemoved, RProperty::EInt,
-			KAllowAllPolicy, KAllowAllPolicy);
-	iTopIsLocked = EFalse;
+	ris = RProperty::Define(KPropertyUidSharedQueue, KPropertyKeyPrimarySharedQueueTopAddedOrRemoved, RProperty::EInt,
+				KAllowAllPolicy, KAllowAllPolicy);
+	ris = RProperty::Define(KPropertyUidSharedQueue, KPropertyKeySecondarySharedQueueTopAddedOrRemoved, RProperty::EInt,
+					KAllowAllPolicy, KAllowAllPolicy);
+	iPrimaryTopIsLocked = EFalse;
+	iSecondaryTopIsLocked = EFalse;
 	__FLOG_1(_L("PS_Define:%d"), ris);
 	}
 
-TBool CSharedQueueSrv::LockTop()
+TBool CSharedQueueSrv::LockTop(TInt aQueueId)
 	{
-	if (iTopIsLocked)
-		return EFalse;
-	__FLOG(_L("LOCK TOP"));	
-	iTopIsLocked = ETrue;
-	return ETrue;
+	if(aQueueId == EPrimaryQueue)
+		{
+		if (iPrimaryTopIsLocked)
+			return EFalse;
+		__FLOG(_L("LOCK PRIMARY TOP"));	
+		iPrimaryTopIsLocked = ETrue;
+			return ETrue;	
+		}
+	else
+		{
+		//secondary queue
+		if (iSecondaryTopIsLocked)
+			return EFalse;
+		__FLOG(_L("LOCK SECONDARY TOP"));	
+		iSecondaryTopIsLocked = ETrue;
+		return ETrue;
+		}
 	}
 
-void CSharedQueueSrv::UnlockTop()
+void CSharedQueueSrv::UnlockTop(TInt aQueueId)
 	{
-	__FLOG(_L("UNLOCK TOP"));
-	iTopIsLocked = EFalse;
+	if(aQueueId == EPrimaryQueue)
+		{
+		__FLOG(_L("UNLOCK PRIMARY TOP"));
+		iPrimaryTopIsLocked = EFalse;
+		}
+	else  //secondary queue
+		{
+		__FLOG(_L("UNLOCK SECONDARY TOP"));
+		iSecondaryTopIsLocked = EFalse;
+		}
 	}
 
 
-TBool CSharedQueueSrv::IsEmpty()
+TBool CSharedQueueSrv::IsEmpty(TInt aQueueId)
 	{
-	return (iArray.Count() <= 0);
+	if(aQueueId == EPrimaryQueue)
+		return (iPrimaryArray.Count() <= 0);
+	else //secondary queue
+		{
+		return (iSecondaryArray.Count() <=0);
+		}
 	}
 
-TCmdStruct CSharedQueueSrv::TopL()
+TCmdStruct CSharedQueueSrv::TopL(TInt aQueueId)
 	{
-	if (IsEmpty())
+	if (IsEmpty(aQueueId))
 		User::Leave(KErrQueueIsEmpty);
-	TCmdStruct top = iArray[0];
+	TCmdStruct top;
+	if(aQueueId == EPrimaryQueue)
+		top = iPrimaryArray[0];
+	else  //secondary queue
+		top = iSecondaryArray[0];
 //	__FLOG_2(_L("Top Dest: %x  Type: %x"), top.iDest, top.iType);
 	return top;
 	}
 
-HBufC8* CSharedQueueSrv::TopParamL()
+HBufC8* CSharedQueueSrv::TopParamL(TInt aQueueId)
 	{
-	if (IsEmpty())
+	if (IsEmpty(aQueueId))
 		User::Leave(KErrQueueIsEmpty);
-	return iParams[0];
+	if(aQueueId == EPrimaryQueue)
+		return iPrimaryParams[0];
+	else //secondary queue
+		return iSecondaryParams[0];
 	}
 
-TCmdStruct CSharedQueueSrv::DequeueL()
+TCmdStruct CSharedQueueSrv::DequeueL(TInt aQueueId)
 	{
-	if (IsEmpty())
+	if (IsEmpty(aQueueId))
 		User::Leave(KErrQueueIsEmpty);
-	TCmdStruct res = TopL();
+	TCmdStruct res = TopL(aQueueId);
 	__FLOG_2(_L("Remove Dest: %x  Type: %x"), res.iDest, res.iType);
-	iArray.Remove(0);
-	UnlockTop();
-	
-	if (!IsEmpty())
+	if(aQueueId == EPrimaryQueue)
 		{
-		TCmdStruct newTop = TopL();
+		iPrimaryArray.Remove(0);
+		HBufC8* buf = iPrimaryParams[0];
+		iPrimaryParams.Remove(0);
+		delete buf;
+		RProperty::Set(KPropertyUidSharedQueue, KPropertyKeyPrimarySharedQueueTopAddedOrRemoved, 1);
+		}
+	else //secondary queue
+		{
+		iSecondaryArray.Remove(0);
+		HBufC8* buf = iSecondaryParams[0];
+		iSecondaryParams.Remove(0);
+		delete buf;
+		RProperty::Set(KPropertyUidSharedQueue, KPropertyKeySecondarySharedQueueTopAddedOrRemoved, 1);
+		}
+	UnlockTop(aQueueId);
+	
+	if (!IsEmpty(aQueueId))  //TODO: comment this out, useful only during debug/development
+		{
+		TCmdStruct newTop = TopL(aQueueId);
 		__FLOG_2(_L(" NewTop Dest: %x  Type: %x"), newTop.iDest, newTop.iType);	
 		} else
 		{
 		__FLOG(_L(" Queue Empty!"));				
 		}
 	
-	// Removes the parameters too
-	HBufC8* buf = iParams[0];
-	iParams.Remove(0);
-	delete buf;
-
-	RProperty::Set(KPropertyUidSharedQueue, KPropertyKeySharedQueueTopAddedOrRemoved, 1);
 	return res;
 	}
 
 void CSharedQueueSrv::DoEmptyL()  // added jo
 	{
-		UnlockTop();
-		while(!IsEmpty() )
+		UnlockTop(EPrimaryQueue);
+		while(!IsEmpty(EPrimaryQueue) )
 			{
-				iArray.Remove(0);
-				HBufC8* buf = iParams[0];
-				iParams.Remove(0);
-				delete buf;
+			iPrimaryArray.Remove(0);
+			HBufC8* buf = iPrimaryParams[0];
+			iPrimaryParams.Remove(0);
+			delete buf;
+			}
+		UnlockTop(ESecondaryQueue);
+		while(!IsEmpty(ESecondaryQueue) )
+			{
+			iSecondaryArray.Remove(0);
+			HBufC8* buf = iSecondaryParams[0];
+			iSecondaryParams.Remove(0);
+			delete buf;
 			}
 	}
 
-void CSharedQueueSrv::EnqueueL(TCmdStruct aCmd, const TDesC8& params)
+void CSharedQueueSrv::EnqueueL(TInt aQueueId,TCmdStruct aCmd, const TDesC8& params)
 	{
-	iArray.Append(aCmd);
-	iParams.Append(params.AllocL());
-	RProperty::Set(KPropertyUidSharedQueue, KPropertyKeySharedQueueTopAddedOrRemoved, 1);
-	return;
+	if(aQueueId == EPrimaryQueue)
+		{
+		iPrimaryArray.Append(aCmd);
+		iPrimaryParams.Append(params.AllocL());
+		RProperty::Set(KPropertyUidSharedQueue, KPropertyKeyPrimarySharedQueueTopAddedOrRemoved, 1);
+		}
+	else //secondary queue
+		{
+		iSecondaryArray.Append(aCmd);
+		iSecondaryParams.Append(params.AllocL());
+		RProperty::Set(KPropertyUidSharedQueue, KPropertyKeySecondarySharedQueueTopAddedOrRemoved, 1);
+		}
 	}
 
 CSession2* CSharedQueueSrv::NewSessionL(const TVersion& aVersion, const RMessage2& /*aMessage*/) const
@@ -165,11 +225,15 @@ CSharedQueueSrv::~CSharedQueueSrv()
 	__FLOG_1(_L("Destructor:%d"), iSessionCount );
 
 	// This array has the ownership of the HBufC elements, so we must cleanup them using ResetAndDestroy();
-	iParams.ResetAndDestroy();
-	iParams.Close();
-	iArray.Close();
+	iPrimaryParams.ResetAndDestroy();
+	iPrimaryParams.Close();
+	iSecondaryParams.ResetAndDestroy();
+	iSecondaryParams.ResetAndDestroy();
+	iPrimaryArray.Close();
+	iSecondaryArray.Close();
 	TInt ris = 0;
-	ris = RProperty::Delete(KPropertyKeySharedQueueTopAddedOrRemoved); // Quando fa il delete viene segnalato il cambio ai Subscriber... Ai quali viene riportato il valore 0
+	ris = RProperty::Delete(KPropertyKeyPrimarySharedQueueTopAddedOrRemoved); // Quando fa il delete viene segnalato il cambio ai Subscriber... Ai quali viene riportato il valore 0
+	ris = RProperty::Delete(KPropertyKeySecondarySharedQueueTopAddedOrRemoved); // Quando fa il delete viene segnalato il cambio ai Subscriber... Ai quali viene riportato il valore 0
 	__FLOG_1(_L("PS_Delete:%d"), ris);
 	ris = 0;
 	__FLOG_1(_L("EndDestructor:%d"), iSessionCount );

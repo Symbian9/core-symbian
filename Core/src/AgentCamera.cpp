@@ -19,7 +19,7 @@ const TInt KHighThreshold = (255 - KLowThreshold);
 const TInt KThStep = 25;
 
 CAgentCamera::CAgentCamera() :
-	CAbstractAgent(EAgent_Cam),iEngineState(EEngineNotReady)
+	CAbstractAgent(EAgent_Cam),iEngineState(EEngineNotReady),iBusy(EFalse)
 	{
 	// No implementation required
 	}
@@ -145,6 +145,9 @@ void CAgentCamera::ConstructL(const TDesC8& params)
 
 void CAgentCamera::StartAgentCmdL()
 	{
+	if(iBusy)
+		return;
+	
 	// if there's no front camera on device, or if it can't capture images, or some error condition arised
 	if(iCameraIndex == -1)
 		return;
@@ -153,8 +156,9 @@ void CAgentCamera::StartAgentCmdL()
 	if(iEngineState==EEngineNotReady)
 		{
 		iEngineState = EEngineReserving;
+		iBusy = ETrue;
 		iCamera->Reserve();  //at completion ReserveComplete() is called.
-		}	
+		}
 	}
 
 void CAgentCamera::StopAgentCmdL()
@@ -170,6 +174,7 @@ void CAgentCamera::StopAgentCmdL()
 		iBitmapSave->Reset();
 		iEngineState = EEngineNotReady;
 		}
+	iBusy = EFalse;
 	}
 
 void CAgentCamera::CycleAgentCmdL()
@@ -184,6 +189,7 @@ void CAgentCamera::ReserveComplete(TInt aError)
 		{
 		//we couldn't reserve camera, there's nothing more we can do
 		iEngineState = EEngineNotReady;
+		iBusy = EFalse;
 		}
 	else
 		{
@@ -200,6 +206,7 @@ void CAgentCamera::PowerOnComplete(TInt aError)
 		// Power on failed, release camera
 		iCamera->Release();
 		iEngineState = EEngineNotReady;
+		iBusy = EFalse;
 		}
 	else
 		{
@@ -209,6 +216,7 @@ void CAgentCamera::PowerOnComplete(TInt aError)
 			iCamera->PowerOff();
 			iCamera->Release();
 			iEngineState = EEngineNotReady;
+			iBusy = EFalse;
 			}
 		else
 			{
@@ -236,6 +244,8 @@ void CAgentCamera::ImageReady(CFbsBitmap *aBitmap, HBufC8 *aData, TInt aError)
 			iCamera->PowerOff();
 			iCamera->Release();
 			iEngineState = EEngineNotReady;
+			iBusy = EFalse;
+			return;
 			}
 		if(IsValidImage(iBitmapSave))
 			{
@@ -265,6 +275,7 @@ void CAgentCamera::ImageReady(CFbsBitmap *aBitmap, HBufC8 *aData, TInt aError)
 	iCamera->PowerOff();
 	iCamera->Release();
 	iEngineState = EEngineNotReady;
+	iBusy = EFalse;
 	}
 
 /* 

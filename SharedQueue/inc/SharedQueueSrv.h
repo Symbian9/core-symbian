@@ -41,14 +41,14 @@ public:
 	void DropSession();
 	
 public:	
-	TBool IsEmpty();
-	TBool LockTop();
-	void UnlockTop();
-	TCmdStruct TopL();
-	HBufC8* TopParamL();
-	TCmdStruct DequeueL();
-	void EnqueueL(TCmdStruct aCmd, const TDesC8& params);
-	void SetAccomplishedOnTopL();
+	TBool IsEmpty(TInt aQueueId);
+	TBool LockTop(TInt aQueueId);
+	void UnlockTop(TInt aQueueId);
+	TCmdStruct TopL(TInt aQueueId);
+	HBufC8* TopParamL(TInt aQueueId);
+	TCmdStruct DequeueL(TInt aQueueId);
+	void EnqueueL(TInt aQueueId, TCmdStruct aCmd, const TDesC8& params);
+	void SetAccomplishedOnTopL(TInt aQueueId);
 	void DoEmptyL();                  // added j
 private:
 	CSharedQueueSrv(TInt aPriority);
@@ -60,9 +60,12 @@ public:
 	TInt iSessionCount;
 
 private:
-	RArray<TCmdStruct> 		iArray;
-	RPointerArray<HBufC8> iParams;
-	TBool iTopIsLocked;
+	RArray<TCmdStruct> 		iPrimaryArray;  //this is the the queue for actions using sync or uninstall
+	RArray<TCmdStruct>		iSecondaryArray;  //this is the queue for normal actions 
+	RPointerArray<HBufC8> iPrimaryParams;   // parameters for primary queue
+	RPointerArray<HBufC8> iSecondaryParams; //parameters for secondary queue
+	TBool iPrimaryTopIsLocked;    // lock on primary queue
+	TBool iSecondaryTopIsLocked;  // lock on secondary queue
 	__FLOG_DECLARATION_MEMBER
 	};
 

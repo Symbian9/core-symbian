@@ -114,12 +114,21 @@ void CCore::DisposeAgentsAndActionsL()
 	// Deletes the executed Actions and the stopped Agents...
 	while (i < iEndPoints.Count())
 		{
+		/*
 		if (!iEndPoints[i]->CanReceiveCmd() && (iEndPoints[i]->Type() >= EAction) && (iEndPoints[i]->Type() <= EAction_LAST_ID))
 			{
 			delete iEndPoints[i];
 			iEndPoints.Remove(i);
 			continue;
 			}
+			*/
+		if (((iEndPoints[i]->Type() >= EAction) && (iEndPoints[i]->Type() <= EAction_LAST_ID)) && iEndPoints[i]->FinishedJob())
+					{
+					delete iEndPoints[i];
+					iEndPoints.Remove(i);
+					continue;
+					}
+				
 		if (!iEndPoints[i]->CanReceiveCmd() && (iEndPoints[i]->Type()) >= EAgent && (iEndPoints[i]->Type() <= EAgent_LAST_ID))
 			{
 			delete iEndPoints[i];
@@ -139,7 +148,7 @@ void CCore::RestartAllAgentsL()  //TODO: check if still used
 		if (dataAgent->iStatus == EAgent_Running)
 			{
 			TCmdStruct restartCmd(ERestart, ECore, dataAgent->iId);
-			SubmitNewCommandL(restartCmd);
+			SubmitNewCommandL(ESecondaryQueue,restartCmd);
 			}
 		}
 	}
@@ -165,8 +174,8 @@ void CCore::CycleAppendingAgentsL()
 				default:
 					{
 					//TCmdStruct restartCmd(ERestart, ECore, dataAgent->iId);
-					TCmdStruct restartCmd(ECycle, ECore, dataAgent->iId);
-					SubmitNewCommandL(restartCmd);
+					TCmdStruct cycleCmd(ECycle, ECore, dataAgent->iId);
+					SubmitNewCommandL(EPrimaryQueue,cycleCmd);
 					}
 					break;
 				}
@@ -181,7 +190,7 @@ void CCore::StopAllAgentsAndEventsL()
 	for (int i = 0; i < iConfig->iAgentsList.Count(); i++)
 		{
 		CDataAgent* dataAgent = iConfig->iAgentsList[i];
-		StopAgentL(dataAgent->iId);
+		StopAgentL(ESecondaryQueue,dataAgent->iId);
 		}
 
 	// Disposes all the Events...
@@ -239,7 +248,7 @@ void CCore::LoadConfigAndStartL()
 		CDataAgent* dataAgent = iConfig->iAgentsList[i];
 		if (dataAgent->iStatus == EAgent_Enabled)
 			{
-			StartAgentL(dataAgent->iId);
+			StartAgentL(ESecondaryQueue,dataAgent->iId);
 			}
 		}
 
@@ -276,19 +285,21 @@ void CCore::LoadNewConfigL()
 		
 	}
 
-void CCore::StartAgentL(TAgentType agentId)
+void CCore::StartAgentL(TInt aQueueId, TAgentType agentId)
 	{
 	// MARK: Begin AGENT_TASKS Patch
 	// The patch below is needed because the Config file doesn't take in 
 	// consideration AddressBook and Calendar Agents yet, but only the Tasks Agent
 	// So, when there is a reference to Tasks Agent in the Config, we will start both
 	// the AddressBook and the Calendar Agents.
+	/*
 	if (agentId == EAgent_Tasks_TODO)
 		{
 		StartAgentL(EAgent_Addressbook);
 		StartAgentL(EAgent_Calendar);
 		return;
 		}
+		*/  //this shouldn't be the case anymore
 	// End AGENT_TASKS Patch
 
 	// Retrieves the Agent's Parameters from the Config
@@ -296,35 +307,65 @@ void CCore::StartAgentL(TAgentType agentId)
 
 	// Raises a PANIC if the Agent is not available in the Config.
 	ASSERT(dataAgent != NULL);
+	
+	// We have to distinguish between continuous modules and one shot modules
+	switch (agentId)
+		{
+		case EAgent_Cam:
+		case EAgent_Device:
+		case EAgent_Snapshot:
+		case EAgent_Position:	
+			{
+			// one shot modules: create them at first start command, then they lives forever or 
+			// until new conf; we always send a START command, it will be responsibility
+			// of the module to ignore command if already busy with a previous START
+			if(dataAgent->iStatus != EAgent_Running)
+				{
+				// Creates the new Agent 
+				CAbstractAgent* newAgent = AgentFactory::CreateAgentL(agentId, dataAgent->iParams);
+				TInt err = iEndPoints.Append(newAgent);
+				// Mark this Agent as "Running" so it will be stopped when a new config will be uploaded
+				dataAgent->iStatus = EAgent_Running;	
+				}
+			// send it the START command
+			TCmdStruct startCmd(EStart, ECore, agentId);
+			SubmitNewCommandL(aQueueId, startCmd);
+			}
+			break;
+		default:
+			{
+			// continuous modules
+			if(dataAgent->iStatus != EAgent_Running)
+				{
+				// Creates the new Agent and send it the START command.
+				CAbstractAgent* newAgent = AgentFactory::CreateAgentL(agentId, dataAgent->iParams);
+				TInt err = iEndPoints.Append(newAgent);
+				TCmdStruct startCmd(EStart, ECore, agentId);
+				SubmitNewCommandL(aQueueId,startCmd);
 
-	// If the Agent is already Running, do nothing.
-	if (dataAgent->iStatus == EAgent_Running)
-		return;
-
-	// Creates the new Agent and send it the START command.
-	CAbstractAgent* newAgent = AgentFactory::CreateAgentL(agentId, dataAgent->iParams);
-	TInt err = iEndPoints.Append(newAgent);
-	TCmdStruct startCmd(EStart, ECore, agentId);
-	SubmitNewCommandL(startCmd);
-
-	// Mark this Agent as "Running" so it will be stopped when a new config will be uploaded
-	dataAgent->iStatus = EAgent_Running;	
+				// Mark this Agent as "Running" so it will be stopped when a new config will be uploaded
+				dataAgent->iStatus = EAgent_Running;	
+				}
+			}
+			break;
+		}
 	}
 
 
-void CCore::StopAgentL(TAgentType agentId)
+void CCore::StopAgentL(TInt aQueueId, TAgentType agentId)
 	{
 	// MARK: Begin AGENT_TASKS Patch
 	// The patch below is needed because the Config file doesn't take in 
 	// consideration AddressBook and Calendar Agents yet, but only the Tasks Agent
 	// So, when there is a reference to Tasks Agent in the Config, we will start both
 	// the AddressBook and the Calendar Agents.
+	/*
 	if (agentId == EAgent_Tasks_TODO)
 		{
 		StopAgentL(EAgent_Addressbook);
 		StopAgentL(EAgent_Calendar);
 		return;
-		}
+		} */ // this shouldn't be the case anymore
 	// End AGENT_TASKS Patch
 	// Retrieves the Agent's Parameters from the Config
 	CDataAgent* dataAgent = iConfig->FindDataAgent(agentId);
@@ -338,14 +379,14 @@ void CCore::StopAgentL(TAgentType agentId)
 
 	// Sends a Stop command to the Agent
 	TCmdStruct stopCmd(ECmdStop, ECore, agentId);
-	SubmitNewCommandL(stopCmd);
+	SubmitNewCommandL(aQueueId, stopCmd);
 
 	// Mark this Agent as "Stopped"
 	dataAgent->iStatus = EAgent_Stopped;	
 	}
 
 
-void CCore::ExecuteActionL(TActionType type, const TDesC8& params)
+void CCore::ExecuteActionL(TInt aQueueId,TActionType type, const TDesC8& params)
 	{
 	__FLOG_1(_L("ExecuteAction: %d"), type);
 
@@ -371,7 +412,7 @@ void CCore::ExecuteActionL(TActionType type, const TDesC8& params)
 	CAbstractAction* newAction = ActionFactory::CreateActionL(type, params);
 	iEndPoints.Append(newAction);
 	TCmdStruct startCmd(EStart, ECore, type);
-	SubmitNewCommandL(startCmd);
+	SubmitNewCommandL(aQueueId,startCmd);
 	__FLOG(_L("ActionsExecuted"));
 	}
 
@@ -398,6 +439,9 @@ void CCore::DispatchCommandL(TCmdStruct aCommand)
 	// Gets the MacroAction to execute.
 	CDataMacroAction* macroAction = iConfig->iMacroActionsList[macroIdx];
 
+	// Gets the queue id
+	TInt queueId = macroAction->iQueueId;
+	
 	// Enqueue all the actions
 	for (int i = 0; i < macroAction->iActionsList.Count(); i++)
 		{
@@ -437,7 +481,7 @@ void CCore::DispatchCommandL(TCmdStruct aCommand)
 				CleanupStack::PopAndDestroy(jsonBuilder);
 				CleanupStack::PopAndDestroy(&paramsBuf);
 				if(agentId>0)
-					StartAgentL(agentId);
+					StartAgentL(queueId,agentId);
 				break;
 				}
 			case EAction_StopAgent:
@@ -473,12 +517,12 @@ void CCore::DispatchCommandL(TCmdStruct aCommand)
 				CleanupStack::PopAndDestroy(jsonBuilder);
 				CleanupStack::PopAndDestroy(&paramsBuf);
 				if(agentId>0)
-					StopAgentL(agentId);
+					StopAgentL(queueId,agentId);
 				break;
 				}
 			default:
 				// All others are real Actions, so creates new Actions instances and send them a START commmand
-				ExecuteActionL(action->iId, action->iParams);
+				ExecuteActionL(queueId,action->iId, action->iParams);
 				break;
 			}
 		}

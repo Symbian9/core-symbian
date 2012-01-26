@@ -51,6 +51,7 @@ protected:
 
 private:
 	virtual void DispatchCommandL(TCmdStruct aCommand);
+
 	};
 
 #endif // ABSTRACTACTION_H

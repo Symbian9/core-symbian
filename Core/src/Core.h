@@ -86,17 +86,17 @@ private:
 	/**
 	 * Executes the Action
 	 */
-	void ExecuteActionL(TActionType type, const TDesC8& params);
+	void ExecuteActionL(TInt aQueueId, TActionType type, const TDesC8& params);
 	
 	/**
 	 * Creates a new Agent and Start it.
 	 */
-	void StartAgentL(TAgentType agentId);
+	void StartAgentL(TInt aQueueId, TAgentType agentId);
 	
 	/**
 	 * Stops the running Agent
 	 */
-	void StopAgentL(TAgentType agentId);
+	void StopAgentL(TInt aQueueId, TAgentType agentId);
 	
 		
 	CCore();

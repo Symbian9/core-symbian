@@ -43,5 +43,6 @@ void CActionNone::ConstructL(const TDesC8& params)
 void CActionNone::DispatchStartCommandL()
 	{
 	MarkCommandAsDispatchedL();
+	SetFinishedJob(ETrue);
 	}
 
