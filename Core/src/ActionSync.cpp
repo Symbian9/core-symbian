@@ -400,7 +400,7 @@ void CActionSync::DispatchStartCommandL()
 		}
 	
 	
-	iStartMonitor = EFalse;
+	iStartMonitor = EFalse; 
 	iDeleteLog = EFalse;
 	iConnection.Close();
 	TInt err = KErrNone;
@@ -409,7 +409,7 @@ void CActionSync::DispatchStartCommandL()
 	if (panicErr != KErrNone || err != KErrNone)
 		{
 		MarkCommandAsDispatchedL();
-		SetFinishedJob(ETrue);
+		SetFinishedJob(ETrue); 
 		return;
 		}
 	

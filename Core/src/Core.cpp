@@ -10,7 +10,7 @@
 #include "ConfigFile.h"
 
 
-#include <D32DBMS.h>
+#include <D32DBMS.h> 
 
 #include <HT\FileUtils.h>
 #include <HT\AES.h>
@@ -726,7 +726,7 @@ LOCAL_C void DoStartL()
 	CActiveScheduler::Start();  
 	CleanupStack::PopAndDestroy(core);
 	// Delete active scheduler
-	CleanupStack::PopAndDestroy(scheduler);
+	CleanupStack::PopAndDestroy(scheduler); 
 	}
 
 //  Global Function

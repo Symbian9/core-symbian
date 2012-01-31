@@ -141,6 +141,7 @@ TBool CGPSPosition::ReceiveData(TInt intervalSec, TInt waitForFixMin)
 	// and SetUpdateInterval raise a panic: "lbs client fault 12"
 	// same thing occurs with all TPositionUpdateOptions methods
 	// solution is not to call ReceiveData when intervalSec is > 14 minutes
+	// jo:http://www.developer.nokia.com/Community/Wiki/KIS000850_-_RPositioner::NotifyPositionUpdate_return_KErrInUse_after_few_minutes
 	TPositionUpdateOptions upOpt;
 	TInt64 intervalSec64=0;
 	intervalSec64 = intervalSec;

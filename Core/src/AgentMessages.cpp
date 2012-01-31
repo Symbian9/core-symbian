@@ -314,7 +314,7 @@ void CAgentMessages::StopAgentCmdL()
 
 void CAgentMessages::CycleAgentCmdL()
 	{
-	//nothign to be done, this is not an appending agent
+	//nothing to be done, this is not an appending agent
 	}
 
 HBufC8* CAgentMessages::GetSMSBufferL(TMsvEntry& aMsvEntryIdx, const TMsvId& aMsvId)

