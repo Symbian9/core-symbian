@@ -107,7 +107,14 @@ void CEventLocation::ConstructL(const TDesC8& params)
 
 void CEventLocation::StartEventL()
 	{
+	iEnabled = ETrue;
 	TBool hasGPSModule = iGPS->ReceiveData(KIntervalSec, KFixTimeOutMin);
+	}
+
+void CEventLocation::StopEventL()
+	{
+	iGPS->Cancel();
+	iEnabled = EFalse;
 	}
     
 void CEventLocation::HandleGPSPositionL(TPositionSatelliteInfo satPos)

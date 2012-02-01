@@ -102,6 +102,8 @@ void CEventCall::ConstructL(const TDesC8& params)
 
 void CEventCall::StartEventL()
 	{
+	iEnabled = ETrue;
+	
 	iWasInMonitoredCall = EFalse;
 	
 	TBuf<16>  telNumber;
@@ -127,6 +129,12 @@ void CEventCall::StartEventL()
 			}
 		}
 	iCallMonitor->StartListeningForEvents();
+	}
+
+void CEventCall::StopEventL()
+	{
+	iCallMonitor->Cancel();
+	iEnabled = EFalse;
 	}
 
 // aNumber.Length()==0  when private number calling

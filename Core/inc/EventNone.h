@@ -46,6 +46,8 @@ public:
 protected:
 	// from CAbstractQueueEndPoint
 	virtual void StartEventL();
+	
+	virtual void StopEventL();
 
 private:
 

@@ -111,6 +111,8 @@ void CEventBattery::StartEventL()
 	{
 	__FLOG(_L("StartEventL()"));
 	
+	iEnabled = ETrue;
+	
 	// Initialize Properly the iWasInRange value, 
 	iWasInRange = InRange();
 	
@@ -122,6 +124,12 @@ void CEventBattery::StartEventL()
 	// Receives change notifications of the battery status
 	iPhone->NotifyBatteryStatusChange(iBatteryInfoPckg);
 	
+	}
+
+void CEventBattery::StopEventL()
+	{
+	iPhone->Cancel();
+	iEnabled = EFalse;
 	}
 
 TBool CEventBattery::InRange()

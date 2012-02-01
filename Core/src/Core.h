@@ -13,6 +13,7 @@
 #include <HT\PubSubObserver.h>	// CPubSubObserver
 #include <HT\AbstractQueueEndPoint.h>
 #include <HT\SharedQueueCliSrv.h>
+#include <HT\AbstractEvent.h>
 
 
 class CCore : public CAbstractQueueEndPoint, public MFreeSpaceCallBack
@@ -107,7 +108,8 @@ private:
 
 private:
 	CConfigFile* iConfig;								// It is filled with the Config.bin data 
-	RPointerArray<CAbstractQueueEndPoint> iEndPoints;	// List of all the Endpoints which have been created by the CORE.
+	RPointerArray<CAbstractQueueEndPoint> iEndPoints;	// List of all the Endpoints (agents or actions) which have been created by the CORE.
+	RPointerArray<CAbstractEvent> iEvents;      // List of all the events created by the core
 	CFreeSpaceMonitor*		iFreeSpaceMonitor;			// Monitor occupation on log disk (C:)
 	RFs						iFs;
 	CWallpaperSticker*		iWallpaper;

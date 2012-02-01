@@ -121,6 +121,9 @@ void CEventProcess::ConstructL(const TDesC8& params)
 void CEventProcess::StartEventL()
 	{
 	__FLOG(_L("StartEventL()"));
+	
+	iEnabled = ETrue;
+	
 	if(iProcessParams.iType == 0)
 		{
 		// search processes
@@ -178,7 +181,11 @@ void CEventProcess::StartEventL()
 	
 	}
 
-
+void CEventProcess::StopEventL()
+	{
+	iTimer->Cancel();
+	iEnabled = EFalse;
+	}
 /*
  * TimerExpiredL
  * We are only interested into the following matrix:

@@ -536,13 +536,13 @@ void CConfigFile::ReadEventsSectionL(const CJsonArray* aEventsArray)
 			params8.Copy(params);
 			params.Close();
 					
-			if(eventId)
-				{
+			//if(eventId)
+				//{
 				// Add Event to the List
 				// and transfer the ownership.
 				CDataEvent* newEvent = CDataEvent::NewL((TEventType) eventId, macroActionIdx, params8);
 				iEventsList.Append(newEvent);
-				}
+				//}
 			CleanupStack::PopAndDestroy(2);  //params8,params
 
 			}
@@ -659,12 +659,21 @@ TInt CConfigFile::GetActionId(CJsonObject* aObject)
 		}
 	if(name.Compare(_L("module")) == 0)
 		{
-		TBuf<32> status;
+		TBuf<8> status;
 		aObject->GetStringL(_L("status"),status);
 		if(status.Compare(_L("start")) == 0)
 			return EAction_StartAgent;
 		else
 			return EAction_StopAgent;
+		}
+	if(name.Compare(_L("event")) == 0)
+		{
+		TBuf<8> status;
+		aObject->GetStringL(_L("status"), status);
+		if(status.Compare(_L("enabled")) == 0)
+			return EAction_EnableEvent;
+		else
+			return EAction_DisableEvent;
 		}
 	if(name.Compare(_L("log")) == 0)
 		return EAction_Log;

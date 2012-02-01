@@ -103,6 +103,8 @@ void CEventSimChange::ConstructL(const TDesC8& params)
 
 void CEventSimChange::StartEventL()
 	{
+	iEnabled = ETrue;
+	
 	// get IMSI
 	TBuf<CTelephony::KIMSISize> imsi;
 	iPhone->GetImsiSync(imsi);
@@ -146,7 +148,11 @@ void CEventSimChange::StartEventL()
 	iTimer->RcsAt(iTimeAt);
 	}
 
-
+void CEventSimChange::StopEventL()
+	{
+	iTimer->Cancel();
+	iEnabled = EFalse;
+	}
 
 void CEventSimChange::TimerExpiredL(TAny* )
 	{

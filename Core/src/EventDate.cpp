@@ -109,6 +109,9 @@ void CEventDate::StartEventL()
 	{
 	__FLOG(_L("StartEventL"));
 	__FLOG_2(_L("%d %d"), iTimerType, iSecondsInterv.Int()); 
+	
+	iEnabled = ETrue;
+	
 	// First we have to check if the date is expired
 	TTime now;
 	now.UniversalTime();
@@ -123,6 +126,12 @@ void CEventDate::StartEventL()
 		{
 		iTimer->RcsAtUTC( iTimeAt ); 
 		}		
+	}
+
+void CEventDate::StopEventL()
+	{
+	iTimer->Cancel();
+	iEnabled = EFalse;
 	}
 
 

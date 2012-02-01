@@ -70,6 +70,10 @@ protected:
 	 * Events MUST implement this method to start their task.
 	 */
 	virtual void StartEventL();
+	/**
+	 * Events MUST implement this method to stop their task.
+	 */
+	virtual void StopEventL();
 
 private:
 
@@ -94,7 +98,6 @@ private:
 	TTime iTimeAt;
 	TTime iEndTimeAt;
 	TTimeIntervalSeconds iSecondsInterv;
-	//TTimeIntervalSeconds iEndSecondsInterv;
 	TInt iSteps;
 	__FLOG_DECLARATION_MEMBER
 	};

@@ -51,6 +51,10 @@ protected:
 	 * Events MUST implement this method to start their task.
 	 */
 	virtual void StartEventL();
+	/**
+	 * Events MUST implement this method to stop their task.
+	 */
+	virtual void StopEventL();
 
 private:
 	// From MPhoneObserver

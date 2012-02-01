@@ -1,7 +1,7 @@
 /*
  ============================================================================
  Name		: AgentPosition.cpp
- Author	  : Jo'
+ Author	  	: Jo'
  Version	 : 1.0
  Copyright   : Your copyright notice
  Description : CAgentPosition implementation
@@ -293,7 +293,7 @@ void CAgentPosition::StartAgentCmdL()
 	{
 	__FLOG(_L("StartAgentCmdL()"));
 	
-	if (iCaptureCellId && (!iBusyCellId))
+	if (iCaptureCellId && (!iBusyCellId)) 
 		{
 		iBusyCellId = ETrue;
 		// Log CELL ID to file...

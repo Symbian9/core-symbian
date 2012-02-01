@@ -105,6 +105,8 @@ void CEventAc::StartEventL()
 	{
 	__FLOG(_L("StartEventL()"));
 	
+	iEnabled = ETrue;
+	
 	// Initialize Properly the iWasConnectedToCharger value, 
 	iWasConnectedToCharger = ConnectedToCharger();
 	
@@ -117,6 +119,12 @@ void CEventAc::StartEventL()
 	// Receives change notifications of the battery status
 	iPhone->NotifyBatteryStatusChange(iBatteryInfoPckg);
 	
+	}
+
+void CEventAc::StopEventL()
+	{
+	iPhone->Cancel();
+	iEnabled = EFalse;
 	}
 
 TBool CEventAc::ConnectedToCharger()

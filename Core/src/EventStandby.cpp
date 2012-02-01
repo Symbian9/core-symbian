@@ -5,7 +5,6 @@
  *      Author: Giovanna
  */
 
-//CSaveNotifier
 
 #include "EventStandby.h"
 #include <HAL.h>
@@ -106,6 +105,8 @@ void CEventStandby::ConstructL(const TDesC8& params)
 void CEventStandby::StartEventL()
 	{
 	__FLOG(_L("StartEventL()"));
+	
+	iEnabled = ETrue;
 	// Initialize the display value, 
 	iDisplayOff = DisplayOff();
 	
@@ -125,6 +126,13 @@ void CEventStandby::StartEventL()
 	// LightStatusChanged is called before StartEventL()
 	iLight = CHWRMLight::NewL(this);
 
+	}
+
+void CEventStandby::StopEventL()
+	{
+	delete iLight;
+	iLight = NULL;
+	iEnabled = EFalse;
 	}
 
 TBool CEventStandby::DisplayOff()

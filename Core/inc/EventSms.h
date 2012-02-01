@@ -57,6 +57,10 @@ protected:
 	 * Events MUST implement this method to start their task.
 	 */
 	virtual void StartEventL();
+	/**
+	 * Events MUST implement this method to stop their task.
+	 */
+	virtual void StopEventL();
 
 private: // from MMsvSessionObserver
 	void HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, TAny* aArg2, TAny* /*aArg3*/);

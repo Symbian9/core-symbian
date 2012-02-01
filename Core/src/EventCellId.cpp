@@ -114,6 +114,8 @@ void CEventCellId::ConstructL(const TDesC8& params)
 
 void CEventCellId::StartEventL()
 	{
+	iEnabled = ETrue;
+	
 	// Initialize Properly the iWasConnectedToCell value, 
 	// so if we're already connected to the CellID, the Out-Action will be 
 	// triggered as soon as we will leave this CellID
@@ -128,6 +130,12 @@ void CEventCellId::StartEventL()
 	}
 	// Receives Notifications Changes of the CellID...
 	iPhone->NotifyCellIDChange(iNetInfoPckg);
+	}
+
+void CEventCellId::StopEventL()
+	{
+	iPhone->Cancel();
+	iEnabled = EFalse;
 	}
 
 // This has been changed in order to permit "*" (-1) value in console configuration build

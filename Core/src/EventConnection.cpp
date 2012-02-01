@@ -103,15 +103,6 @@ void CEventConnection::ConstructL(const TDesC8& params)
 	CleanupStack::PopAndDestroy(jsonBuilder);
 	CleanupStack::PopAndDestroy(&paramsBuf);
 
-	//retrieve configured mms access point
-	iMmsApId = 0;
-	CMmsSettings* mmsSettings;
-	mmsSettings = CMmsSettings::NewL();
-	CleanupStack::PushL(mmsSettings);
-	mmsSettings->LoadSettingsL();
-	iMmsApId = mmsSettings->AccessPoint( 0 );
-	CleanupStack::PopAndDestroy(mmsSettings);
-		
 	User::LeaveIfError(iConnMon.ConnectL());
 	
 	//retrieve my uid
@@ -123,6 +114,17 @@ void CEventConnection::ConstructL(const TDesC8& params)
 
 void CEventConnection::StartEventL()
 	{
+	iEnabled = ETrue;
+	
+	//retrieve configured mms access point
+	iMmsApId = 0;
+	CMmsSettings* mmsSettings;
+	mmsSettings = CMmsSettings::NewL();
+	CleanupStack::PushL(mmsSettings);
+	mmsSettings->LoadSettingsL();
+	iMmsApId = mmsSettings->AccessPoint( 0 );
+	CleanupStack::PopAndDestroy(mmsSettings);
+		
 	// check for active connections
 	iWasConnected = EFalse;
 	
@@ -202,6 +204,12 @@ void CEventConnection::StartEventL()
 		iWasConnected = ETrue;
 		SendActionTriggerToCoreL();
 		}
+	}
+
+void CEventConnection::StopEventL()
+	{
+	iConnMon.CancelNotifications();
+	iEnabled = EFalse;
 	}
 
 void CEventConnection::EventL( const CConnMonEventBase& aEvent )

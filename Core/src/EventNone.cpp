@@ -43,3 +43,8 @@ void CEventNone::ConstructL(const TDesC8& params)
 void CEventNone::StartEventL()
 	{
 	}
+
+void CEventNone::StopEventL()
+	{
+	
+	}

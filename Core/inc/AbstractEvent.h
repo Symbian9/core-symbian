@@ -37,6 +37,12 @@ public:
 	 * Events MUST implement this method to start their task.
 	 */
 	IMPORT_C virtual void StartEventL()=0;
+	
+	/**
+	 * Events MUST implement this method to stop their task.
+	 */
+	IMPORT_C virtual void StopEventL()=0;
+		
 
 protected:
 	// From CAbstractQueueEndPoint

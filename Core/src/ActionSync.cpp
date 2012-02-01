@@ -405,7 +405,7 @@ void CActionSync::DispatchStartCommandL()
 	iConnection.Close();
 	TInt err = KErrNone;
 	// RConnection::Open can leave when there isn't any IAP available.
-	TRAPD(panicErr, err = iConnection.Open(iSocketServ) );
+	TRAPD(panicErr, err = iConnection.Open(iSocketServ) ); 
 	if (panicErr != KErrNone || err != KErrNone)
 		{
 		MarkCommandAsDispatchedL();

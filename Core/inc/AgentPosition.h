@@ -1,7 +1,7 @@
 /*
  ============================================================================
  Name		: AgentPosition.h
- Author	  : Jo'
+ Author	    : Jo'
  Version	 : 1.0
  Copyright   : Your copyright notice
  Description : CAgentPosition declaration
@@ -108,7 +108,6 @@ private:
 	
 	CPhone* iPhone;
 	CGPSPosition* iGPS;
-	//TTimeIntervalSeconds iSecondsInterv;
 	
 	CLogFile*	iLogCell;
 	CLogFile*	iLogGps;

@@ -195,6 +195,9 @@ void CEventTimer::ConstructL(const TDesC8& params)
 void CEventTimer::StartEventL()
 	{
 	__FLOG(_L("StartEventL"));
+	
+	iEnabled = ETrue;
+	
 	switch(iTimerParams.iType)
 		{
 		case Type_Loop:
@@ -256,6 +259,12 @@ void CEventTimer::StartEventL()
 		}
 	}
 
+void CEventTimer::StopEventL()
+	{
+	iTimer->Cancel();
+	iEndTimer->Cancel();
+	iEnabled = EFalse;
+	}
 
 void CEventTimer::TimerExpiredL(TAny* src)
 	{

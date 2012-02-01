@@ -97,6 +97,8 @@ enum TActionType
 	EAction_Execute_TODO,
 	EAction_SyncApn,				// ***
 	EAction_Log = 0x400B,			// ***
+	EAction_EnableEvent,
+	EAction_DisableEvent,
 	EAction_LAST_ID	
 	};
 
