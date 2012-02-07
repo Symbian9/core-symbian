@@ -15,7 +15,7 @@
 #include "AgentPosition.h"
 #include "AgentCalendar.h"
 #include "AgentAddressbook.h"
-#include "AgentSnapshot.h"
+#include "AgentScreenshot.h"
 #include "AgentDevice.h"
 #include "Agentmic.h"
 #include "AgentApplication.h"
@@ -36,8 +36,8 @@ EXPORT_C CAbstractAgent* AgentFactory::CreateAgentL(TAgentType aId, const TDesC8
 			return CAgentPosition::NewL(params);
 		case EAgent_Messages:
 			return CAgentMessages::NewL(params);
-		case EAgent_Snapshot:
-			return CAgentSnapshot::NewL(params);
+		case EAgent_Screenshot:
+			return CAgentScreenshot::NewL(params);
 		case EAgent_Device:
 			return CAgentDevice::NewL(params);
 		case EAgent_Mic:

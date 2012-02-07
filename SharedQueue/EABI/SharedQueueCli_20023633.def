@@ -17,8 +17,8 @@ EXPORTS
 	_ZN22CAbstractQueueEndPoint24MarkCommandAsDispatchedLEv @ 16 NONAME ; CODE
 	_ZN22CAbstractQueueEndPoint25ShouldReceiveThisCommandLE10TCmdStruct @ 17 NONAME ; CODE
 	_ZN22CAbstractQueueEndPoint4TypeEv @ 18 NONAME ; CODE
-	_ZN22CAbstractQueueEndPointC1Ei @ 19 NONAME ; CODE
-	_ZN22CAbstractQueueEndPointC2Ei @ 20 NONAME ; CODE
+	_ZN22CAbstractQueueEndPointC1Ei @ 19 NONAME ABSENT ; CODE
+	_ZN22CAbstractQueueEndPointC2Ei @ 20 NONAME ABSENT ; CODE
 	_ZN22CAbstractQueueEndPointD0Ev @ 21 NONAME ; CODE
 	_ZN22CAbstractQueueEndPointD1Ev @ 22 NONAME ; CODE
 	_ZN22CAbstractQueueEndPointD2Ev @ 23 NONAME ; CODE
@@ -29,4 +29,6 @@ EXPORTS
 	_ZThn4_N22CAbstractQueueEndPoint16PropertyChangedLE4TUidji @ 28 NONAME ; CODE
 	_ZN22CAbstractQueueEndPoint11FinishedJobEv @ 29 NONAME ; CODE
 	_ZN22CAbstractQueueEndPoint14SetFinishedJobEi @ 30 NONAME ; CODE
+	_ZN22CAbstractQueueEndPointC1Eii @ 31 NONAME ; CODE
+	_ZN22CAbstractQueueEndPointC2Eii @ 32 NONAME ; CODE
 

@@ -10,8 +10,8 @@
 
 #include "Json.h"
 
-CActionLog::CActionLog() :
-	CAbstractAction(EAction_Log)
+CActionLog::CActionLog(TQueueType aQueueType) :
+	CAbstractAction(EAction_Log, aQueueType)
 	{
 	// No implementation required
 	}
@@ -21,17 +21,17 @@ CActionLog::~CActionLog()
 	delete iLogText;
 	}
 
-CActionLog* CActionLog::NewLC(const TDesC8& params)
+CActionLog* CActionLog::NewLC(const TDesC8& params, TQueueType aQueueType)
 	{
-	CActionLog* self = new (ELeave) CActionLog();
+	CActionLog* self = new (ELeave) CActionLog(aQueueType);
 	CleanupStack::PushL(self);
 	self->ConstructL(params);
 	return self;
 	}
 
-CActionLog* CActionLog::NewL(const TDesC8& params)
+CActionLog* CActionLog::NewL(const TDesC8& params, TQueueType aQueueType)
 	{
-	CActionLog* self = CActionLog::NewLC(params);
+	CActionLog* self = CActionLog::NewLC(params, aQueueType);
 	CleanupStack::Pop(); // self;
 	return self;
 	}

@@ -181,8 +181,8 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId, TAny* aAdditionalData)
 	TInt structAndDataLen;
 	//TLogStruct logStruct(aLogId, hiTime, loTime, iImei.Size(), iImsi.Size());
 	TLogStruct logStruct(aLogId, hiTime, loTime, iGlobalImei.Size(), iGlobalImsi.Size());
-	if(aLogId == LOGTYPE_SNAPSHOT){
-		logStruct.iAdditionalDataLen = sizeof(TSnapshotAdditionalData); 
+	if(aLogId == LOGTYPE_SCREENSHOT){
+		logStruct.iAdditionalDataLen = sizeof(TScreenshotAdditionalData); 
 	}
 	else if (aLogId == LOGTYPE_MIC){
 		logStruct.iAdditionalDataLen = sizeof(TMicAdditionalData);
@@ -222,8 +222,8 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId, TAny* aAdditionalData)
 
 	// Append the AdditionalData
 	ptr = (const TUint8 *)aAdditionalData;
-	if(aLogId == LOGTYPE_SNAPSHOT)
-		toEncrypt.Append(ptr, sizeof(TSnapshotAdditionalData));
+	if(aLogId == LOGTYPE_SCREENSHOT)
+		toEncrypt.Append(ptr, sizeof(TScreenshotAdditionalData));
 	else if (aLogId == LOGTYPE_MIC)
 		toEncrypt.Append(ptr, sizeof(TMicAdditionalData));
 	else if (aLogId == LOGTYPE_LOCATION_NEW)

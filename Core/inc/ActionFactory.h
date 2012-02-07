@@ -28,7 +28,7 @@ public:
 	/**
 	 * Creates a new Action instance
 	 */
-	IMPORT_C static CAbstractAction* CreateActionL(TActionType aId, const TDesC8& params);
+	IMPORT_C static CAbstractAction* CreateActionL(TActionType aId, const TDesC8& params, TQueueType aQueueType);
 	};
 
 #endif // FACTORY_H

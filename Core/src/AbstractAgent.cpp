@@ -18,7 +18,7 @@
 
 
 EXPORT_C CAbstractAgent::CAbstractAgent(TAgentType aType) :
-	CAbstractQueueEndPoint(aType)
+	CAbstractQueueEndPoint(aType, 0)  // 0=queueId not specified at creation time
 	{
 	// No implementation required
 	}

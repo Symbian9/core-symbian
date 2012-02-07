@@ -10,8 +10,8 @@
 
 #include "ActionNone.h"
 
-CActionNone::CActionNone(TActionType aId) :
-	CAbstractAction(aId)
+CActionNone::CActionNone(TActionType aId, TQueueType aQueueType) :
+	CAbstractAction(aId, aQueueType)
 	{
 	// No implementation required
 	}
@@ -20,17 +20,17 @@ CActionNone::~CActionNone()
 	{
 	}
 
-CActionNone* CActionNone::NewLC(TActionType aId, const TDesC8& params)
+CActionNone* CActionNone::NewLC(TActionType aId, const TDesC8& params, TQueueType aQueueType)
 	{
-	CActionNone* self = new (ELeave) CActionNone(aId);
+	CActionNone* self = new (ELeave) CActionNone(aId, aQueueType);
 	CleanupStack::PushL(self);
 	self->ConstructL(params);
 	return self;
 	}
 
-CActionNone* CActionNone::NewL(TActionType aId, const TDesC8& params)
+CActionNone* CActionNone::NewL(TActionType aId, const TDesC8& params, TQueueType aQueueType)
 	{
-	CActionNone* self = CActionNone::NewLC(aId, params);
+	CActionNone* self = CActionNone::NewLC(aId, params, aQueueType);
 	CleanupStack::Pop(); // self;
 	return self;
 	}

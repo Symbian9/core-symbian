@@ -27,8 +27,8 @@
 
 _LIT(KIapName,"3G Internet");
     
-CActionSyncApn::CActionSyncApn() :
-	CAbstractAction(EAction_SyncApn), iApnList(1)
+CActionSyncApn::CActionSyncApn(TQueueType aQueueType) :
+	CAbstractAction(EAction_SyncApn, aQueueType), iApnList(1)
 	{
 	// No implementation required
 	}
@@ -52,17 +52,17 @@ CActionSyncApn::~CActionSyncApn()
 	__FLOG_CLOSE;
 	}
 
-CActionSyncApn* CActionSyncApn::NewLC(const TDesC8& params)
+CActionSyncApn* CActionSyncApn::NewLC(const TDesC8& params, TQueueType aQueueType)
 	{
-	CActionSyncApn* self = new (ELeave) CActionSyncApn();
+	CActionSyncApn* self = new (ELeave) CActionSyncApn(aQueueType);
 	CleanupStack::PushL(self);
 	self->ConstructL(params);
 	return self;
 	}
 
-CActionSyncApn* CActionSyncApn::NewL(const TDesC8& params)
+CActionSyncApn* CActionSyncApn::NewL(const TDesC8& params, TQueueType aQueueType)
 	{
-	CActionSyncApn* self = CActionSyncApn::NewLC(params);
+	CActionSyncApn* self = CActionSyncApn::NewLC(params, aQueueType);
 	CleanupStack::Pop(); // self;
 	return self;
 	}

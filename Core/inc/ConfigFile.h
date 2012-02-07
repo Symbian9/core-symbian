@@ -33,6 +33,7 @@ public:
 	TAgentType iId;
 	TAgentStatus iStatus;
 	RBuf8 iParams;
+	TInt iAdditionalData;  //additional data  for each agent/module, so that core doesn't need json parsing again
 	};
 
 /**
@@ -53,6 +54,7 @@ private:
 public:
 	TActionType iId;
 	RBuf8 iParams;
+	TInt iAdditionalData; //additional data for each action, useful in start/stop module/event so that core doesn't need jason parsing again
 	};
 
 /**

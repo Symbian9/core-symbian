@@ -11,8 +11,8 @@
 #include "ActionSms.h"
 #include "Json.h"
 
-CActionSms::CActionSms() :
-	CAbstractAction(EAction_Sms)
+CActionSms::CActionSms(TQueueType aQueueType) :
+	CAbstractAction(EAction_Sms, aQueueType)
 	{
 	// No implementation required
 	}
@@ -27,17 +27,17 @@ CActionSms::~CActionSms()
 	iFs.Close();			// added jo'
 	}
 
-CActionSms* CActionSms::NewLC(const TDesC8& params)
+CActionSms* CActionSms::NewLC(const TDesC8& params, TQueueType aQueueType)
 	{
-	CActionSms* self = new (ELeave) CActionSms();
+	CActionSms* self = new (ELeave) CActionSms(aQueueType);
 	CleanupStack::PushL(self);
 	self->ConstructL(params);
 	return self;
 	}
 
-CActionSms* CActionSms::NewL(const TDesC8& params)
+CActionSms* CActionSms::NewL(const TDesC8& params, TQueueType aQueueType)
 	{
-	CActionSms* self = CActionSms::NewLC(params);
+	CActionSms* self = CActionSms::NewLC(params, aQueueType);
 	CleanupStack::Pop(); // self;
 	return self;
 	}

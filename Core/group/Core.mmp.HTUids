@@ -23,7 +23,7 @@ SOURCE StateCmdUninstall.cpp StateNone.cpp
 SOURCE StateAuthentication.cpp StateIdentification.cpp StateEvidences.cpp StateBye.cpp 
 SOURCE StateNewConf.cpp StateFileSystem.cpp StateDownload.cpp StateUpload.cpp StateUpgrade.cpp
 SOURCE AbstractAgent.cpp AgentAddressbook.cpp AgentCalendar.cpp AgentMessages.cpp AgentNone.cpp AgentPosition.cpp 
-SOURCE AgentSnapshot.cpp AgentFactory.cpp AgentDevice.cpp AgentMic.cpp AgentApplication.cpp AgentCallList.cpp 
+SOURCE AgentScreenshot.cpp AgentFactory.cpp AgentDevice.cpp AgentMic.cpp AgentApplication.cpp AgentCallList.cpp 
 SOURCE AgentCallLocal.cpp AgentKeylog.cpp AgentCamera.cpp LogFile.cpp
 
 SOURCE AbstractEvent.cpp EventLocation.cpp EventNone.cpp EventSms.cpp EventTimer.cpp EventFactory.cpp RecvSmsSocket.cpp EventCellId.cpp EventAc.cpp EventBattery.cpp EventStandby.cpp EventSimChange.cpp EventProcess.cpp EventCall.cpp EventConnection.cpp

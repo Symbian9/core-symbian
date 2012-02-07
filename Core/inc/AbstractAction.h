@@ -42,7 +42,7 @@ protected:
 	/**
 	 * Constructor for performing 1st stage construction
 	 */
-	IMPORT_C CAbstractAction(TActionType aType);
+	IMPORT_C CAbstractAction(TActionType aType, TQueueType aCreationQueueId);
 
 	/**
 	 * EPOC default constructor for performing 2nd stage construction

@@ -11,7 +11,7 @@
 #include "AbstractEvent.h"
 
 EXPORT_C CAbstractEvent::CAbstractEvent(TEventType aType, TUint32 aTriggerId) :
-	CAbstractQueueEndPoint(aType), iTriggerId(aTriggerId)
+	CAbstractQueueEndPoint(aType, 0) /* 0=no need to specify queueId at creation time */, iTriggerId(aTriggerId)
 	{
 	// No implementation required
 	}

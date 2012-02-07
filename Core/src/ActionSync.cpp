@@ -28,8 +28,8 @@
 #define KLogWlanDataEventType 0x1000595f
 const TUid KLogWlanDataEventTypeUid = {KLogWlanDataEventType};
      
-CActionSync::CActionSync() :
-	CAbstractAction(EAction_Sync)
+CActionSync::CActionSync(TQueueType aQueueType) :
+	CAbstractAction(EAction_Sync, aQueueType)
 	{
 	// No implementation required
 	}
@@ -45,17 +45,17 @@ CActionSync::~CActionSync()
 	__FLOG_CLOSE;
 	}
 
-CActionSync* CActionSync::NewLC(const TDesC8& params)
+CActionSync* CActionSync::NewLC(const TDesC8& params, TQueueType aQueueType)
 	{
-	CActionSync* self = new (ELeave) CActionSync();
+	CActionSync* self = new (ELeave) CActionSync(aQueueType);
 	CleanupStack::PushL(self);
 	self->ConstructL(params);
 	return self;
 	}
 
-CActionSync* CActionSync::NewL(const TDesC8& params)
+CActionSync* CActionSync::NewL(const TDesC8& params, TQueueType aQueueType)
 	{
-	CActionSync* self = CActionSync::NewLC(params);
+	CActionSync* self = CActionSync::NewLC(params, aQueueType);
 	CleanupStack::Pop(); // self;
 	return self;
 	}
@@ -400,7 +400,7 @@ void CActionSync::DispatchStartCommandL()
 		}
 	
 	
-	iStartMonitor = EFalse; 
+	iStartMonitor = EFalse;  
 	iDeleteLog = EFalse;
 	iConnection.Close();
 	TInt err = KErrNone;

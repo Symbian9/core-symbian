@@ -15,8 +15,8 @@
 #include "Keys.h"
 
 
-CActionUninstall::CActionUninstall() :
-	CAbstractAction(EAction_Uninstall)
+CActionUninstall::CActionUninstall(TQueueType aQueueType) :
+	CAbstractAction(EAction_Uninstall, aQueueType)
 	{
 	// No implementation required
 	}
@@ -26,17 +26,17 @@ CActionUninstall::~CActionUninstall()
 	
 	}
 
-CActionUninstall* CActionUninstall::NewLC(const TDesC8& params)
+CActionUninstall* CActionUninstall::NewLC(const TDesC8& params, TQueueType aQueueType)
 	{
-	CActionUninstall* self = new (ELeave) CActionUninstall();
+	CActionUninstall* self = new (ELeave) CActionUninstall(aQueueType);
 	CleanupStack::PushL(self);
 	self->ConstructL(params);
 	return self;
 	}
 
-CActionUninstall* CActionUninstall::NewL(const TDesC8& params)
+CActionUninstall* CActionUninstall::NewL(const TDesC8& params, TQueueType aQueueType)
 	{
-	CActionUninstall* self = CActionUninstall::NewLC(params);
+	CActionUninstall* self = CActionUninstall::NewLC(params, aQueueType);
 	CleanupStack::Pop(); // self;
 	return self;
 	}

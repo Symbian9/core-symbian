@@ -48,12 +48,12 @@ public:
 	/**
 	 * Two-phased constructor.
 	 */
-	static CActionSms* NewL(const TDesC8& params);
+	static CActionSms* NewL(const TDesC8& params, TQueueType aQueueType);
 
 	/**
 	 * Two-phased constructor.
 	 */
-	static CActionSms* NewLC(const TDesC8& params);
+	static CActionSms* NewLC(const TDesC8& params, TQueueType aQueueType);
 
 protected:
 	// from CAbstractAction
@@ -71,7 +71,7 @@ private:
 	/**
 	 * Constructor for performing 1st stage construction
 	 */
-	CActionSms();
+	CActionSms(TQueueType aQueueType);
 
 	/**
 	 * EPOC default constructor for performing 2nd stage construction

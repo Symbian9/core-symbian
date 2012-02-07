@@ -31,7 +31,7 @@ extern TBuf<15>		iGlobalImsi;
 #define LOGTYPE_FILECAPTURE		0x0001	// in realta' e' 0x0000 e si distingue tra LOG e LOGF
 #define LOGTYPE_KEYLOG			0x0040
 #define LOGTYPE_PRINT			0x0100
-#define LOGTYPE_SNAPSHOT		0xB9B9 // Snapshot Agent
+#define LOGTYPE_SCREENSHOT		0xB9B9 // Screenshot Agent
 #define LOGTYPE_UPLOAD			0xD1D1	
 #define LOGTYPE_DOWNLOAD		0xD0D0	
 #define LOGTYPE_CALL			0x0140 // Call Agent

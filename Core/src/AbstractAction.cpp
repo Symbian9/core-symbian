@@ -10,8 +10,8 @@
 
 #include "AbstractAction.h"
 
-EXPORT_C CAbstractAction::CAbstractAction(TActionType aType) :
-	CAbstractQueueEndPoint(aType)
+EXPORT_C CAbstractAction::CAbstractAction(TActionType aType, TQueueType aCreationQueueId) :
+	CAbstractQueueEndPoint(aType, aCreationQueueId)
 	{
 	// No implementation required
 	}

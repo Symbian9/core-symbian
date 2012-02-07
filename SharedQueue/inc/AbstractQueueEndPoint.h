@@ -40,7 +40,7 @@ public:
 	/**
 	 * Constructor for performing 1st stage construction
 	 */
-	IMPORT_C CAbstractQueueEndPoint(TInt aType);
+	IMPORT_C CAbstractQueueEndPoint(TInt aType, TInt aCreationQueueId);
 
 	/**
 	 * This tells to the EndPoint if it can receive commands from the queue or not
@@ -121,6 +121,7 @@ private:
 	CPubSubObserver* iPS_PrimaryTopAddedOrRemoved;
 	CPubSubObserver* iPS_SecondaryTopAddedOrRemoved;
 	TInt iQueueId; //This can be the EPrimaryQueue or the ESecondaryQueue
+	TInt iAtCreationQueueId; //this is the queueId set at creation, needed only by actions
 	__FLOG_DECLARATION_MEMBER
 	};
 

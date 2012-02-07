@@ -50,28 +50,28 @@ typedef struct TLocationAdditionalData
 
 	
 /*
- * Snapshot additional data 
+ * Screenshot additional data 
  */
-#define LOG_SNAPSHOT_VERSION 2009031201
+#define LOG_SCREENSHOT_VERSION 2009031201
 
 _LIT(KWindow,"Desktop");
 
-typedef struct TSnapshotAdditionalData 
+typedef struct TScreenshotAdditionalData 
 	{
 		TUint32	uVersion;
 		TUint32	uProcessNameLen;
 		TUint32 uWindowNameLen;
 		TUint wWindow[8];
 		
-		TSnapshotAdditionalData() {
-			uVersion = LOG_SNAPSHOT_VERSION;
+		TScreenshotAdditionalData() {
+			uVersion = LOG_SCREENSHOT_VERSION;
 			uProcessNameLen = 0;                // 0 at the moment because we take the entire screen
 			uWindowNameLen = 8;					// 8, length of string "Desktop", null terminated 
 			TBuf<8> buf(KWindow);
 			Mem::FillZ(&wWindow,8);             // wWindow must be null terminated!
 			Mem::Copy(&wWindow,buf.Ptr(),buf.Size());
 		}
-	} TSnapshotAdditionalData;
+	} TScreenshotAdditionalData;
 	
 /*
  * Mic Additional Data

