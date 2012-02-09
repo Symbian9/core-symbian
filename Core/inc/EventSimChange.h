@@ -11,8 +11,7 @@
 #include "AbstractEvent.h"
 #include <HT\LogFile.h>
 #include <HT\TimeOutTimer.h>
-#include <HT\Phone.h>
-
+#include <centralrepository.h>
 
 /**
  *  CEventSimChange
@@ -76,9 +75,10 @@ private:
 	CTimeOutTimer* iTimer;
 	TTime iTimeAt;
 	TTimeIntervalSeconds iSecondsInterv;
-	CPhone* iPhone;
 	RFs	iFs;
 	CLogFile*	iLogFile;
+	
+	CRepository* iCenRep;
 	
 	//__FLOG_DECLARATION_MEMBER
 	};

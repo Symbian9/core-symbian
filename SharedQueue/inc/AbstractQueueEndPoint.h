@@ -112,12 +112,12 @@ protected:
 
 protected:	
 	RBuf8 iParams;
-	
+	TInt iType;
 private:
 	RSharedQueue iQueue;
 	TBool iCanReceive;
 	TBool iFinishedJob;
-	TInt iType;
+	//TInt iType;
 	CPubSubObserver* iPS_PrimaryTopAddedOrRemoved;
 	CPubSubObserver* iPS_SecondaryTopAddedOrRemoved;
 	TInt iQueueId; //This can be the EPrimaryQueue or the ESecondaryQueue

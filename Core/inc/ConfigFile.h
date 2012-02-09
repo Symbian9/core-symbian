@@ -54,7 +54,9 @@ private:
 public:
 	TActionType iId;
 	RBuf8 iParams;
-	TInt iAdditionalData; //additional data for each action, useful in start/stop module/event so that core doesn't need jason parsing again
+	TInt iAdditionalData; // additional data for each action, useful in start/stop module/event so that core doesn't need jason parsing again
+	TBool iConditioned; // this tells if this action is conditioned by the result of a previous sync in the same macroaction 
+	TInt iTagId; //this uniquely identifies the action as macroactionId (high order 16 bits) and orderId (low order 16 bits)
 	};
 
 /**

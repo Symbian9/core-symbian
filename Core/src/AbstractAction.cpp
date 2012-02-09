@@ -11,7 +11,7 @@
 #include "AbstractAction.h"
 
 EXPORT_C CAbstractAction::CAbstractAction(TActionType aType, TQueueType aCreationQueueId) :
-	CAbstractQueueEndPoint(aType, aCreationQueueId)
+	CAbstractQueueEndPoint(aType, aCreationQueueId) /*, iConditioned (EFalse)*/
 	{
 	// No implementation required
 	}
@@ -25,6 +25,13 @@ EXPORT_C void CAbstractAction::BaseConstructL(const TDesC8& params)
 	CAbstractQueueEndPoint::BaseConstructL(params);
 	}
 
+
+TBool CAbstractAction::ShouldReceiveThisCommandL(TCmdStruct aCommand)
+	{
+	if((aCommand.iDest == iType) && (aCommand.iTag == iTag))
+		return ETrue;
+	return EFalse;
+	}
 
 void CAbstractAction::DispatchCommandL(TCmdStruct aCommand)
 	{

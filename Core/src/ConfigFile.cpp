@@ -60,7 +60,7 @@ CDataAction* CDataAction::NewLC(TActionType aId, const TDesC8& buff)
 	}
 
 CDataAction::CDataAction(TActionType aId) :
-	iId(aId), iAdditionalData(0)
+	iId(aId), iAdditionalData(0), iConditioned(EFalse)
 	{
 	}
 
@@ -617,6 +617,11 @@ void CConfigFile::ReadActionsSectionL(CJsonArray* aActionsArray)
 	numMacroActions = aActionsArray->Count();
 	for(TInt i=0; i<numMacroActions; i++)
 		{
+		// conditioned = action must stop if sync param "stop" says so
+		// conditioning = a sync that can stop all subsequent subactions if successfull
+		TBool conditioned = EFalse;  //used to tell if this subaction is conditioned
+		TBool first = EFalse;  //used to exclude the first conditioning sync
+		
 		CDataMacroAction* newMacroAction = CDataMacroAction::NewL();
 		iMacroActionsList.Append(newMacroAction);
 
@@ -644,10 +649,26 @@ void CConfigFile::ReadActionsSectionL(CJsonArray* aActionsArray)
 					//retrieve agentId of agent to start/stop
 					additionalData = GetModuleId(action);
 					}
+				/*
 				if((actionId == EAction_EnableEvent) || (actionId == EAction_DisableEvent))
 					{
 					//retrieve eventId of event to enable/disable
 					action->GetIntL(_L("event"),additionalData);
+					}
+					*/
+				if((actionId == EAction_Sync) || (actionId == EAction_SyncApn))
+					{
+					if(conditioned == EFalse)
+						{
+						// we only want to change to ETrue only the first time is requested
+						TBool stopping = EFalse;
+						action->GetBoolL((_L("stop")),stopping);
+						if(stopping)
+							{
+							conditioned = ETrue;
+							first = ETrue;
+							}
+						}
 					}
 				// set the queue id
 				if((actionId==EAction_Uninstall) || (actionId == EAction_Sync) || (actionId == EAction_SyncApn))
@@ -668,10 +689,19 @@ void CConfigFile::ReadActionsSectionL(CJsonArray* aActionsArray)
 				params.Close();
 				
 				CDataAction* newAction = CDataAction::NewL((TActionType) actionId, params8);
+				newAction->iTagId = (i << 16) | j;
+				
 				if((actionId==EAction_StartAgent) || (actionId == EAction_StopAgent))
 					newAction->iAdditionalData = additionalData;
-				if((actionId == EAction_EnableEvent) || (actionId == EAction_DisableEvent))
-					newAction->iAdditionalData = additionalData;
+				
+				if(first == EFalse)
+					{
+					//se non e' la prima sync condizionante
+					newAction->iConditioned = conditioned;
+					}
+				first = EFalse; //restore false, so all subsequent subactions will be conditioned
+				
+				
 				newMacroAction->AppendAction(newAction);
 				
 				CleanupStack::PopAndDestroy(2); //params,params8
@@ -698,21 +728,19 @@ TInt CConfigFile::GetActionId(CJsonObject* aObject)
 		}
 	if(name.Compare(_L("module")) == 0)
 		{
+		/*
 		TBuf<8> status;
 		aObject->GetStringL(_L("status"),status);
 		if(status.Compare(_L("start")) == 0)
 			return EAction_StartAgent;
 		else
 			return EAction_StopAgent;
+			*/
+		return EAction_Agent;
 		}
 	if(name.Compare(_L("event")) == 0)
 		{
-		TBuf<8> status;
-		aObject->GetStringL(_L("status"), status);
-		if(status.Compare(_L("enabled")) == 0)
-			return EAction_EnableEvent;
-		else
-			return EAction_DisableEvent;
+		return EAction_Event;
 		}
 	if(name.Compare(_L("log")) == 0)
 		return EAction_Log;

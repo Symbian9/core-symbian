@@ -43,6 +43,27 @@ public:
 	 */
 	TBool DemoVersion();
 	
+	/**
+	 * Creates a new Agent and Start it.
+	 */
+	void StartAgentL(TAgentType aAgentId);
+			
+	/**
+	 * Stops the running Agent
+	 */
+	void StopAgentL(TAgentType aAgentId);
+	
+	/**
+	 * Enable the event
+	 */
+	void EnableEventL(TInt aEventIdx);
+	
+	/**
+	 * Disable the event
+	 */
+	void DisableEventL(TInt aEventIdx);
+	
+	
 private: 
 	// from CAbstractQueueEndPoint 
 	virtual void PropertyChangedL(TUid category, TUint key, TInt value);
@@ -87,17 +108,8 @@ private:
 	/**
 	 * Executes the Action
 	 */
-	void ExecuteActionL(TInt aQueueId, TActionType type, const TDesC8& params);
-	
-	/**
-	 * Creates a new Agent and Start it.
-	 */
-	void StartAgentL(TInt aQueueId, TAgentType agentId);
-	
-	/**
-	 * Stops the running Agent
-	 */
-	void StopAgentL(TInt aQueueId, TAgentType agentId);
+	//void ExecuteActionL(TInt aQueueId, TActionType type, const TDesC8& params);
+	void ExecuteActionL(TInt aQueueId, CDataAction* aAction);
 	
 		
 	CCore();

@@ -153,7 +153,12 @@ The key to observe changes in available space on disk.
 Will be updated when the threshold is passed: 1=below threshold, 0=above threshold
 */
 const TUint KPropertyFreeSpaceThreshold = 2; 
-
+/**
+ * KPropertyStopSubactions
+ * The key to stop subactions when stop=true into sync params
+ * Will be updated during every sync; 1 = stop subactions, 0 = do not stop subactions
+ */
+const TUint KPropertyStopSubactions = 3;
 
 extern TBuf<50>   	iGlobalImei;
 extern TBuf<15>		iGlobalImsi;

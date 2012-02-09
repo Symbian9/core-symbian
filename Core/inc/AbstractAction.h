@@ -51,7 +51,11 @@ protected:
 
 private:
 	virtual void DispatchCommandL(TCmdStruct aCommand);
+	virtual TBool ShouldReceiveThisCommandL(TCmdStruct aCommand);
 
+public:
+	TBool iConditioned;
+	TInt iTag;
 	};
 
 #endif // ABSTRACTACTION_H

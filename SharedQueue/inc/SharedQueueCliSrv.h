@@ -97,8 +97,8 @@ enum TActionType
 	EAction_Execute_TODO,
 	EAction_SyncApn,				// ***
 	EAction_Log = 0x400B,			// ***
-	EAction_EnableEvent,
-	EAction_DisableEvent,
+	EAction_Event,
+	EAction_Agent,
 	EAction_LAST_ID	
 	};
 
@@ -136,6 +136,7 @@ public:
 	TCmdType iType;
 	TInt iSrc;
 	TInt iDest;
+	TInt iTag;
 	
 public:
 	inline TCmdStruct() { TCmdStruct(EStart, ECore, ECore); }
@@ -145,6 +146,14 @@ public:
 		iType = aType;
 		iSrc = aSrc;
 		iDest = aDest;
+		iTag = 0;
+		}
+	inline TCmdStruct(TCmdType aType, TInt aSrc, TInt aDest, TInt aTag) 
+		{
+		iType = aType;
+		iSrc = aSrc;
+		iDest = aDest;
+		iTag = aTag;
 		}
 	} TCommand;
 
