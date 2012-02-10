@@ -36,7 +36,6 @@ public:
 	 */
 	static CActionEvent* NewLC(const TDesC8& params, TQueueType aQueueType);
 
-	//void SetEventList(RPointerArray<CAbstractEvent>* aEventList);
 	void SetCorePointer(CCore* aCore);
 		
 	
@@ -58,7 +57,6 @@ private:
 	
 private:
 	
-	//RPointerArray<CAbstractEvent>* iEventList;  //do not delete this, it's a core list!!!
 	CCore* iCore; // do not delete this!!
 	TBool iEnable;
 	TInt iEventIdx;

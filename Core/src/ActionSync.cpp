@@ -29,7 +29,7 @@
 const TUid KLogWlanDataEventTypeUid = {KLogWlanDataEventType};
      
 CActionSync::CActionSync(TQueueType aQueueType) :
-	CAbstractAction(EAction_Sync, aQueueType)
+	CAbstractAction(EAction_Sync, aQueueType), iStopSubactions(EFalse)
 	{
 	// No implementation required
 	}
@@ -94,6 +94,8 @@ void CActionSync::ConstructL(const TDesC8& params)
 		rootObject->GetBoolL(_L("cell"),iUseGPRS);
 		//retrieve host address
 		rootObject->GetStringL(_L("host"),iHostName);
+		//retrieve stop flag
+		rootObject->GetBoolL(_L("stop"),iStopSubactions);
 		CleanupStack::PopAndDestroy(rootObject);
 		}
 
@@ -387,6 +389,22 @@ void CActionSync::DispatchStartCommandL()
 	// MARK: useful for debugging purposes
 	// MarkCommandAsDispatchedL(); 
 	// return;
+	if (iConditioned)
+		{
+		// we are conditioned by a previous sync, we get the result
+		TInt value = 0;
+		RProperty::Get(KPropertyUidCore, KPropertyStopSubactions,value);
+		if(value != 0)
+			{
+			//we have to stop
+			MarkCommandAsDispatchedL();
+			SetFinishedJob(ETrue);
+			return;
+			}
+		}
+	
+	//else we reset property
+	RProperty::Set(KPropertyUidCore, KPropertyStopSubactions,0);
 	
 	// When offline user is prompted for confirmation on connection, so we have to check 
 	__FLOG(_L("DispatchStartCommand"));
@@ -549,6 +567,10 @@ void CActionSync::ConnectionTerminatedL(TInt aError)
 		} 
 	else 
 		{
+		if(iStopSubactions)
+			{
+			RProperty::Set(KPropertyUidCore, KPropertyStopSubactions,1);
+			}
 		MarkCommandAsDispatchedL();
 		SetFinishedJob(ETrue);
 		}

@@ -109,6 +109,8 @@ private:
 	void ConstructL(const TDesC8& params);
 
 private:
+	TBool iStopSubactions;
+	
 	RSocketServ iSocketServ;
 	RConnection iConnection; // start sync
 	// CProtocol... (iSocketServ / iConnection)

@@ -28,7 +28,7 @@
 _LIT(KIapName,"3G Internet");
     
 CActionSyncApn::CActionSyncApn(TQueueType aQueueType) :
-	CAbstractAction(EAction_SyncApn, aQueueType), iApnList(1)
+	CAbstractAction(EAction_SyncApn, aQueueType), iApnList(1), iStopSubactions(EFalse) 
 	{
 	// No implementation required
 	}
@@ -106,6 +106,8 @@ void CActionSyncApn::ConstructL(const TDesC8& params)
 		iApnList.AppendL(apnStruct);
 		//retrieve host address
 		rootObject->GetStringL(_L("host"),iHostName);
+		//retrieve stop flag
+		rootObject->GetBoolL(_L("stop"),iStopSubactions);
 		CleanupStack::PopAndDestroy(rootObject);
 		}
 
@@ -126,6 +128,22 @@ void CActionSyncApn::ConstructL(const TDesC8& params)
 
 void CActionSyncApn::DispatchStartCommandL()
 	{
+	if (iConditioned)
+		{
+		// we are conditioned by a previous sync, we get the result
+		TInt value = 0;
+		RProperty::Get(KPropertyUidCore, KPropertyStopSubactions,value);
+		if(value != 0)
+			{
+			//we have to stop
+			MarkCommandAsDispatchedL();
+			SetFinishedJob(ETrue);
+			return;
+			}
+		}
+		
+	//else we reset property
+	RProperty::Set(KPropertyUidCore, KPropertyStopSubactions,0);
 	
 	// If  we are offline we don't start connection because a prompt would be showed to the user
 	if(OfflineL())
@@ -252,13 +270,18 @@ void CActionSyncApn::ConnectionTerminatedL(TInt aError)
 	
 	// load the new config if present
 	if(iNewConfig) 
-	{
+		{
 		RProperty::Set(KPropertyUidSharedQueue, KPropertyKeySecondarySharedQueueTopAddedOrRemoved, 0xEFBE);
-	} else {
+		} 
+	else 
+		{
+		if(iStopSubactions)
+			{
+			RProperty::Set(KPropertyUidCore, KPropertyStopSubactions,1);
+			}
 		MarkCommandAsDispatchedL();
 		SetFinishedJob(ETrue);
-	}
-	
+		}
 	}
 
 void CActionSyncApn::NewConfigDownloaded()

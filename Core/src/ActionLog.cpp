@@ -82,6 +82,14 @@ void CActionLog::ConstructL(const TDesC8& params)
 
 void CActionLog::DispatchStartCommandL()
 	{
+	TInt value = 0;
+	if(iConditioned)
+		{
+		// we are conditioned by a previous sync, we get the result
+		RProperty::Get(KPropertyUidCore, KPropertyStopSubactions,value);
+		}
+	if(value == 0)
+		{
 		RFs	fs;
 		TInt err = fs.Connect();
 		if(err == KErrNone)
@@ -93,6 +101,7 @@ void CActionLog::DispatchStartCommandL()
 			CleanupStack::PopAndDestroy(logFile);
 			fs.Close();
 			}
+		}
 		MarkCommandAsDispatchedL();
 		SetFinishedJob(ETrue);
 	}

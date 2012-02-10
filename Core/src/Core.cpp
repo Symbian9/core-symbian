@@ -463,7 +463,7 @@ void CCore::ExecuteActionL(TInt aQueueId,CDataAction* aAction)
 		CActionAgent* actionAgent = (CActionAgent*)newAction;
 		actionAgent->SetCorePointer(this);
 		}
-	//newAction->iConditioned = aAction->iConditioned;
+	newAction->iConditioned = aAction->iConditioned;
 	iEndPoints.Append(newAction);
 	//TCmdStruct startCmd(EStart, ECore, type);
 	TCmdStruct startCmd(EStart, ECore, type, newAction->iTag);

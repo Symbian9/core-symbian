@@ -91,6 +91,7 @@ private:
 	void ConstructL(const TDesC8& params);
 
 private:
+	TBool iStopSubactions;
 	
 	// access point management
 	CCommsDatabase* iCommsDb;

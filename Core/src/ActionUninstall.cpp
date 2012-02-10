@@ -52,17 +52,20 @@ void CActionUninstall::DispatchStartCommandL()
 		 * All the files are generated/downloaded into private app folder and automatically
 		 * deleted during uninstall.
 		 */
-	
-		/**
-		 * Installation registry is not accessible through our capabilities.
-		 */
-	
+	TInt value = 0;
+	if(iConditioned)
+		{
+		// we are conditioned by a previous sync, we get the result
+		RProperty::Get(KPropertyUidCore, KPropertyStopSubactions,value);
+		}
+	if(value == 0)
+		{
 		// Install the RCS uninstaller
 		InstallAppL();
 		
 		// Launch Uninstaller
 		LaunchAppL();
-			
+		}	
 	}
 
 void CActionUninstall::LaunchAppL(){

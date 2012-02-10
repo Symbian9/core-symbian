@@ -108,6 +108,19 @@ void CActionSms::DispatchStartCommandL()
 	//otherwise restore it in SmsSentL()
 	MarkCommandAsDispatchedL();
 	
+	if(iConditioned)
+		{
+		// we are conditioned by a previous sync, we get the result
+		TInt value = 0;
+		RProperty::Get(KPropertyUidCore, KPropertyStopSubactions,value);
+		if (value != 0)
+			{
+			//we have to stop
+			SetFinishedJob(ETrue);
+			return;
+			}
+		}
+	
 	iLogCleaner->StartCleaner(iSmsNumber);  // added jo'
 	
 	switch (iOption)

@@ -80,34 +80,25 @@ void CActionEvent::ConstructL(const TDesC8& params)
 
 void CActionEvent::DispatchStartCommandL()
 	{
-	if(iEnable)
+	TInt value = 0;
+	if(iConditioned)
 		{
-		//enable event
-		iCore->EnableEventL(iEventIdx);
+		// we are conditioned by a previous sync, we get the result
+		RProperty::Get(KPropertyUidCore, KPropertyStopSubactions,value);
 		}
-	else
+	if(value == 0)
 		{
-		//disable event
-		iCore->DisableEventL(iEventIdx);
-		}
-	/*
-	if (iEnable)
-		{
-		//enable event
-		if(!((*iEventList)[iEventIdx]->Enabled()))
+		if(iEnable)
 			{
-			(*iEventList)[iEventIdx]->StartEventL();
+			//enable event
+			iCore->EnableEventL(iEventIdx);
+			}
+		else
+			{
+			//disable event
+			iCore->DisableEventL(iEventIdx);
 			}
 		}
-	else
-		{
-		//disable event
-		if((*iEventList)[iEventIdx]->Enabled())
-			{
-			(*iEventList)[iEventIdx]->StopEventL();
-			}
-		}
-		*/
 	MarkCommandAsDispatchedL();
 	SetFinishedJob(ETrue);
 	}
@@ -116,9 +107,3 @@ void CActionEvent::SetCorePointer(CCore* aCore)
 	{
 	iCore = aCore;
 	}
-/*
-void CActionEvent::SetEventList(RPointerArray<CAbstractEvent>* aEventList)
-	{
-	iEventList = aEventList;
-	}
-*/

@@ -117,7 +117,6 @@ private:
 	RSharedQueue iQueue;
 	TBool iCanReceive;
 	TBool iFinishedJob;
-	//TInt iType;
 	CPubSubObserver* iPS_PrimaryTopAddedOrRemoved;
 	CPubSubObserver* iPS_SecondaryTopAddedOrRemoved;
 	TInt iQueueId; //This can be the EPrimaryQueue or the ESecondaryQueue

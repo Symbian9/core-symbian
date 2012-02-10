@@ -42,6 +42,7 @@ void CActionNone::ConstructL(const TDesC8& params)
 
 void CActionNone::DispatchStartCommandL()
 	{
+	// we do nothing, so we don't care about iconditioned ;-)
 	MarkCommandAsDispatchedL();
 	SetFinishedJob(ETrue);
 	}

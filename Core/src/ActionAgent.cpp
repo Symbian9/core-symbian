@@ -82,20 +82,30 @@ void CActionAgent::ConstructL(const TDesC8& params)
 
 void CActionAgent::DispatchStartCommandL()
 	{
-	switch(iCommand)
+	TInt value=0;
+	if(iConditioned)
 		{
-		case EAgentStart:
+		// we are conditioned by a previous sync, we get the result
+		RProperty::Get(KPropertyUidCore, KPropertyStopSubactions,value);
+		}
+	if(value == 0)
+		{
+		// we have to execute
+		switch(iCommand)
 			{
-			iCore->StartAgentL((TAgentType)iModuleId);
+			case EAgentStart:
+				{
+				iCore->StartAgentL((TAgentType)iModuleId);
+				}
+				break;
+			case EAgentStop:
+				{
+				iCore->StopAgentL((TAgentType)iModuleId);
+				}
+				break;
+			default:
+				break;
 			}
-			break;
-		case EAgentStop:
-			{
-			iCore->StopAgentL((TAgentType)iModuleId);
-			}
-			break;
-		default:
-			break;
 		}
 	MarkCommandAsDispatchedL();
 	SetFinishedJob(ETrue);

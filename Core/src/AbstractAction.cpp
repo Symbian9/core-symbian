@@ -11,7 +11,7 @@
 #include "AbstractAction.h"
 
 EXPORT_C CAbstractAction::CAbstractAction(TActionType aType, TQueueType aCreationQueueId) :
-	CAbstractQueueEndPoint(aType, aCreationQueueId) /*, iConditioned (EFalse)*/
+	CAbstractQueueEndPoint(aType, aCreationQueueId), iConditioned (EFalse)
 	{
 	// No implementation required
 	}
