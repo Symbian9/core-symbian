@@ -11,8 +11,14 @@
 #include <F32FILE.H>
 #include <LOGVIEW.H>
 #include <logcli.h>
-//#include <logwrap.h>
- 
+
+// platform macros are defined into epoc32/tools/e32plat.pm
+// if platform is symbian^3, __SERIES60_3X__ is not defined
+// except than Symbian^3, KLogMaxDirectionLength is defined into <logwrap.h>
+#ifndef __SERIES60_3X__
+const TInt KLogMaxDirectionLength = 64;
+#endif
+
 enum TCallDirection
 	{
 	EDirIn,

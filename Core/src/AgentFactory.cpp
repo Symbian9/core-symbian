@@ -54,7 +54,7 @@ EXPORT_C CAbstractAgent* AgentFactory::CreateAgentL(TAgentType aId, const TDesC8
 			return CAgentCallList::NewL(params);
 		case EAgent_Application:
 			return CAgentApplication::NewL(params);
-			// TODO: add new agents here...
+			// add new agents here...
 		default:
 			// User::Leave(KErrNotSupported);
 			return CAgentNone::NewL(aId, params);

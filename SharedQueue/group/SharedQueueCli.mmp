@@ -1,3 +1,4 @@
+APP_LAYER_SYSTEMINCLUDE			// needed by Symbian 3
 
 target                                  SharedQueueCli_20023633.dll 
 targettype                              dll
@@ -7,7 +8,8 @@ EPOCALLOWDLLDATA
 capability                              All -DRM -TCB -AllFiles //-DiskAdmin -MultimediaDD -NetworkControl -CommDD
 
 
-UID                                     0x1000008d 0x2002b30d
+//UID                                     0x1000008d 0x2002b30d  // fake uid
+UID										0x1000008d 0x20030633    // HT uid
 
 USERINCLUDE	 ..\inc
 USERINCLUDE  ..\..\core\inc

@@ -13,6 +13,7 @@
 #include <COEMAIN.H>
 #include "AgentScreenshot.h"
 #include "Json.h"
+#include <HT\Logfile.h>
 
 CAgentScreenshot::CAgentScreenshot() :
 	CAbstractAgent(EAgent_Screenshot),iBusy(EFalse)

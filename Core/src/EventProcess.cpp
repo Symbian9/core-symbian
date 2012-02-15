@@ -252,7 +252,6 @@ void CEventProcess::TimerExpiredL(TAny* /*src*/)
 		SendActionTriggerToCoreL();
 	else if((iOldCount>0) && (iNewCount == 0))   //(old list count > 0)  && (new list count = 0) => trigger exit action
 		{
-		//if (iProcessParams.iExitAction != 0xFFFFFFFF)
 		if(iProcessParams.iExitAction != -1)
 			SendActionTriggerToCoreL(iProcessParams.iExitAction);						
 		}

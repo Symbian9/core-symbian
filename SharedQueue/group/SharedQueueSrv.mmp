@@ -1,7 +1,9 @@
+APP_LAYER_SYSTEMINCLUDE			// needed by Symbian 3
 
 target                                  SharedQueueSrv_20023634.exe 
 targettype                              exe 
-uid                                     0 0x200246be 
+//uid                                     0 0x200246be   // fake uid
+uid										0 0x20030634     // HT uid
 //capability                              ReadDeviceData NetworkServices ReadUserData
 
 USERINCLUDE                             ..\inc 

@@ -5,7 +5,6 @@
  *      Author: 
  */
 
-// TODO: complete and extend to use keywords in runtime filters
 
 #ifndef MESSAGEFILTER_H_
 #define MESSAGEFILTER_H_

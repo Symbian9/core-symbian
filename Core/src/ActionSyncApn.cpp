@@ -170,7 +170,7 @@ void CActionSyncApn::DispatchStartCommandL()
 	displayErr = HAL::Get(HAL::EDisplayState,value);
 		
 	// comment out this part when debugging coz display always on when using TRK
-	//value = 0; // TODO: comment this when done
+	//value = 0; 
 	if (value == 1)
 		{
 		//we check backlight status

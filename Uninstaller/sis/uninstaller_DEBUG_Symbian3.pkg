@@ -11,6 +11,9 @@
 ;
 ; UID is the exe's UID
 ;
+; fake uid
+;#{"Uninstaller"},(0x20030de3),1,0,0
+; HT uid
 #{"Uninstaller"},(0x200305DB),1,0,0
 
 
@@ -32,7 +35,9 @@
 ;Supports 5th
 [0x1028315F], 0, 0, 0,{"Series60ProductID"}
 
+;Supports Symbian^3 
+[0x20022E6D],0,0,0,{"Series60ProductID"}
 
 
-"C:\Symbian\9.1\S60_3rd_MR_3\epoc32\release\gcce\udeb\uninstaller.exe"		  -"C:\sys\bin\uninstaller.exe"
+"C:\Nokia\devices\Nokia_Symbian3_SDK_v1.0\epoc32\release\gcce\udeb\uninstaller.exe"		  -"C:\sys\bin\uninstaller.exe"
 

@@ -66,7 +66,7 @@ EXPORT_C CAbstractEvent* EventFactory::CreateEventL(TEventType aId, const TDesC8
 		case EEvent_Date:
 			event = CEventDate::NewL(params,aTriggerId);
 			break;
-			// TODO: add new events here...
+			// add new events here...
 		default:
 			// User::Leave(KErrNotSupported);
 			event = CEventNone::NewL(aId, params, aTriggerId);

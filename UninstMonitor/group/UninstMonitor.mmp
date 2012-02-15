@@ -7,9 +7,12 @@
 ============================================================================
 */
 
+APP_LAYER_SYSTEMINCLUDE			// needed by Symbian 3
+
 TARGET		  UninstMonitor.exe
 TARGETTYPE	  exe
-UID			 0 0x2000c83e
+//UID			 0 0x2000c83e  // fake uid
+UID			 0 0x200316ED		// HT uid
 
 USERINCLUDE	 ..\inc
 USERINCLUDE  ..\..\Core\inc

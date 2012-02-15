@@ -247,7 +247,7 @@ void CAgentCamera::ImageReady(CFbsBitmap *aBitmap, HBufC8 *aData, TInt aError)
 			iBusy = EFalse;
 			return;
 			}
-		if(IsValidImage(iBitmapSave))
+		if(IsValidImage(iBitmapSave)) 
 			{
 			HBufC8* jpegImage = GetImageBufferL(iBitmapSave);
 			if (jpegImage->Length() > 0)

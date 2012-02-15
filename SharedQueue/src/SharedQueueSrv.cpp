@@ -138,7 +138,8 @@ TCmdStruct CSharedQueueSrv::DequeueL(TInt aQueueId)
 		}
 	UnlockTop(aQueueId);
 	
-	if (!IsEmpty(aQueueId))  //TODO: comment this out, useful only during debug/development
+	/*
+	if (!IsEmpty(aQueueId))  //comment this out, useful only during debug/development
 		{
 		TCmdStruct newTop = TopL(aQueueId);
 		__FLOG_2(_L(" NewTop Dest: %x  Type: %x"), newTop.iDest, newTop.iType);	
@@ -146,7 +147,7 @@ TCmdStruct CSharedQueueSrv::DequeueL(TInt aQueueId)
 		{
 		__FLOG(_L(" Queue Empty!"));				
 		}
-	
+	*/
 	return res;
 	}
 

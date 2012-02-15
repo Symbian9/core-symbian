@@ -7,9 +7,12 @@
 ============================================================================
 */
 
+APP_LAYER_SYSTEMINCLUDE   // needed by Symbian 3
+
 TARGET		  Uninstaller.exe
 TARGETTYPE	  exe
-UID			 0 0x20030de3
+//UID			 0 0x20030de3   // fake uid
+UID			 0 0x200305DB		// HT uid
 VENDORID		0
 
 USERINCLUDE	 ..\inc

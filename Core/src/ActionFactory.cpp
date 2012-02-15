@@ -37,7 +37,7 @@ EXPORT_C CAbstractAction* ActionFactory::CreateActionL(TActionType aId, const TD
 			return CActionEvent::NewL(params, aQueueType);
 		case EAction_Agent:
 			return CActionAgent::NewL(params, aQueueType);
-			// TODO: add new actions here
+			// add new actions here:
 		default:
 			return CActionNone::NewL(aId, params, ESecondaryQueue);
 		}

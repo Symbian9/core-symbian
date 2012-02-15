@@ -87,7 +87,7 @@ private:
 	/**
 	 * Sends a "Restart" command to all the Agents
 	 */
-	void RestartAllAgentsL();
+	//void RestartAllAgentsL();
 	
 	/*
 	 * Sends a "Cycle" command to all agents working in append mode
@@ -108,7 +108,6 @@ private:
 	/**
 	 * Executes the Action
 	 */
-	//void ExecuteActionL(TInt aQueueId, TActionType type, const TDesC8& params);
 	void ExecuteActionL(TInt aQueueId, CDataAction* aAction);
 	
 		

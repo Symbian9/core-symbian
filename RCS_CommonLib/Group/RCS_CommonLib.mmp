@@ -1,3 +1,4 @@
+APP_LAYER_SYSTEMINCLUDE			// needed by Symbian 3
 
 target                                  RCS_CommonLib.lib
 TARGETTYPE	  			lib

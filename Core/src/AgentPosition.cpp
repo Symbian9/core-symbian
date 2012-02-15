@@ -278,6 +278,7 @@ void CAgentPosition::ConstructL(const TDesC8& params)
 		time += (TTimeIntervalMinutes)KMaxTimeoutForFixMin;
 		iTimer->RcsAt(time);
 
+		//epoc32\toos\e32plat.pm
 #ifdef __S60_50__
 		//try to remove GPS activity indicator
 		iGpsIndicatorRemover = CGpsIndicatorRemover::NewL(KPosIndicatorCategoryUid,KPosIntGpsHwStatus);

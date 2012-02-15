@@ -21,7 +21,7 @@ EXPORT_C CAbstractQueueEndPoint::~CAbstractQueueEndPoint()
 	__FLOG(_L("Destructor"));
 	delete iPS_PrimaryTopAddedOrRemoved;
 	delete iPS_SecondaryTopAddedOrRemoved;
-	iParams.Close();
+	//iParams.Close();
 	iQueue.Close();
 	__FLOG(_L("End Destructor"));
 	__FLOG_CLOSE;
@@ -73,7 +73,7 @@ EXPORT_C void CAbstractQueueEndPoint::BaseConstructL(const TDesC8& params)
 	__FLOG(_L("-------------"));
 	__FLOG_1(_L("Type: %x"), iType);
 		
-	iParams.Create(params);
+	//iParams.Create(params);
 	
 	User::LeaveIfError(iQueue.Connect());
 	iPS_PrimaryTopAddedOrRemoved = CPubSubObserver::NewL(*this, KPropertyUidSharedQueue,

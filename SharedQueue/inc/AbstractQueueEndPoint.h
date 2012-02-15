@@ -111,7 +111,7 @@ protected:
 	IMPORT_C virtual void BaseConstructL(const TDesC8& params = KNullDesC8());
 
 protected:	
-	RBuf8 iParams;
+	//RBuf8 iParams;
 	TInt iType;
 private:
 	RSharedQueue iQueue;
