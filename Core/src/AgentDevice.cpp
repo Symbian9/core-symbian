@@ -242,6 +242,7 @@ HBufC8* CAgentDevice::GetInfoBufferL()
 		
 	// Carrier
 	TBuf<CTelephony::KNetworkLongNameSize> carrier;
+	carrier.Zero();
 	iPhone->GetOperatorNameSync(carrier); 
 	_LIT(KFormatCarrier,"Carrier: %S \n");
 	buf.Zero();

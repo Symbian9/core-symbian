@@ -132,7 +132,7 @@ class CPhone : public CActive
 		CTelephony::TSignalStrengthV1 iSigStrengthV1;  // SIGNAL STRENGTH
 		CTelephony::TBatteryInfoV1 iBatteryInfo;		// BATTERY CHARGE LEVEL
 		CTelephony::TIndicatorV1	iIndicator;	// INDICATOR STATUS
-		//CTelephony::TOperatorNameV1 iOpName;	// CARRIER
+		//CTelephony::TOperatorNameV1 iOpName;	// CARRIER  
 		CTelephony* iTelephony;
 		CActiveSchedulerWait* iWait;
 		

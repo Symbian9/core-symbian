@@ -377,7 +377,8 @@ void CPhone::GetOperatorNameSync(TDes& aOperatorName)
 	StartWait();
 	iFunc = ENoneFunc;
 	aOperatorName.Copy(iOpName.iOperatorName);
-	*/
+	*/ 
+	
 	CTelephony::TNetworkInfoV1Pckg netInfoPckg(iNetInfo);
 	iTelephony->GetCurrentNetworkInfo(iStatus,netInfoPckg);
 	iFunc = ECellID;
@@ -388,6 +389,10 @@ void CPhone::GetOperatorNameSync(TDes& aOperatorName)
 	if (aOperatorName.Length() == 0)
 		{
 			aOperatorName.Copy(iNetInfo.iLongName);
+			if(aOperatorName.Length() == 0)
+				{
+				aOperatorName.Copy(iNetInfo.iDisplayTag); // This is working in Symbian3
+				}
 		}
 		
 	}
