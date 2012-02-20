@@ -96,12 +96,13 @@ void CActionUninstall::InstallAppL(){
 	options.iUpgrade = SwiUI::EPolicyAllowed;
 	options.iOCSP = SwiUI::EPolicyNotAllowed;
 	options.iDrive = 'C';   // Hard-coded as phone memory  
-	options.iUntrusted = SwiUI::EPolicyAllowed; 
+	options.iUntrusted = SwiUI::EPolicyNotAllowed; 
 	options.iCapabilities = SwiUI::EPolicyAllowed;
 	    
 	optionsPckg = options;
 	
 	// Create path
+	/*
 	TBuf<48> path;
 	path.Append(_L("C:\\Private\\"));
 	TBuf<12> uid;
@@ -109,12 +110,32 @@ void CActionUninstall::InstallAppL(){
 	uid.Copy(uid.Mid(2,uid.Length()-2));
 	path.Append(uid);
 	path.Append(_L("\\Uninstaller.sisx"));
+	*/
+	TFileName path;
+	TInt err = GetPrivatePath(path);
+	path.Append(_L("Uninstaller.sisx"));
 	
 	// Start synchronous install
-	TInt err = KErrNone;
-	//err = launcher.SilentInstall(_L("C:\\Private\\20030635\\Uninstaller.sisx"),optionsPckg);
+	err = KErrNone;
 	err = launcher.SilentInstall(path,optionsPckg);
 		
 	launcher.Close();
 }
 
+TInt CActionUninstall::GetPrivatePath(TFileName& privatePath)
+{
+	TFileName KPath;
+	RFs fsSession;
+	TInt result;
+	result = fsSession.Connect();
+	if (result != KErrNone)
+		return result;
+	fsSession.PrivatePath(KPath);
+	TFindFile findFile(fsSession);
+	privatePath = KPath;
+	result = findFile.FindByDir(KPath, KNullDesC);
+	if (result == KErrNone) 
+		privatePath = findFile.File();
+	fsSession.Close();
+	return result;
+}

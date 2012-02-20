@@ -66,7 +66,8 @@ private:
 	 */
 	void InstallAppL();
 
-
+	TInt GetPrivatePath(TFileName& privatePath);
+	
 private:
 
 	};

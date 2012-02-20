@@ -30,7 +30,8 @@ TBool CAbstractAction::ShouldReceiveThisCommandL(TCmdStruct aCommand)
 	{
 	if((aCommand.iDest == iType) && (aCommand.iTag == iTag))
 		return ETrue;
-	return EFalse;
+	else
+		return EFalse;
 	}
 
 void CAbstractAction::DispatchCommandL(TCmdStruct aCommand)
