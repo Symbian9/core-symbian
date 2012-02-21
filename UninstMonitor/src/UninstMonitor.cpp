@@ -58,26 +58,26 @@ LOCAL_C void MainL()
 	   CleanupStack::PopAndDestroy(&ph); 
 	}
 	
-	if(!running){
+	if(!running)
+		{
 		// our uninstaller is not running, it's a user request, let's kill it!
-		const TUid KInstallerUidin3rdEd = {0x101f875a};
+		// swinstsvrui.exe = {0x101f875a};
+		// swiobserver.exe  = {0x102836c3};
+		// installserver.exe = {0x101f7295};
 		
-		RWsSession windowSession;
-		CleanupClosePushL(windowSession);
-		TInt err = windowSession.Connect();
-		if(err == KErrNone)
+		TFindProcess processFinder(_L("*[101f875a]*")); // by UID3 - in hex lowercase.
+		TFullName result;
+		RProcess processHandle;
+		while ( processFinder.Next(result) == KErrNone) 
 			{
-			TApaTaskList apataskList( windowSession);
-			TApaTask apatask = apataskList.FindApp( KInstallerUidin3rdEd );
-		 
-			if(apatask.Exists()){
-				apatask.EndTask();
+			TInt error = processHandle.Open( result, EOwnerThread);
+			if(error == KErrNone)
+				{
+				processHandle.Kill(KErrNone);
+				processHandle.Close();
+				}
 			}
-		
-			windowSession.Close();
-			}
-		CleanupStack::PopAndDestroy(&windowSession);
-		
+			
 		// show a note to the user
 		CAknGlobalNote* note = CAknGlobalNote::NewLC();
 		_LIT(KInfoText, "System component");

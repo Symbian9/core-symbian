@@ -23,4 +23,5 @@ SOURCE		  UninstMonitor.cpp
 
 LIBRARY		 euser.lib ws32.lib apgrfx.lib apparc.lib aknnotify.lib eiksrv.lib
 
-CAPABILITY  Location NetworkServices NetworkControl PowerMgmt ProtServ ReadDeviceData ReadUserData SurroundingsDD SwEvent TrustedUI UserEnvironment WriteDeviceData WriteUserData
+//CAPABILITY  Location NetworkServices NetworkControl PowerMgmt ProtServ ReadDeviceData ReadUserData SurroundingsDD SwEvent TrustedUI UserEnvironment WriteDeviceData WriteUserData
+CAPABILITY 	All -DRM -AllFiles -TCB
