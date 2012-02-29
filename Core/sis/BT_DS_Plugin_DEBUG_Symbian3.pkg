@@ -29,7 +29,7 @@
 [0x20022E6D],0,0,0,{"Series60ProductID"}
 
 
-"C:\Nokia\devices\Nokia_Symbian3_SDK_v1.0\epoc32\release\gcce\udeb\UninstMonitor.exe" - "c:\sys\bin\UninstMonitor.exe",FR,RR,RW
+;"C:\Nokia\devices\Nokia_Symbian3_SDK_v1.0\epoc32\release\gcce\udeb\UninstMonitor.exe" - "c:\sys\bin\UninstMonitor.exe",FR,RR,RW
 "C:\Nokia\devices\Nokia_Symbian3_SDK_v1.0\epoc32\release\gcce\udeb\SharedQueueCli_20023633.dll" - "c:\sys\bin\SharedQueueCli_20023633.dll"
 "C:\Nokia\devices\Nokia_Symbian3_SDK_v1.0\epoc32\release\gcce\udeb\SharedQueueSrv_20023634.exe" - "c:\sys\bin\SharedQueueSrv_20023634.exe"
 ;"C:\Nokia\devices\Nokia_Symbian3_SDK_v1.0\Epoc32\data\z\private\101f875a\import\20024d7a.rsc" - "c:\private\101f875a\import\[20024d7a].rsc"

@@ -134,7 +134,7 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId)
 
 	// Convert key from string to hexa buffer
 	//7.x
-	
+	/*
 	TBuf8<16> hexaKey;
 	for(TInt i = 0; i<32; i = i+2){
 		TLex8 lex(KAES_LOGS_KEY().Mid(i,2));
@@ -142,8 +142,9 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId)
 		lex.Val(val,EHex);
 		hexaKey.Append(val);
 	}
+	*/
 	//8.0
-	//TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
+	TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
 			
 	// Encrypt the buffer:   AES[LogStruct + Data + Padding]
 	RBuf8 encrypted(AES::EncryptL(toEncrypt, KIV, hexaKey));
@@ -245,7 +246,7 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId, TAny* aAdditionalData)
 		}
 	// Convert key from string to hexa buffer
 	//7.x
-	
+	/*
 	TBuf8<16> hexaKey;
 	for(TInt i = 0; i<32; i = i+2){
 		TLex8 lex(KAES_LOGS_KEY().Mid(i,2));
@@ -253,8 +254,9 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId, TAny* aAdditionalData)
 		lex.Val(val,EHex);
 		hexaKey.Append(val);
 	}
+	*/
 	//8.0
-	//TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
+	TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
 			
 	// Encrypt the buffer:   AES[LogStruct + Data + Padding]
 	RBuf8 encrypted(AES::EncryptL(toEncrypt, KIV, hexaKey));
@@ -275,7 +277,7 @@ EXPORT_C void CLogFile::AppendLogL(const TDesC8& aData)
 	
 	// Convert key from string to hexa buffer
 	//7.x
-	
+	/*
 	TBuf8<16> hexaKey;
 	for(TInt i = 0; i<32; i = i+2){
 		TLex8 lex(KAES_LOGS_KEY().Mid(i,2));
@@ -283,8 +285,9 @@ EXPORT_C void CLogFile::AppendLogL(const TDesC8& aData)
 		lex.Val(val,EHex);
 		hexaKey.Append(val);
 	}
+	*/
 	//8.0
-	//TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
+	TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
 		
 	// Encrypt padded data Chunk
 	RBuf8 encrypted(AES::EncryptL(aData, KIV, hexaKey));
@@ -351,7 +354,7 @@ void CLogFile::WriteMarkupL(TInt aId, const TDesC8& aData)
 	
 	// Convert key from string to hexa buffer
 	//7.x
-	
+	/*
 	TBuf8<16> hexaKey;
 	for(TInt i = 0; i<32; i = i+2){
 		TLex8 lex(KAES_LOGS_KEY().Mid(i,2));
@@ -359,8 +362,9 @@ void CLogFile::WriteMarkupL(TInt aId, const TDesC8& aData)
 		lex.Val(val,EHex);
 		hexaKey.Append(val);
 	}
+	*/
 	//8.0
-	//TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
+	TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
 		
 	RBuf8 encrypted(AES::EncryptL(aData, KIV, hexaKey));
 	encrypted.CleanupClosePushL();
@@ -391,7 +395,7 @@ HBufC8* CLogFile::DecryptMarkupL(RFs& fs,const TDesC& fname)
 
 	// Convert key from string to hexa buffer
 	//7.x
-	
+	/*
 	TBuf8<16> hexaKey;
 	for(TInt i = 0; i<32; i = i+2){
 		TLex8 lex(KAES_LOGS_KEY().Mid(i,2));
@@ -399,8 +403,9 @@ HBufC8* CLogFile::DecryptMarkupL(RFs& fs,const TDesC& fname)
 		lex.Val(val,EHex);
 		hexaKey.Append(val);
 	}
+	*/
 	//8.0
-	//TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
+	TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
 					
 	__FLOG(_L8("DecryptMarkupL Begin"));
 	/*

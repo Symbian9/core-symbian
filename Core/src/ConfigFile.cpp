@@ -233,7 +233,7 @@ HBufC8* CConfigFile::DecryptConfigFileL(RFs& fs, const TDesC& fname)
 		}
 
 	// 7.x Convert key from string to hexa buffer
-
+    /*
 	TBuf8<16> hexaKey;
 	for(TInt i = 0; i<32; i = i+2){
 		TLex8 lex(KAES_CONFIG_KEY().Mid(i,2));
@@ -241,9 +241,9 @@ HBufC8* CConfigFile::DecryptConfigFileL(RFs& fs, const TDesC& fname)
 		lex.Val(val,EHex);
 		hexaKey.Append(val);
 	}
-	
+	*/
 	// 8.0 take 16 bytes from config key
-	//TBuf8<16> hexaKey(KAES_CONFIG_KEY().Left(16));
+	TBuf8<16> hexaKey(KAES_CONFIG_KEY().Left(16));
 		
 	__FLOG(_L8("DecryptConfigFileL Begin"));
 	if (!BaflUtils::FileExists(fs, fname))

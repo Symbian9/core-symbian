@@ -19,9 +19,16 @@ _LIT8(KFake,"\xff\xff\xff\xff");
 _LIT(KLocal,"Local");
 
 CAgentCallLocal::CAgentCallLocal() :
-CAbstractAgent(EAgent_CallLocal),iInCall(EFalse),iRecState(ENotReady),iMicrosecInterval(500000)
+CAbstractAgent(EAgent_CallLocal),iInCall(EFalse),iRecState(ENotReady)
 	{
-	// No implementation required
+	/*
+#ifdef __SERIES60_3X__   // 3rd and 5th ed.
+	iMicrosecInterval = 500000;
+#else                   // Symbian 3
+	iMicrosecInterval = 300000;
+#endif
+*/
+	iMicrosecInterval = 500000;
 	}
 
 CAgentCallLocal::~CAgentCallLocal()
