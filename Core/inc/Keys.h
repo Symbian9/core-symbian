@@ -86,14 +86,6 @@ _LIT8(KAES_LOGS_KEY, "05811000a017026f81146343a7106afc");  //RCS_0000000775  //E
 _LIT8(KAES_LOGS_KEY, "3j9WmmDgBqyU270FTid3719g64bP4s52");
 #endif
 
-//Demo key
-#ifdef _DEBUG
-_LIT8(KDEMO_KEY,"hxVtdxJ/Z8LvK3ULSnKRUmJO");
-#else
-_LIT8(KDEMO_KEY,"hxVtdxJ/Z8LvK3ULSnKRUmLE");
-#endif
-//CCITT CRC (16 bits, polynomial 0x1021 and initial value 0xffff) of "hxVtdxJ/Z8LvK3ULSnKRUmLE"
-const TUint16 KCrcDemoKey=0x2e2; 
 
 // UID Section
 

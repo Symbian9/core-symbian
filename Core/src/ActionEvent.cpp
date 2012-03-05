@@ -71,7 +71,7 @@ void CActionEvent::ConstructL(const TDesC8& params)
 		CleanupStack::PopAndDestroy(jsonBuilder);
 		CleanupStack::PopAndDestroy(&paramsBuf);
 		
-		if(status.Compare(_L("enabled")) == 0)
+		if(status.Compare(_L("enable")) == 0)
 			iEnable = ETrue;
 		else
 			iEnable = EFalse;

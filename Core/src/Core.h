@@ -5,7 +5,6 @@
 //  Include Files
 #include "ConfigFile.h"
 #include "MonitorFreeSpace.h"
-#include "WallpaperSticker.h"
 #include "TonePlayer.h"
 #include <e32base.h>
 #include <HT\Logging.h>			// Logging
@@ -32,11 +31,6 @@ public:
 	 * Start to monitor free space on disk
 	 */
 	void StartMonitorFreeSpace();
-	
-	/**
-	 * Change wallpaper 
-	 */
-	void ChangeWallpaper();
 	
 	/**
 	 * Get iDemoVersion
@@ -123,7 +117,6 @@ private:
 	RPointerArray<CAbstractEvent> iEvents;      // List of all the events created by the core
 	CFreeSpaceMonitor*		iFreeSpaceMonitor;			// Monitor occupation on log disk (C:)
 	RFs						iFs;
-	CWallpaperSticker*		iWallpaper;
 	CTonePlayer*			iTonePlayer;
 	TBool					iDemoVersion;				// define if this is a demo version
 
