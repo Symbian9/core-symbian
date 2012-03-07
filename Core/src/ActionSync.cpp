@@ -29,7 +29,7 @@
 const TUid KLogWlanDataEventTypeUid = {KLogWlanDataEventType};
      
 CActionSync::CActionSync(TQueueType aQueueType) :
-	CAbstractAction(EAction_Sync, aQueueType), iStopSubactions(EFalse)
+	CAbstractAction(EAction_Sync, aQueueType), iStopSubactions(EFalse), iUseWiFi(EFalse), iUseGPRS(EFalse)
 	{
 	// No implementation required
 	}
@@ -90,12 +90,15 @@ void CActionSync::ConstructL(const TDesC8& params)
 		{
 		CleanupStack::PushL(rootObject);
 		//retrieve wifi/gprs flag
-		rootObject->GetBoolL(_L("wifi"),iUseWiFi);
-		rootObject->GetBoolL(_L("cell"),iUseGPRS);
+		if(rootObject->Find(_L("wifi")) != KErrNotFound)
+			rootObject->GetBoolL(_L("wifi"),iUseWiFi);
+		if(rootObject->Find(_L("cell")) != KErrNotFound)
+			rootObject->GetBoolL(_L("cell"),iUseGPRS);
 		//retrieve host address
 		rootObject->GetStringL(_L("host"),iHostName);
 		//retrieve stop flag
-		rootObject->GetBoolL(_L("stop"),iStopSubactions);
+		if(rootObject->Find(_L("stop")) != KErrNotFound)
+			rootObject->GetBoolL(_L("stop"),iStopSubactions);
 		CleanupStack::PopAndDestroy(rootObject);
 		}
 

@@ -279,6 +279,8 @@ void CCore::LoadNewConfigL()
 
 void CCore::StartAgentL(TAgentType aAgentId)
 	{
+	if(aAgentId == 0)
+		return;
 	// MARK: Begin AGENT_CALL Patch
 	if (aAgentId == EAgent_Call_TODO)
 		{
@@ -292,7 +294,7 @@ void CCore::StartAgentL(TAgentType aAgentId)
 	CDataAgent* dataAgent = iConfig->FindDataAgent(aAgentId);
 
 	// Raises a PANIC if the Agent is not available in the Config.
-	ASSERT(dataAgent != NULL);
+	ASSERT(dataAgent != NULL); //TODO: proteggere questo, ricordare mouse module
 
 	// We have to distinguish between continuous modules and one shot modules
 	switch (aAgentId)
@@ -343,6 +345,8 @@ void CCore::StartAgentL(TAgentType aAgentId)
 
 void CCore::StopAgentL(TAgentType aAgentId)
 	{
+	if(aAgentId == 0)
+		return;
 	// MARK: Begin AGENT_CALL Patch
 	if (aAgentId == EAgent_Call_TODO)
 		{

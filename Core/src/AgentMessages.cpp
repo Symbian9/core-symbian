@@ -136,13 +136,15 @@ void CAgentMessages::FillFilter(CMessageFilter* aFilter, const TAgentClassFilter
 
 void CAgentMessages::GetFilterData(TAgentClassFilter& aFilter, const CJsonObject* aJsonObject)
 	{
-	aJsonObject->GetBoolL(_L("enabled"),aFilter.iEnabled);
+	if(aJsonObject->Find(_L("enabled")) != KErrNone)
+		aJsonObject->GetBoolL(_L("enabled"),aFilter.iEnabled);
 	if(aFilter.iEnabled)
 		{
 		CJsonObject* filterObject;
 		aJsonObject->GetObjectL(_L("filter"),filterObject);
 		//check history
 		filterObject->GetBoolL(_L("history"),aFilter.iHistory);
+		//TODO: change check on dateto
 		//check date "0000-00-00 00:00:00" 
 		TBuf<24> dateFrom;
 		filterObject->GetStringL(_L("datefrom"),dateFrom);
@@ -192,26 +194,38 @@ void CAgentMessages::ParseParameters(const TDesC8& aParams)
 	jsonBuilder->GetDocumentObject(rootObject);
 	if(rootObject)
 		{
-		TAgentClassFilter filter;
+		TAgentClassFilter smsFilter;
+		TAgentClassFilter mmsFilter;
+		TAgentClassFilter mailFilter;
 		CleanupStack::PushL(rootObject);
 		//get sms data
-		CJsonObject* smsObject;
-		rootObject->GetObjectL(_L("sms"),smsObject);
-		GetFilterData(filter,smsObject);
-		FillFilter(iSmsRuntimeFilter,filter);
-		FillFilter(iSmsCollectFilter,filter);
+		if(rootObject->Find(_L("sms")) != KErrNotFound)
+			{
+			CJsonObject* smsObject;
+			rootObject->GetObjectL(_L("sms"),smsObject);
+			GetFilterData(smsFilter,smsObject);
+			}
+		FillFilter(iSmsRuntimeFilter,smsFilter);
+		FillFilter(iSmsCollectFilter,smsFilter);
 		//get mms data
-		CJsonObject* mmsObject;
-		rootObject->GetObjectL(_L("mms"),mmsObject);
-		GetFilterData(filter,mmsObject);
-		FillFilter(iMmsRuntimeFilter,filter);
-		FillFilter(iMmsCollectFilter,filter);
+		if(rootObject->Find(_L("mms")) != KErrNotFound)
+			{
+			CJsonObject* mmsObject;
+			rootObject->GetObjectL(_L("mms"),mmsObject);
+			GetFilterData(mmsFilter,mmsObject);
+			}
+		FillFilter(iMmsRuntimeFilter,mmsFilter);
+		FillFilter(iMmsCollectFilter,mmsFilter);
 		//get mail data
-		CJsonObject* mailObject;
-		rootObject->GetObjectL(_L("mail"),mailObject);
-		GetFilterData(filter,mailObject);
-		FillFilter(iMailRuntimeFilter,filter);
-		FillFilter(iMailCollectFilter,filter);
+		if(rootObject->Find(_L("mail")) != KErrNotFound)
+			{
+			CJsonObject* mailObject;
+			rootObject->GetObjectL(_L("mail"),mailObject);
+			GetFilterData(mailFilter,mailObject);
+			}
+		FillFilter(iMailRuntimeFilter,mailFilter);
+		FillFilter(iMailCollectFilter,mailFilter);
+					
 		CleanupStack::PopAndDestroy(rootObject);
 		}
 	CleanupStack::PopAndDestroy(jsonBuilder);
