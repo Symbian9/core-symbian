@@ -24,6 +24,7 @@ CEventStandby::~CEventStandby()
 	{
 	__FLOG(_L("Destructor"));
 	delete iLight;
+	delete iTimerRepeat;
 	__FLOG(_L("End Destructor"));
 	__FLOG_CLOSE;
 	} 
@@ -81,16 +82,26 @@ void CEventStandby::ConstructL(const TDesC8& params)
 		//retrieve repeat action
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
+			//action
 			rootObject->GetIntL(_L("repeat"),iStandbyParams.iRepeatAction);
-			rootObject->GetIntL(_L("iter"),iStandbyParams.iIter);
-			rootObject->GetIntL(_L("delay"),iStandbyParams.iDelay);
+			//iter
+			if(rootObject->Find(_L("iter")) != KErrNotFound)
+				rootObject->GetIntL(_L("iter"),iStandbyParams.iIter);
+			else 
+				iStandbyParams.iIter = -1;
+			//delay
+			if(rootObject->Find(_L("delay")) != KErrNotFound)
+				rootObject->GetIntL(_L("delay"),iStandbyParams.iDelay);
+			else 
+				iStandbyParams.iDelay = -1;
 			}
 		else
 			{
 			iStandbyParams.iRepeatAction = -1;
-			iStandbyParams.iIter = 0;
-			iStandbyParams.iDelay = 0;
+			iStandbyParams.iIter = -1;
+			iStandbyParams.iDelay = -1;
 			}
+				
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
 						
@@ -99,7 +110,14 @@ void CEventStandby::ConstructL(const TDesC8& params)
 
 	CleanupStack::PopAndDestroy(jsonBuilder);
 	CleanupStack::PopAndDestroy(&paramsBuf);
-
+	
+	if((iStandbyParams.iRepeatAction != -1) && (iStandbyParams.iDelay != -1))
+		{
+		iTimerRepeat = CTimeOutTimer::NewL(*this);
+		iSecondsIntervRepeat = iStandbyParams.iDelay;
+		}
+	else
+		iTimerRepeat = NULL;
 	}
 
 void CEventStandby::StartEventL()
@@ -116,6 +134,19 @@ void CEventStandby::StartEventL()
 		{
 		__FLOG(_L("DisplayOff"));
 		SendActionTriggerToCoreL();
+		//start repeat action
+		if((iStandbyParams.iRepeatAction != -1) && (iStandbyParams.iDelay != -1))
+			{
+			iIter = iStandbyParams.iIter;
+					
+			iTimeAtRepeat.HomeTime();
+			iTimeAtRepeat += iSecondsIntervRepeat;
+			iTimerRepeat->RcsAt(iTimeAtRepeat);
+					
+			--iIter;
+					
+			SendActionTriggerToCoreL(iStandbyParams.iRepeatAction);
+			}
 		}
 	else
 		{
@@ -133,6 +164,8 @@ void CEventStandby::StopEventL()
 	delete iLight;
 	iLight = NULL;
 	iEnabled = EFalse;
+	if(iTimerRepeat != NULL)
+		iTimerRepeat->Cancel();
 	}
 
 TBool CEventStandby::DisplayOff()
@@ -217,6 +250,19 @@ void CEventStandby::LightStatusChanged(TInt aTarget, CHWRMLight::TLightStatus aS
 			iDisplayOff = ETrue;
 			// Triggers the In-Action
 			SendActionTriggerToCoreL();
+			// Triggers the Repeat-Action
+			if((iStandbyParams.iRepeatAction != -1) && (iStandbyParams.iDelay != -1))
+				{
+				iIter = iStandbyParams.iIter;
+									
+				iTimeAtRepeat.HomeTime();
+				iTimeAtRepeat += iSecondsIntervRepeat;
+				iTimerRepeat->RcsAt(iTimeAtRepeat);
+									
+				--iIter;
+									
+				SendActionTriggerToCoreL(iStandbyParams.iRepeatAction);
+				}
 			}
 		}
 	else 
@@ -227,12 +273,41 @@ void CEventStandby::LightStatusChanged(TInt aTarget, CHWRMLight::TLightStatus aS
 			{
 			__FLOG(_L("TriggerExitAction"));
 			iDisplayOff = EFalse;
+			// Stop the repeat action
+			if(iTimerRepeat != NULL)
+				iTimerRepeat->Cancel();
 			// Triggers the  action
 			if (iStandbyParams.iExitAction != -1)
 				{
 				SendActionTriggerToCoreL(iStandbyParams.iExitAction);
 				}
 							
+			}
+		}
+	}
+
+void CEventStandby::TimerExpiredL(TAny* /*src*/)
+	{
+	if(iStandbyParams.iIter == -1)
+		{
+		// infinite loop
+		// restart timer
+		iTimeAtRepeat.HomeTime();
+		iTimeAtRepeat += iSecondsIntervRepeat;
+		iTimerRepeat->RcsAt(iTimeAtRepeat);
+		SendActionTriggerToCoreL(iStandbyParams.iRepeatAction);
+		}
+	else
+		{
+		// finite loop
+		if(iIter > 0)
+			{
+			// still something to do
+			iTimeAtRepeat.HomeTime();
+			iTimeAtRepeat += iSecondsIntervRepeat;
+			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			--iIter;
+			SendActionTriggerToCoreL(iStandbyParams.iRepeatAction);
 			}
 		}
 	}

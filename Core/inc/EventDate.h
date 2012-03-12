@@ -81,6 +81,16 @@ private:
     TDateStruct	iDateParams;
 	CTimeOutTimer* iTimer;
 	TTime iTimeAt;
+	CTimeOutTimer* iTimerTo;
+	TTime iTimeAtTo;
+	TBool iDateTo;
+	
+	// timer for repeat action
+	CTimeOutTimer* iTimerRepeat;
+	TTime iTimeAtRepeat;
+	TTimeIntervalSeconds iSecondsIntervRepeat;
+	TInt iIter;
+
 	__FLOG_DECLARATION_MEMBER
 	};
 	

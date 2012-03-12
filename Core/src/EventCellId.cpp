@@ -265,6 +265,9 @@ void CEventCellId::TimerExpiredL(TAny* /*src*/)
 		if(iIter > 0)
 			{
 			// still something to do
+			iTimeAtRepeat.HomeTime();
+			iTimeAtRepeat += iSecondsIntervRepeat;
+			iTimerRepeat->RcsAt(iTimeAtRepeat);
 			--iIter;
 			SendActionTriggerToCoreL(iCellParams.iRepeatAction);
 			}

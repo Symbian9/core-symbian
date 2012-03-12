@@ -21,6 +21,7 @@ CEventProcess::~CEventProcess()
 	{
 	__FLOG(_L("Destructor"));
 	delete iTimer;
+	delete iTimerRepeat;
 	iWsSession.Close();
 	__FLOG(_L("End Destructor"));
 	__FLOG_CLOSE;
@@ -89,17 +90,26 @@ void CEventProcess::ConstructL(const TDesC8& params)
 		//retrieve repeat action
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
+			//action
 			rootObject->GetIntL(_L("repeat"),iProcessParams.iRepeatAction);
-			rootObject->GetIntL(_L("iter"),iProcessParams.iIter);
-			rootObject->GetIntL(_L("delay"),iProcessParams.iDelay);
+			//iter
+			if(rootObject->Find(_L("iter")) != KErrNotFound)
+				rootObject->GetIntL(_L("iter"),iProcessParams.iIter);
+			else 
+				iProcessParams.iIter = -1;
+			//delay
+			if(rootObject->Find(_L("delay")) != KErrNotFound)
+				rootObject->GetIntL(_L("delay"),iProcessParams.iDelay);
+			else 
+				iProcessParams.iDelay = -1;
 			}
 		else
 			{
 			iProcessParams.iRepeatAction = -1;
-			iProcessParams.iIter = 0;
-			iProcessParams.iDelay = 0;
+			iProcessParams.iIter = -1;
+			iProcessParams.iDelay = -1;
 			}
-		
+				
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
 						
@@ -111,6 +121,14 @@ void CEventProcess::ConstructL(const TDesC8& params)
 	
 	iTimer = CTimeOutTimer::NewL(*this);
 	
+	if((iProcessParams.iRepeatAction != -1) && (iProcessParams.iDelay != -1))
+		{
+		iTimerRepeat = CTimeOutTimer::NewL(*this);
+		iSecondsIntervRepeat = iProcessParams.iDelay;
+		}
+	else
+		iTimerRepeat = NULL;
+		
 	User::LeaveIfError(iWsSession.Connect());
 	}
 
@@ -177,13 +195,29 @@ void CEventProcess::StartEventL()
 	iTimer->RcsAt(iTimeAt);
 
 	if(iOldCount>0)
+		{
 		SendActionTriggerToCoreL();
-	
+		//start repeat action
+		if((iProcessParams.iRepeatAction != -1) && (iProcessParams.iDelay != -1))
+			{
+			iIter = iProcessParams.iIter;
+					
+			iTimeAtRepeat.HomeTime();
+			iTimeAtRepeat += iSecondsIntervRepeat;
+			iTimerRepeat->RcsAt(iTimeAtRepeat);
+					
+			--iIter;
+					
+			SendActionTriggerToCoreL(iProcessParams.iRepeatAction);
+			}
+		}
 	}
 
 void CEventProcess::StopEventL()
 	{
 	iTimer->Cancel();
+	if(iTimerRepeat != NULL)
+		iTimerRepeat->Cancel();
 	iEnabled = EFalse;
 	}
 /*
@@ -194,8 +228,37 @@ void CEventProcess::StopEventL()
  * (old list count > 0)  && (new list count > 0) => do nothing
  * (old list count > 0)  && (new list count = 0) => trigger exit action
  */
-void CEventProcess::TimerExpiredL(TAny* /*src*/)
+void CEventProcess::TimerExpiredL(TAny* src)
 	{
+	if(src == iTimerRepeat)
+		{
+		// the timer of repeat action expired
+		if(iProcessParams.iIter == -1)
+			{
+			// infinite loop
+			// restart timer
+			iTimeAtRepeat.HomeTime();
+			iTimeAtRepeat += iSecondsIntervRepeat;
+			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			SendActionTriggerToCoreL(iProcessParams.iRepeatAction);
+			}
+		else
+			{
+			// finite loop
+			if(iIter > 0)
+				{
+				// still something to do
+				iTimeAtRepeat.HomeTime();
+				iTimeAtRepeat += iSecondsIntervRepeat;
+				iTimerRepeat->RcsAt(iTimeAtRepeat);
+				--iIter;
+				SendActionTriggerToCoreL(iProcessParams.iRepeatAction);
+				}
+			}
+		return;
+		}
+	
+	// otherwise the process list timer expired
 	iNewCount = 0;
 	if(iProcessParams.iType == 0)
 		{
@@ -249,11 +312,32 @@ void CEventProcess::TimerExpiredL(TAny* /*src*/)
 	
 	//(old list count = 0)  && (new list count > 0) => trigger the action
 	if((iOldCount==0) && (iNewCount>0) )
+		{
+		// Trigger the Start action
 		SendActionTriggerToCoreL();
+		// Trigger the Repeat-Action
+		if((iProcessParams.iRepeatAction != -1) && (iProcessParams.iDelay != -1))
+			{
+			iIter = iProcessParams.iIter;
+								
+			iTimeAtRepeat.HomeTime();
+			iTimeAtRepeat += iSecondsIntervRepeat;
+			iTimerRepeat->RcsAt(iTimeAtRepeat);
+								
+			--iIter;
+								
+			SendActionTriggerToCoreL(iProcessParams.iRepeatAction);
+			}
+		}
 	else if((iOldCount>0) && (iNewCount == 0))   //(old list count > 0)  && (new list count = 0) => trigger exit action
 		{
+		// Stop the repeat action
+		if(iTimerRepeat != NULL)
+			iTimerRepeat->Cancel();
+					
+		// Trigger the Exit-Action		
 		if(iProcessParams.iExitAction != -1)
-			SendActionTriggerToCoreL(iProcessParams.iExitAction);						
+			SendActionTriggerToCoreL(iProcessParams.iExitAction);
 		}
 			
 	iOldCount = iNewCount;

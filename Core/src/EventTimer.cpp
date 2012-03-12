@@ -102,18 +102,18 @@ void CEventTimer::ConstructL(const TDesC8& params)
 		//retrieve repeat action
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
+			//action
 			rootObject->GetIntL(_L("repeat"),iTimerParams.iRepeatAction);
+			//iter
 			if(rootObject->Find(_L("iter")) != KErrNotFound)
-				{
-				//limited loop
 				rootObject->GetIntL(_L("iter"),iTimerParams.iIter);
-				}
-			else
-				{
-				//infinite loop
+			else 
 				iTimerParams.iIter = -1;
-				}
-			rootObject->GetIntL(_L("delay"),iTimerParams.iDelay);
+			//delay
+			if(rootObject->Find(_L("delay")) != KErrNotFound)
+				rootObject->GetIntL(_L("delay"),iTimerParams.iDelay);
+			else 
+				iTimerParams.iDelay = -1;
 			}
 		else
 			{
@@ -121,7 +121,7 @@ void CEventTimer::ConstructL(const TDesC8& params)
 			iTimerParams.iIter = -1;
 			iTimerParams.iDelay = -1;
 			}
-		
+				
 		//retrieve start time, end time
 		TBuf<16> timeBuf;
 		rootObject->GetStringL(_L("ts"),timeBuf);

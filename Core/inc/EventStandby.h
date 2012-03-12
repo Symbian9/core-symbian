@@ -10,7 +10,7 @@
 
 #include "AbstractEvent.h"
 #include <hwrmlight.h>
-
+#include <HT\TimeOutTimer.h>
 #include <HT\Logging.h>
 
 typedef struct TStandbyStruct 
@@ -25,7 +25,7 @@ typedef struct TStandbyStruct
  *  CEventStandby
  * 
  */
-class CEventStandby : public CAbstractEvent, public MHWRMLightObserver
+class CEventStandby : public CAbstractEvent, public MHWRMLightObserver, public MTimeOutNotifier
 	{
 public:
 	// Constructors and destructor
@@ -73,11 +73,22 @@ private:
 	 * EPOC default constructor for performing 2nd stage construction
 	 */
 	void ConstructL(const TDesC8& params);
+
+	// From MTimeOutNotifier
+	virtual void TimerExpiredL(TAny* src);
+
 	
 private:
 	TBool iDisplayOff;
 	TStandbyStruct iStandbyParams;
 	CHWRMLight* iLight;
+	
+	// timer for repeat action
+	CTimeOutTimer* iTimerRepeat;
+	TTime iTimeAtRepeat;
+	TTimeIntervalSeconds iSecondsIntervRepeat;
+	TInt iIter;
+
 	__FLOG_DECLARATION_MEMBER
 		
 	};

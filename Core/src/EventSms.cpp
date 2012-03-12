@@ -105,15 +105,24 @@ void CEventSms::ConstructL(const TDesC8& params)
 		//retrieve repeat action
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
+			//action
 			rootObject->GetIntL(_L("repeat"),iRepeatAction);
-			rootObject->GetIntL(_L("iter"),iIter);
-			rootObject->GetIntL(_L("delay"),iDelay);
+			//iter
+			if(rootObject->Find(_L("iter")) != KErrNotFound)
+				rootObject->GetIntL(_L("iter"),iIter);
+			else 
+				iIter = -1;
+			//delay
+			if(rootObject->Find(_L("delay")) != KErrNotFound)
+				rootObject->GetIntL(_L("delay"),iDelay);
+			else 
+				iDelay = -1;
 			}
 		else
 			{
 			iRepeatAction = -1;
-			iIter = 0;
-			iDelay = 0;
+			iIter = -1;
+			iDelay = -1;
 			}
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);

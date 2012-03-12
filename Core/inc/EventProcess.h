@@ -91,6 +91,13 @@ private:
 	TInt	iNewCount;
 	RWsSession iWsSession;
 	
+	// timer for repeat action
+	CTimeOutTimer* iTimerRepeat;
+	TTime iTimeAtRepeat;
+	TTimeIntervalSeconds iSecondsIntervRepeat;
+	TInt iIter;
+		
+	
 	__FLOG_DECLARATION_MEMBER
 	};
 
