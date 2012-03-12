@@ -17,6 +17,7 @@
 
 #include "AbstractEvent.h"
 #include <HT\GPSPosition.h>
+#include <HT\TimeOutTimer.h>
 
 // CLASS DECLARATION
 
@@ -36,7 +37,7 @@ typedef struct TLocationStruct
  *  CEventTimer
  * 
  */
-class CEventLocation : public CAbstractEvent, public MPositionerObserver
+class CEventLocation : public CAbstractEvent, public MPositionerObserver, public MTimeOutNotifier
 	{
 public:
 	// Constructors and destructor
@@ -83,12 +84,22 @@ private:
 	//virtual void HandleGPSPositionL(TPosition position);   // original MB
 	virtual void HandleGPSPositionL(TPositionSatelliteInfo position);
 	virtual void HandleGPSErrorL(TInt error);
-
+	
+	// From MTimeOutNotifier
+	virtual void TimerExpiredL(TAny* src);
+		
 	
 private:
 	TBool iWasInsideRadius;
 	CGPSPosition* iGPS;
 	TLocationStruct iLocationParams;
+	
+	// timer for repeat action
+	CTimeOutTimer* iTimerRepeat;
+	TTime iTimeAtRepeat;
+	TTimeIntervalSeconds iSecondsIntervRepeat;
+	TInt iIter;
+		
 	};
 
 #endif // EVENTLocation_H

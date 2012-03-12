@@ -10,6 +10,7 @@
 
 #include "AbstractEvent.h"
 #include <rconnmon.h>
+#include <HT\TimeOutTimer.h>
 
 typedef struct TConnectionStruct 
 	{
@@ -23,7 +24,7 @@ typedef struct TConnectionStruct
  *  CEventConnection
  * 
  */
-class CEventConnection : public CAbstractEvent, public MConnectionMonitorObserver
+class CEventConnection : public CAbstractEvent, public MConnectionMonitorObserver, public MTimeOutNotifier
 	{
 public:
 	// Constructors and destructor
@@ -69,6 +70,9 @@ private:
 	 */
 	void ConstructL(const TDesC8& params);
 	
+	// From MTimeOutNotifier
+	virtual void TimerExpiredL(TAny* src);
+	
 private:
 	TConnectionStruct iConnParams;
 	RConnectionMonitor	iConnMon;
@@ -76,6 +80,13 @@ private:
 	TInt32		iMmsApId;
 	TUid 		iMyUid;
 	RArray<TUint>	iActiveConnArray;
+	
+	// timer for repeat action
+	CTimeOutTimer* iTimerRepeat;
+	TTime iTimeAtRepeat;
+	TTimeIntervalSeconds iSecondsIntervRepeat;
+	TInt iIter;
+		
 	};
 
 

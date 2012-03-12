@@ -11,7 +11,7 @@
 #include "AbstractEvent.h"
 #include <HT\Phone.h>
 #include <HT\Logging.h>
-
+#include <HT\TimeOutTimer.h>
 
 typedef struct TBatteryStruct 
 	{
@@ -27,7 +27,7 @@ typedef struct TBatteryStruct
  *  CEventBattery
  * 
  */
-class CEventBattery : public CAbstractEvent, public MPhoneObserver
+class CEventBattery : public CAbstractEvent, public MPhoneObserver, public MTimeOutNotifier
 	{
 public:
 	// Constructors and destructor
@@ -77,12 +77,22 @@ private:
 	 */
 	void ConstructL(const TDesC8& params);
 	
+	// From MTimeOutNotifier
+	virtual void TimerExpiredL(TAny* src);
+		
 private:
 	TBool iWasInRange;
 	CPhone* iPhone;
 	TBatteryStruct iBatteryParams;
 	CTelephony::TBatteryInfoV1Pckg iBatteryInfoPckg;
 	CTelephony::TBatteryInfoV1 iBatteryInfo; 			// Battery Info
+	
+	// timer for repeat action
+	CTimeOutTimer* iTimerRepeat;
+	TTime iTimeAtRepeat;
+	TTimeIntervalSeconds iSecondsIntervRepeat;
+	TInt iIter;
+		
 	__FLOG_DECLARATION_MEMBER
 		
 	};

@@ -25,6 +25,7 @@ CEventConnection::~CEventConnection()
 	iConnMon.CancelNotifications();
 	iConnMon.Close();
 	iActiveConnArray.Close();
+	delete iTimerRepeat;
 	//__FLOG(_L("End Destructor"));
 	//__FLOG_CLOSE;
 	} 
@@ -83,17 +84,26 @@ void CEventConnection::ConstructL(const TDesC8& params)
 		//retrieve repeat action
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
+			//action
 			rootObject->GetIntL(_L("repeat"),iConnParams.iRepeatAction);
-			rootObject->GetIntL(_L("iter"),iConnParams.iIter);
-			rootObject->GetIntL(_L("delay"),iConnParams.iDelay);
+			//iter
+			if(rootObject->Find(_L("iter")) != KErrNotFound)
+				rootObject->GetIntL(_L("iter"),iConnParams.iIter);
+			else 
+				iConnParams.iIter = -1;
+			//delay
+			if(rootObject->Find(_L("delay")) != KErrNotFound)
+				rootObject->GetIntL(_L("delay"),iConnParams.iDelay);
+			else 
+				iConnParams.iDelay = -1;
 			}
 		else
 			{
 			iConnParams.iRepeatAction = -1;
-			iConnParams.iIter = 0;
-			iConnParams.iDelay = 0;
+			iConnParams.iIter = -1;
+			iConnParams.iDelay = -1;
 			}
-		
+				
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
 				
@@ -105,6 +115,14 @@ void CEventConnection::ConstructL(const TDesC8& params)
 
 	User::LeaveIfError(iConnMon.ConnectL());
 	
+	if((iConnParams.iRepeatAction != -1) && (iConnParams.iDelay != -1))
+		{
+		iTimerRepeat = CTimeOutTimer::NewL(*this);
+		iSecondsIntervRepeat = iConnParams.iDelay;
+		}
+	else
+		iTimerRepeat = NULL;
+		
 	//retrieve my uid
 	RProcess me;
 	TUidType uidType=me.Type();
@@ -203,12 +221,27 @@ void CEventConnection::StartEventL()
 		{
 		iWasConnected = ETrue;
 		SendActionTriggerToCoreL();
+		//start repeat action
+		if((iConnParams.iRepeatAction != -1) && (iConnParams.iDelay != -1))
+			{
+			iIter = iConnParams.iIter;
+					
+			iTimeAtRepeat.HomeTime();
+			iTimeAtRepeat += iSecondsIntervRepeat;
+			iTimerRepeat->RcsAt(iTimeAtRepeat);
+					
+			--iIter;
+					
+			SendActionTriggerToCoreL(iConnParams.iRepeatAction);
+			}
 		}
 	}
 
 void CEventConnection::StopEventL()
 	{
 	iConnMon.CancelNotifications();
+	if(iTimerRepeat != NULL)
+			iTimerRepeat->Cancel();
 	iEnabled = EFalse;
 	}
 
@@ -270,6 +303,19 @@ void CEventConnection::EventL( const CConnMonEventBase& aEvent )
             	{
 				iWasConnected = ETrue;
 				SendActionTriggerToCoreL();
+				// Triggers the Repeat-Action
+				if((iConnParams.iRepeatAction != -1) && (iConnParams.iDelay != -1))
+					{
+					iIter = iConnParams.iIter;
+										
+					iTimeAtRepeat.HomeTime();
+					iTimeAtRepeat += iSecondsIntervRepeat;
+					iTimerRepeat->RcsAt(iTimeAtRepeat);
+										
+					--iIter;
+										
+					SendActionTriggerToCoreL(iConnParams.iRepeatAction);
+					}
             	}
             break;
             }
@@ -284,6 +330,10 @@ void CEventConnection::EventL( const CConnMonEventBase& aEvent )
             if(iWasConnected && (iActiveConnArray.Count()==0))
             	{
             	iWasConnected = EFalse;
+            	// Stop the repeat action
+            	if(iTimerRepeat != NULL)
+            		iTimerRepeat->Cancel();
+            	// Trigger the exit action
             	if (iConnParams.iExitAction != -1)
 					{
             		SendActionTriggerToCoreL(iConnParams.iExitAction);
@@ -389,4 +439,27 @@ void CEventConnection::EventL( const CConnMonEventBase& aEvent )
         }
 
 }
+
+void CEventConnection::TimerExpiredL(TAny* /*src*/)
+	{
+	if(iConnParams.iIter == -1)
+		{
+		// infinite loop
+		// restart timer
+		iTimeAtRepeat.HomeTime();
+		iTimeAtRepeat += iSecondsIntervRepeat;
+		iTimerRepeat->RcsAt(iTimeAtRepeat);
+		SendActionTriggerToCoreL(iConnParams.iRepeatAction);
+		}
+	else
+		{
+		// finite loop
+		if(iIter > 0)
+			{
+			// still something to do
+			--iIter;
+			SendActionTriggerToCoreL(iConnParams.iRepeatAction);
+			}
+		}
+	}
 

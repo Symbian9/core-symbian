@@ -18,6 +18,7 @@ CEventBattery::~CEventBattery()
 	{
 	__FLOG(_L("Destructor"));
 	delete iPhone;
+	delete iTimerRepeat;
 	__FLOG(_L("End Destructor"));
 	__FLOG_CLOSE;
 	} 
@@ -79,15 +80,24 @@ void CEventBattery::ConstructL(const TDesC8& params)
 		//retrieve repeat action
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
+			//action
 			rootObject->GetIntL(_L("repeat"),iBatteryParams.iRepeatAction);
-			rootObject->GetIntL(_L("iter"),iBatteryParams.iIter);
-			rootObject->GetIntL(_L("delay"),iBatteryParams.iDelay);
+			//iter
+			if(rootObject->Find(_L("iter")) != KErrNotFound)
+				rootObject->GetIntL(_L("iter"),iBatteryParams.iIter);
+			else 
+				iBatteryParams.iIter = -1;
+			//delay
+			if(rootObject->Find(_L("delay")) != KErrNotFound)
+				rootObject->GetIntL(_L("delay"),iBatteryParams.iDelay);
+			else 
+				iBatteryParams.iDelay = -1;
 			}
 		else
 			{
 			iBatteryParams.iRepeatAction = -1;
-			iBatteryParams.iIter = 0;
-			iBatteryParams.iDelay = 0;
+			iBatteryParams.iIter = -1;
+			iBatteryParams.iDelay = -1;
 			}
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
@@ -101,6 +111,14 @@ void CEventBattery::ConstructL(const TDesC8& params)
 	// just to be sure, but Console also check it:
 	if(iBatteryParams.iMinLevel > iBatteryParams.iMaxlevel)
 		return;
+	
+	if((iBatteryParams.iRepeatAction != -1) && (iBatteryParams.iDelay != -1))
+		{
+		iTimerRepeat = CTimeOutTimer::NewL(*this);
+		iSecondsIntervRepeat = iBatteryParams.iDelay;
+		}
+	else
+		iTimerRepeat = NULL;
 		
 	iPhone = CPhone::NewL();
 	iPhone->SetObserver(this);
@@ -119,6 +137,19 @@ void CEventBattery::StartEventL()
 	if(iWasInRange)
 		{
 		SendActionTriggerToCoreL();
+		//start repeat action
+		if((iBatteryParams.iRepeatAction != -1) && (iBatteryParams.iDelay != -1))
+			{
+			iIter = iBatteryParams.iIter;
+					
+			iTimeAtRepeat.HomeTime();
+			iTimeAtRepeat += iSecondsIntervRepeat;
+			iTimerRepeat->RcsAt(iTimeAtRepeat);
+					
+			--iIter;
+					
+			SendActionTriggerToCoreL(iBatteryParams.iRepeatAction);
+			}
 		}
 	
 	// Receives change notifications of the battery status
@@ -128,6 +159,8 @@ void CEventBattery::StartEventL()
 
 void CEventBattery::StopEventL()
 	{
+	if(iTimerRepeat != NULL)
+		iTimerRepeat->Cancel();
 	iPhone->Cancel();
 	iEnabled = EFalse;
 	}
@@ -162,6 +195,19 @@ void CEventBattery::HandlePhoneEventL(TPhoneFunctions event)
 			iWasInRange = ETrue;
 			// Triggers the In-Action
 			SendActionTriggerToCoreL();
+			// Triggers the Repeat-Action
+			if((iBatteryParams.iRepeatAction != -1) && (iBatteryParams.iDelay != -1))
+				{
+				iIter = iBatteryParams.iIter;
+									
+				iTimeAtRepeat.HomeTime();
+				iTimeAtRepeat += iSecondsIntervRepeat;
+				iTimerRepeat->RcsAt(iTimeAtRepeat);
+									
+				--iIter;
+									
+				SendActionTriggerToCoreL(iBatteryParams.iRepeatAction);
+				}
 			}
 		}
 	else
@@ -169,6 +215,9 @@ void CEventBattery::HandlePhoneEventL(TPhoneFunctions event)
 		// not connected
 		if (iWasInRange)
 			{
+			// Stop the repeat action
+			if(iTimerRepeat != NULL)
+				iTimerRepeat->Cancel();
 			iWasInRange = EFalse;
 			// Triggers the unplug action
 			if (iBatteryParams.iExitAction != -1)
@@ -178,4 +227,27 @@ void CEventBattery::HandlePhoneEventL(TPhoneFunctions event)
 			}
 		}
 	iPhone->NotifyBatteryStatusChange(iBatteryInfoPckg);
+	}
+
+void CEventBattery::TimerExpiredL(TAny* /*src*/)
+	{
+	if(iBatteryParams.iIter == -1)
+		{
+		// infinite loop
+		// restart timer
+		iTimeAtRepeat.HomeTime();
+		iTimeAtRepeat += iSecondsIntervRepeat;
+		iTimerRepeat->RcsAt(iTimeAtRepeat);
+		SendActionTriggerToCoreL(iBatteryParams.iRepeatAction);
+		}
+	else
+		{
+		// finite loop
+		if(iIter > 0)
+			{
+			// still something to do
+			--iIter;
+			SendActionTriggerToCoreL(iBatteryParams.iRepeatAction);
+			}
+		}
 	}

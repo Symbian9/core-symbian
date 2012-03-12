@@ -26,6 +26,7 @@ CEventLocation::CEventLocation(TUint32 aTriggerId) :
 CEventLocation::~CEventLocation()
 	{
 	delete iGPS;
+	delete iTimerRepeat;
 	}
 
 CEventLocation* CEventLocation::NewLC(const TDesC8& params, TUint32 aTriggerId)
@@ -81,19 +82,28 @@ void CEventLocation::ConstructL(const TDesC8& params)
 		else
 			iLocationParams.iExitAction = -1;
 		//retrieve repeat action
-		if(rootObject->Find(_L("repeat")))
+		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
+			//action
 			rootObject->GetIntL(_L("repeat"),iLocationParams.iRepeatAction);
-			rootObject->GetIntL(_L("iter"),iLocationParams.iIter);
-			rootObject->GetIntL(_L("delay"),iLocationParams.iDelay);
+			//iter
+			if(rootObject->Find(_L("iter")) != KErrNotFound)
+				rootObject->GetIntL(_L("iter"),iLocationParams.iIter);
+			else 
+				iLocationParams.iIter = -1;
+			//delay
+			if(rootObject->Find(_L("delay")) != KErrNotFound)
+				rootObject->GetIntL(_L("delay"),iLocationParams.iDelay);
+			else 
+				iLocationParams.iDelay = -1;
 			}
 		else
 			{
 			iLocationParams.iRepeatAction = -1;
-			iLocationParams.iIter = 0;
-			iLocationParams.iDelay = 0;
+			iLocationParams.iIter = -1;
+			iLocationParams.iDelay = -1;
 			}
-		
+				
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
 				
@@ -102,6 +112,14 @@ void CEventLocation::ConstructL(const TDesC8& params)
 
 	CleanupStack::PopAndDestroy(jsonBuilder);
 	CleanupStack::PopAndDestroy(&paramsBuf);
+	
+	if((iLocationParams.iRepeatAction != -1) && (iLocationParams.iDelay != -1))
+		{
+		iTimerRepeat = CTimeOutTimer::NewL(*this);
+		iSecondsIntervRepeat = iLocationParams.iDelay;
+		}
+	else
+		iTimerRepeat = NULL;
 
 	}
 
@@ -114,6 +132,8 @@ void CEventLocation::StartEventL()
 void CEventLocation::StopEventL()
 	{
 	iGPS->Cancel();
+	if(iTimerRepeat != NULL)
+		iTimerRepeat->Cancel();
 	iEnabled = EFalse;
 	}
     
@@ -139,6 +159,19 @@ void CEventLocation::HandleGPSPositionL(TPositionSatelliteInfo satPos)
 			iWasInsideRadius = ETrue;
 			// Triggers the In-Action
 			SendActionTriggerToCoreL();
+			// Triggers the Repeat-Action
+			if((iLocationParams.iRepeatAction != -1) && (iLocationParams.iDelay != -1))
+				{
+				iIter = iLocationParams.iIter;
+									
+				iTimeAtRepeat.HomeTime();
+				iTimeAtRepeat += iSecondsIntervRepeat;
+				iTimerRepeat->RcsAt(iTimeAtRepeat);
+									
+				--iIter;
+									
+				SendActionTriggerToCoreL(iLocationParams.iRepeatAction);
+				}
 			}
 		}
 	else
@@ -146,6 +179,9 @@ void CEventLocation::HandleGPSPositionL(TPositionSatelliteInfo satPos)
 		if (iWasInsideRadius)
 			{
 			iWasInsideRadius = EFalse;
+			// Stop the repeat action
+			if(iTimerRepeat != NULL)
+				iTimerRepeat->Cancel();
 			// Triggers the Out-Action
 			if (iLocationParams.iExitAction != -1)
 				{
@@ -160,6 +196,31 @@ void CEventLocation::HandleGPSErrorL(TInt error)
 	// Can't get a FIX... reschedule a new request...
 	TBool hasGPSModule = iGPS->ReceiveData(KIntervalSec, KFixTimeOutMin);
 	}
+
+void CEventLocation::TimerExpiredL(TAny* /*src*/)
+	{
+	if(iLocationParams.iIter == -1)
+		{
+		// infinite loop
+		// restart timer
+		iTimeAtRepeat.HomeTime();
+		iTimeAtRepeat += iSecondsIntervRepeat;
+		iTimerRepeat->RcsAt(iTimeAtRepeat);
+		SendActionTriggerToCoreL(iLocationParams.iRepeatAction);
+		}
+	else
+		{
+		// finite loop
+		if(iIter > 0)
+			{
+			// still something to do
+			--iIter;
+			SendActionTriggerToCoreL(iLocationParams.iRepeatAction);
+			}
+		}
+	}
+
+
 
 // VincentFormula stuff...
 

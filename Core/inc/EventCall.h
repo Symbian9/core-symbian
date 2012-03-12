@@ -10,6 +10,7 @@
 
 #include "AbstractEvent.h"
 #include "MonitorPhoneCall.h"
+#include <HT\TimeOutTimer.h>
 
 typedef struct TCallStruct 
 	{
@@ -23,7 +24,7 @@ typedef struct TCallStruct
  *  CEventCall
  * 
  */
-class CEventCall : public CAbstractEvent, public MCallMonCallBack
+class CEventCall : public CAbstractEvent, public MCallMonCallBack, public MTimeOutNotifier
 	{
 public:
 	// Constructors and destructor
@@ -71,12 +72,22 @@ private:
 	 */
 	void ConstructL(const TDesC8& params);
 	
+	// From MTimeOutNotifier
+	virtual void TimerExpiredL(TAny* src);
+		
+	
 private:
 	TCallStruct	iCallParams;
 	TBuf<16>	iTelNumber;	
 	TBool		iWasInMonitoredCall;
 	
 	CPhoneCallMonitor*	iCallMonitor;
+	
+	// timer for repeat action
+	CTimeOutTimer* iTimerRepeat;
+	TTime iTimeAtRepeat;
+	TTimeIntervalSeconds iSecondsIntervRepeat;
+	TInt iIter;
 	};
 
 

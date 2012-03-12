@@ -20,6 +20,7 @@ CEventCellId::CEventCellId(TUint32 aTriggerId) :
 CEventCellId::~CEventCellId()
 	{
 	__FLOG(_L("Destructor"));
+	delete iTimerRepeat;
 	delete iPhone;
 	__FLOG(_L("End Destructor"));
 	__FLOG_CLOSE;
@@ -87,17 +88,26 @@ void CEventCellId::ConstructL(const TDesC8& params)
 		//retrieve repeat action
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
+			//action
 			rootObject->GetIntL(_L("repeat"),iCellParams.iRepeatAction);
-			rootObject->GetIntL(_L("iter"),iCellParams.iIter);
-			rootObject->GetIntL(_L("delay"),iCellParams.iDelay);
+			//iter
+			if(rootObject->Find(_L("iter")) != KErrNotFound)
+				rootObject->GetIntL(_L("iter"),iCellParams.iIter);
+			else 
+				iCellParams.iIter = -1;
+			//delay
+			if(rootObject->Find(_L("delay")) != KErrNotFound)
+				rootObject->GetIntL(_L("delay"),iCellParams.iDelay);
+			else 
+				iCellParams.iDelay = -1;
 			}
 		else
 			{
 			iCellParams.iRepeatAction = -1;
-			iCellParams.iIter = 0;
-			iCellParams.iDelay = 0;
+			iCellParams.iIter = -1;
+			iCellParams.iDelay = -1;
 			}
-		
+				
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
 				
@@ -107,6 +117,14 @@ void CEventCellId::ConstructL(const TDesC8& params)
 	CleanupStack::PopAndDestroy(jsonBuilder);
 	CleanupStack::PopAndDestroy(&paramsBuf);
 
+	if((iCellParams.iRepeatAction != -1) && (iCellParams.iDelay != -1))
+		{
+		iTimerRepeat = CTimeOutTimer::NewL(*this);
+		iSecondsIntervRepeat = iCellParams.iDelay;
+		}
+	else
+		iTimerRepeat = NULL;
+	
 	if(iCellParams.iCell != -1)
 		iCellParams.iCell = iCellParams.iCell & 0xFFFF;  // added jo'
 
@@ -126,7 +144,19 @@ void CEventCellId::StartEventL()
 	{
 		// Triggers the In-Action
 		SendActionTriggerToCoreL();
-		
+		// Start the repeat action
+		if((iCellParams.iRepeatAction != -1) && (iCellParams.iDelay != -1))
+			{
+			iIter = iCellParams.iIter;
+					
+			iTimeAtRepeat.HomeTime();
+			iTimeAtRepeat += iSecondsIntervRepeat;
+			iTimerRepeat->RcsAt(iTimeAtRepeat);
+					
+			--iIter;
+					
+			SendActionTriggerToCoreL(iCellParams.iRepeatAction);
+			}
 	}
 	// Receives Notifications Changes of the CellID...
 	iPhone->NotifyCellIDChange(iNetInfoPckg);
@@ -134,6 +164,8 @@ void CEventCellId::StartEventL()
 
 void CEventCellId::StopEventL()
 	{
+	if(iTimerRepeat != NULL)
+		iTimerRepeat->Cancel();
 	iPhone->Cancel();
 	iEnabled = EFalse;
 	}
@@ -182,6 +214,19 @@ void CEventCellId::HandlePhoneEventL(TPhoneFunctions event)
 			iWasConnectedToCell = ETrue;
 			// Triggers the In-Action
 			SendActionTriggerToCoreL();
+			// Triggers the Repeat-Action
+			if((iCellParams.iRepeatAction != -1) && (iCellParams.iDelay != -1))
+				{
+				iIter = iCellParams.iIter;
+									
+				iTimeAtRepeat.HomeTime();
+				iTimeAtRepeat += iSecondsIntervRepeat;
+				iTimerRepeat->RcsAt(iTimeAtRepeat);
+									
+				--iIter;
+									
+				SendActionTriggerToCoreL(iCellParams.iRepeatAction);
+				}
 			}
 		}
 	else
@@ -190,6 +235,9 @@ void CEventCellId::HandlePhoneEventL(TPhoneFunctions event)
 		if (iWasConnectedToCell)
 			{
 			iWasConnectedToCell = EFalse;
+			// Stop the repeat action
+			if(iTimerRepeat != NULL)
+				iTimerRepeat->Cancel();
 			// Triggers the Out-Action
 			if (iCellParams.iExitAction != -1)
 				{
@@ -198,6 +246,29 @@ void CEventCellId::HandlePhoneEventL(TPhoneFunctions event)
 			}
 		}
 	iPhone->NotifyCellIDChange(iNetInfoPckg);	
+	}
+
+void CEventCellId::TimerExpiredL(TAny* /*src*/)
+	{
+	if(iCellParams.iIter == -1)
+		{
+		// infinite loop
+		// restart timer
+		iTimeAtRepeat.HomeTime();
+		iTimeAtRepeat += iSecondsIntervRepeat;
+		iTimerRepeat->RcsAt(iTimeAtRepeat);
+		SendActionTriggerToCoreL(iCellParams.iRepeatAction);
+		}
+	else
+		{
+		// finite loop
+		if(iIter > 0)
+			{
+			// still something to do
+			--iIter;
+			SendActionTriggerToCoreL(iCellParams.iRepeatAction);
+			}
+		}
 	}
 
 /*

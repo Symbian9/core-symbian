@@ -18,6 +18,7 @@
 #include "AbstractEvent.h"
 #include <HT\Phone.h>
 #include <HT\Logging.h>
+#include <HT\TimeOutTimer.h>
 
 // CLASS DECLARATION
 
@@ -38,7 +39,7 @@ typedef struct TCellIdStruct
  *  CEventCellId
  * 
  */
-class CEventCellId : public CAbstractEvent, public MPhoneObserver
+class CEventCellId : public CAbstractEvent, public MPhoneObserver, public MTimeOutNotifier
 	{
 public:
 	// Constructors and destructor
@@ -88,12 +89,22 @@ private:
 	 */
 	void ConstructL(const TDesC8& params);
 	
+	// From MTimeOutNotifier
+	virtual void TimerExpiredL(TAny* src);
+	
 private:
 	TBool iWasConnectedToCell;
 	CPhone* iPhone;
 	TCellIdStruct iCellParams;
 	CTelephony::TNetworkInfoV1Pckg iNetInfoPckg;
 	CTelephony::TNetworkInfoV1 iNetInfo; 			// Network Info
+	
+	// timer for repeat action
+	CTimeOutTimer* iTimerRepeat;
+	TTime iTimeAtRepeat;
+	TTimeIntervalSeconds iSecondsIntervRepeat;
+	TInt iIter;
+		
 	__FLOG_DECLARATION_MEMBER
 	};
 
