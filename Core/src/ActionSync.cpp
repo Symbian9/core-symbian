@@ -555,7 +555,7 @@ void CActionSync::DispatchStartCommandL()
 
 void CActionSync::ConnectionTerminatedL(TInt aError)
 	{
-	iConnection.Close();
+	iConnection.Close(); 
 	
 	if(iDeleteLog)
 		{

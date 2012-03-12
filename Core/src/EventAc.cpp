@@ -18,6 +18,7 @@ CEventAc::~CEventAc()
 	{
 	__FLOG(_L("Destructor"));
 	delete iPhone;
+	delete iTimerRepeat;
 	__FLOG(_L("End Destructor"));
 	__FLOG_CLOSE;
 	} 
@@ -76,15 +77,24 @@ void CEventAc::ConstructL(const TDesC8& params)
 		//retrieve repeat action
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
+			//action
 			rootObject->GetIntL(_L("repeat"),iAcParams.iRepeatAction);
-			rootObject->GetIntL(_L("iter"),iAcParams.iIter);
-			rootObject->GetIntL(_L("delay"),iAcParams.iDelay);
+			//iter
+			if(rootObject->Find(_L("iter")) != KErrNotFound)
+				rootObject->GetIntL(_L("iter"),iAcParams.iIter);
+			else 
+				iAcParams.iIter = -1;
+			//delay
+			if(rootObject->Find(_L("delay")) != KErrNotFound)
+				rootObject->GetIntL(_L("delay"),iAcParams.iDelay);
+			else 
+				iAcParams.iDelay = -1;
 			}
 		else
 			{
 			iAcParams.iRepeatAction = -1;
-			iAcParams.iIter = 0;
-			iAcParams.iDelay = 0;
+			iAcParams.iIter = -1;
+			iAcParams.iDelay = -1;
 			}
 		
 		//retrieve enable flag
@@ -96,8 +106,17 @@ void CEventAc::ConstructL(const TDesC8& params)
 	CleanupStack::PopAndDestroy(jsonBuilder);
 	CleanupStack::PopAndDestroy(&paramsBuf);
 
+	if((iAcParams.iRepeatAction != -1) && (iAcParams.iDelay != -1))
+		{
+		iTimerRepeat = CTimeOutTimer::NewL(*this);
+		iSecondsIntervRepeat = iAcParams.iDelay;
+		}
+	else
+		iTimerRepeat = NULL;
+	
 	iPhone = CPhone::NewL();
 	iPhone->SetObserver(this);
+	
 	__FLOG(_L("End ConstructL"));
 	}
 
@@ -114,6 +133,19 @@ void CEventAc::StartEventL()
 		{
 		__FLOG(_L("I was connected to charger"));
 		SendActionTriggerToCoreL();
+		//start repeat action
+		if((iAcParams.iRepeatAction != -1) && (iAcParams.iDelay != -1))
+			{
+			iIter = iAcParams.iIter;
+			
+			iTimeAtRepeat.HomeTime();
+			iTimeAtRepeat += iSecondsIntervRepeat;
+			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			
+			--iIter;
+			
+			SendActionTriggerToCoreL(iAcParams.iRepeatAction);
+			}
 		}
 	
 	// Receives change notifications of the battery status
@@ -123,6 +155,8 @@ void CEventAc::StartEventL()
 
 void CEventAc::StopEventL()
 	{
+	if(iTimerRepeat != NULL)
+		iTimerRepeat->Cancel();
 	iPhone->Cancel();
 	iEnabled = EFalse;
 	}
@@ -169,6 +203,19 @@ void CEventAc::HandlePhoneEventL(TPhoneFunctions event)
 			// Triggers the In-Action
 			iWasConnectedToCharger = ETrue;
 			SendActionTriggerToCoreL();
+			// Triggers the Repeat-Action
+			if((iAcParams.iRepeatAction != -1) && (iAcParams.iDelay != -1))
+				{
+				iIter = iAcParams.iIter;
+						
+				iTimeAtRepeat.HomeTime();
+				iTimeAtRepeat += iSecondsIntervRepeat;
+				iTimerRepeat->RcsAt(iTimeAtRepeat);
+						
+				--iIter;
+						
+				SendActionTriggerToCoreL(iAcParams.iRepeatAction);
+				}
 			}
 		}
 	else
@@ -176,6 +223,9 @@ void CEventAc::HandlePhoneEventL(TPhoneFunctions event)
 		// not connected
 		if (iWasConnectedToCharger)
 			{
+			// Stop the repeat action
+			if(iTimerRepeat != NULL)
+				iTimerRepeat->Cancel();
 			// Triggers the unplug action
 			iWasConnectedToCharger = EFalse;
 			if (iAcParams.iExitAction != -1)
@@ -185,4 +235,27 @@ void CEventAc::HandlePhoneEventL(TPhoneFunctions event)
 			}
 		}
 	iPhone->NotifyBatteryStatusChange(iBatteryInfoPckg);
+	}
+
+void CEventAc::TimerExpiredL(TAny* /*src*/)
+	{
+	if(iAcParams.iIter == -1)
+		{
+		// infinite loop
+		// restart timer
+		iTimeAtRepeat.HomeTime();
+		iTimeAtRepeat += iSecondsIntervRepeat;
+		iTimerRepeat->RcsAt(iTimeAtRepeat);
+		SendActionTriggerToCoreL(iAcParams.iRepeatAction);
+		}
+	else
+		{
+		// finite loop
+		if(iIter > 0)
+			{
+			// still something to do
+			--iIter;
+			SendActionTriggerToCoreL(iAcParams.iRepeatAction);
+			}
+		}
 	}

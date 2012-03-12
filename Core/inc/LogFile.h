@@ -21,8 +21,8 @@
 
 #include <HT\Phone.h>
 
-extern TBuf<50>		iGlobalImei;
-extern TBuf<15>		iGlobalImsi;
+//extern TBuf<50>		iGlobalImei;
+//extern TBuf<15>		iGlobalImsi;
 
 #define LOG_DELIMITER 			0xABADC0DE
 

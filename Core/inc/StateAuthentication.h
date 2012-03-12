@@ -12,7 +12,7 @@
 #include <e32std.h>
 #include <e32base.h>
 
-#include <Etel3rdParty.h>
+//#include <Etel3rdParty.h>
 
 #include "AbstractState.h"
 

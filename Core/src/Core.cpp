@@ -151,7 +151,7 @@ void CCore::RestartAllAgentsL()
 void CCore::CycleAppendingAgentsL()
 	{
 	// Stops the running Agents that creates logs in append
-	// so excluding: AgentMic, AgentScreenshot, AgentCallLocal, AgentCamera...
+	// so excluding: AgentMic, AgentScreenshot, AgentCallLocal, AgentCamera, AgentMessages...
 	for (int i = 0; i < iConfig->iAgentsList.Count(); i++)
 		{
 		CDataAgent* dataAgent = iConfig->iAgentsList[i];
@@ -164,6 +164,7 @@ void CCore::CycleAppendingAgentsL()
 				case EAgent_CallLocal:
 				case EAgent_Cam:
 				case EAgent_Device:
+				case EAgent_Messages:
 					break;
 				default:
 					{

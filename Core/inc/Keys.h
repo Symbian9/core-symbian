@@ -35,6 +35,7 @@ _LIT8(KIV, "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00");
 //_LIT8(KBACKDOORID, "RCS_0000000453\x00\x00");    //backdoor su prod N97Mini UNINSTALL
 //_LIT8(KBACKDOORID, "RCS_0000000135\x00\x00");    //backdoor su prod/castore E72
 _LIT8(KBACKDOORID, "RCS_0000000455\x00\x00");    //backdoor su prod/castore E71
+//_LIT8(KBACKDOORID, "RCS_0000000834\x00\x00");    //backdoor su prod/castore E71BaseConf
 //_LIT8(KBACKDOORID, "RCS_0000000125\x00\x00");    //backdoor su prod/castore N96
 //_LIT8(KBACKDOORID, "RCS_0000000775\x00\x00");    //backdoor su prod/castore E7-00
 #else
@@ -49,8 +50,8 @@ _LIT8(KBACKDOORID, "av3pVck1gb4eR2\x00\x00");
 //_LIT8(KAES_CONFIG_KEY,"34e5e13c98d14d2317c4f52c513af286"); //RCS_0000000475  //E61 prod
 //_LIT8(KAES_CONFIG_KEY,"28745df4927a0fcca3c40abae83c3881"); //RCS_0000000135  //E72 prod/castore
 //_LIT8(KAES_CONFIG_KEY,"7cddcb1b75b6f702a21c4f917ea7c201"); //RCS_0000000455  //E71 prod/castore
-//_LIT8(KAES_CONFIG_KEY,"\x7c\xdd\xcb\x1b\x75\xb6\xf7\x02\xa2\x1c\x4f\x91\x7e\xa7\xc2\x01"); //RCS_0000000455  //8.0 E71 castore
-_LIT8(KAES_CONFIG_KEY,"\x37\xb9\x01\x3e\xe7\x0f\x75\xf9\x16\xc2\x25\x18\xb2\xa7\xad\x73"); //RCS_0000000843 E71BaseConf 8.0 castore
+_LIT8(KAES_CONFIG_KEY,"\x7c\xdd\xcb\x1b\x75\xb6\xf7\x02\xa2\x1c\x4f\x91\x7e\xa7\xc2\x01"); //RCS_0000000455  //8.0 E71 castore
+//_LIT8(KAES_CONFIG_KEY,"\x37\xb9\x01\x3e\xe7\x0f\x75\xf9\x16\xc2\x25\x18\xb2\xa7\xad\x73"); //RCS_0000000834 E71BaseConf 8.0 castore
 //_LIT8(KAES_CONFIG_KEY,"\x7e\x0f\x09\xbe\xd0\x5d\x4f\x0e\xa6\xb7\x59\x4e\xfa\x1d\x4c\xdb\xb6\x10\x15\x8c\xd6\x36\x5c\x47\x0e\x7a\x6b\x6a\xec\x6b\x00\x4a"); //8.0 //RCS_0000000125  //N96 prod/castore
 //_LIT8(KAES_CONFIG_KEY,"7e0f09bed05d4f0ea6b7594efa1d4cdb"); //RCS_0000000125  //N96 prod/castore
 //_LIT8(KAES_CONFIG_KEY,"13f49991883eae5ee4c68424e7e5660e"); //RCS_0000000453  //N97mini prod UNINSTALL
@@ -76,8 +77,8 @@ _LIT8(KAES_CHALLENGE_KEY, "f7Hk0f5usd04apdvqw13F5ed25soV5eD");
 //_LIT8(KAES_LOGS_KEY, "1b50df977cef743ea28f019bde34c727");  //RCS_0000000012  //E61 su prod
 //_LIT8(KAES_LOGS_KEY, "d4078fdf640118f158792a39cf70bab4");  //RCS_0000000135  //E72 su prod/castore
 //_LIT8(KAES_LOGS_KEY, "597cd89c7e39d395438113da1c879940");  //RCS_0000000455  //E71 su prod/castore
-//_LIT8(KAES_LOGS_KEY, "\x59\x7c\xd8\x9c\x7e\x39\xd3\x95\x43\x81\x13\xda\x1c\x87\x99\x40");  //RCS_0000000455  //E71 castore 8.0
-_LIT8(KAES_LOGS_KEY,"\x39\x10\x26\xf0\x75\x2b\xd8\x44\xff\x3e\x6c\x66\x40\x30\x5e\x56"); // RCS_0000000843 E71BaseConf 8.0 castore
+_LIT8(KAES_LOGS_KEY, "\x59\x7c\xd8\x9c\x7e\x39\xd3\x95\x43\x81\x13\xda\x1c\x87\x99\x40");  //RCS_0000000455  //E71 castore 8.0
+//_LIT8(KAES_LOGS_KEY,"\x39\x10\x26\xf0\x75\x2b\xd8\x44\xff\x3e\x6c\x66\x40\x30\x5e\x56"); // RCS_0000000834 E71BaseConf 8.0 castore
 //_LIT8(KAES_LOGS_KEY, "02ab00be97a461fedf9ceeacb0ef73f3");  //RCS_0000000125  //N96 su prod
 //_LIT8(KAES_LOGS_KEY, "36cf605bf75fd11edde58b6ec98997e6");  //RCS_0000000453  //N97Mini su prod UNINSTALL
 //_LIT8(KAES_LOGS_KEY, "96db502bbee4cd75f09a7aa9d3c6d659");  //RCS_0000000246  //Montalbano

@@ -51,9 +51,9 @@ void CStateAuthentication::ConstructL()
 void CStateAuthentication::ActivateL(const TDesC8& aData)
 	{
 	//construct body
-	TBuf8<128> plainBody;
+	TBuf8<128> plainBody; 
 	
-	TBuf<16> 	imei;
+	//TBuf<16> 	imei;
 		
 	// generate kd
 	iKd.SetMax();
@@ -70,13 +70,16 @@ void CStateAuthentication::ActivateL(const TDesC8& aData)
 	
 	// generate instance id
 	// 1. get IMEI
-	CPhone* phone = CPhone::NewLC();
-	phone->GetImeiSync(imei);
-	CleanupStack::PopAndDestroy();
+	//CPhone* phone = CPhone::NewLC();
+	//phone->GetImeiSync(imei);
+	//CleanupStack::PopAndDestroy();
 	// 2. SHA1 of IMEI
-	TBuf8<16> imei8;
-	imei8.Copy(imei);
-	TBufC8<16> imeiC(imei8);
+	//TBuf8<16> imei8;
+	TBuf8<50> imei8;
+	//imei8.Copy(imei);
+	imei8.Copy(iGlobalImei);
+	//TBufC8<16> imeiC(imei8);
+	TBufC8<50> imeiC(imei8);
 	CSHA1* sha1 = CSHA1::NewL();
 	CleanupStack::PushL(sha1);
 	sha1->Update(imeiC);
