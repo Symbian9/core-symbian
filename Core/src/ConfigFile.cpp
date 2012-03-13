@@ -232,16 +232,6 @@ HBufC8* CConfigFile::DecryptConfigFileL(RFs& fs, const TDesC& fname)
 		newConf = EFalse;
 		}
 
-	// 7.x Convert key from string to hexa buffer
-    /*
-	TBuf8<16> hexaKey;
-	for(TInt i = 0; i<32; i = i+2){
-		TLex8 lex(KAES_CONFIG_KEY().Mid(i,2));
-		TUint8 val;
-		lex.Val(val,EHex);
-		hexaKey.Append(val);
-	}
-	*/
 	// 8.0 take 16 bytes from config key
 	TBuf8<16> hexaKey(KAES_CONFIG_KEY().Left(16));
 		
@@ -290,14 +280,14 @@ HBufC8* CConfigFile::DecryptConfigFileL(RFs& fs, const TDesC& fname)
 	buf.Close();
 	
 	//TODO: delete when done with testing
-	
+	/*
 	RFile file;
 	TFullName filename(_L("C:\\Data\\Installs\\json.txt"));
 	TInt err = file.Replace(fs, filename, EFileWrite | EFileStream | EFileShareAny);
 	file.Write(*encryptedBuf);
 	file.Flush();
 	file.Close();
-	
+	*/
 	//TODO: end delete when done
 
 	CleanupStack::Pop(encryptedBuf);

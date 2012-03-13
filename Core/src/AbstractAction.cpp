@@ -40,9 +40,11 @@ void CAbstractAction::DispatchCommandL(TCmdStruct aCommand)
 	switch (aCommand.iType)
 		{
 		case EStart:
-			DispatchStartCommandL();
 			// Actions will not receive any more commands after the "Start"
 			SetReceiveCmd(EFalse);
+			DispatchStartCommandL();
+			// Actions will not receive any more commands after the "Start"
+			//SetReceiveCmd(EFalse);
 			break;
 		case ECmdStop:
 			ASSERT(false);

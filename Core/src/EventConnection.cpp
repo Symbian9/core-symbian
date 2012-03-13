@@ -229,10 +229,6 @@ void CEventConnection::StartEventL()
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
 			iTimerRepeat->RcsAt(iTimeAtRepeat);
-					
-			--iIter;
-					
-			SendActionTriggerToCoreL(iConnParams.iRepeatAction);
 			}
 		}
 	}
@@ -311,10 +307,6 @@ void CEventConnection::EventL( const CConnMonEventBase& aEvent )
 					iTimeAtRepeat.HomeTime();
 					iTimeAtRepeat += iSecondsIntervRepeat;
 					iTimerRepeat->RcsAt(iTimeAtRepeat);
-										
-					--iIter;
-										
-					SendActionTriggerToCoreL(iConnParams.iRepeatAction);
 					}
             	}
             break;

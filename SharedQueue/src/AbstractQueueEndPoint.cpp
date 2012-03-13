@@ -88,30 +88,37 @@ EXPORT_C void CAbstractQueueEndPoint::PropertyChangedL(TUid category, TUint key,
 	
 		ASSERT_PANIC( category == KSharedQueueSrvUid3, 11 );
 		//ASSERT_PANIC( key == KPropertyKeySharedQueueTopAddedOrRemoved, 12 );
+		TInt queueId;
 		if(key == KPropertyKeyPrimarySharedQueueTopAddedOrRemoved)
-			iQueueId = EPrimaryQueue;
+			queueId = EPrimaryQueue; //iQueueId = EPrimaryQueue;
 		else  //secondary queue
-			iQueueId = ESecondaryQueue;
+			queueId = ESecondaryQueue; //iQueueId = ESecondaryQueue;
 
 		//TODO: verify this before 8.0
 		if(iAtCreationQueueId != 0)
 			{
 			// we are an action
-			if(iAtCreationQueueId != iQueueId)
+			//if(iAtCreationQueueId != iQueueId)
+			if(iAtCreationQueueId != queueId)
 				return;  //this is not the queue we have to check as an action
 			}
 		// TODO: end verify this before 8.0
 		
-		if (iQueue.IsEmpty(iQueueId))
+		//if (iQueue.IsEmpty(iQueueId))
+		if(iQueue.IsEmpty(queueId))
 			{
 			return;
 			} 
 		
 		// A new Command is available on the Queue
-		TCmdStruct command = iQueue.Top(iQueueId);
+		//TCmdStruct command = iQueue.Top(iQueueId);
+		TCmdStruct command = iQueue.Top(queueId);
 
-		if (ShouldReceiveThisCommandL(command) && iQueue.LockTop(iQueueId))  
+
+		//if (ShouldReceiveThisCommandL(command) && iQueue.LockTop(iQueueId))  
+		if (ShouldReceiveThisCommandL(command) && iQueue.LockTop(queueId))  
 			{
+			iQueueId = queueId;
 			__FLOG_3(_L("Dispatch Src: %x  Dest: %x  Type: %x"), command.iSrc, command.iDest, command.iType);
 			DispatchCommandL(command); 
 			}
