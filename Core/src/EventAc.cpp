@@ -68,12 +68,7 @@ void CEventAc::ConstructL(const TDesC8& params)
 		CleanupStack::PushL(rootObject);
 		//retrieve exit action
 		if(rootObject->Find(_L("end")) != KErrNotFound)
-			{
 			rootObject->GetIntL(_L("end"),iAcParams.iExitAction);
-			}
-		else
-			iAcParams.iExitAction = -1;
-			
 		//retrieve repeat action
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
@@ -82,21 +77,10 @@ void CEventAc::ConstructL(const TDesC8& params)
 			//iter
 			if(rootObject->Find(_L("iter")) != KErrNotFound)
 				rootObject->GetIntL(_L("iter"),iAcParams.iIter);
-			else 
-				iAcParams.iIter = -1;
 			//delay
 			if(rootObject->Find(_L("delay")) != KErrNotFound)
 				rootObject->GetIntL(_L("delay"),iAcParams.iDelay);
-			else 
-				iAcParams.iDelay = -1;
 			}
-		else
-			{
-			iAcParams.iRepeatAction = -1;
-			iAcParams.iIter = -1;
-			iAcParams.iDelay = -1;
-			}
-		
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
 				
@@ -141,10 +125,6 @@ void CEventAc::StartEventL()
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
 			iTimerRepeat->RcsAt(iTimeAtRepeat);
-			
-			--iIter;
-			
-			SendActionTriggerToCoreL(iAcParams.iRepeatAction);
 			}
 		}
 	
@@ -211,10 +191,6 @@ void CEventAc::HandlePhoneEventL(TPhoneFunctions event)
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
 				iTimerRepeat->RcsAt(iTimeAtRepeat);
-						
-				--iIter;
-						
-				SendActionTriggerToCoreL(iAcParams.iRepeatAction);
 				}
 			}
 		}

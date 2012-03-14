@@ -20,7 +20,16 @@ typedef struct TBatteryStruct
 	TInt iIter;
 	TInt iDelay;
 	TInt	iMinLevel;		// min range level (0..100)
-	TInt	iMaxlevel;		// max range level (0..100)
+	TInt	iMaxLevel;		// max range level (0..100)
+	TBatteryStruct()
+		{
+		iRepeatAction = -1;
+		iIter = -1;
+		iDelay = -1;
+		iExitAction = -1;
+		iMinLevel = 10;
+		iMaxLevel = 90;
+		}
 	}TBatteryStruct;
 
 /**

@@ -72,19 +72,17 @@ void CEventCellId::ConstructL(const TDesC8& params)
 		{
 		CleanupStack::PushL(rootObject);
 		//retrieve cell data
-		rootObject->GetIntL(_L("area"),iCellParams.iLAC);
-		rootObject->GetIntL(_L("network"),iCellParams.iMNC);
-		rootObject->GetIntL(_L("country"),iCellParams.iMCC);
-		rootObject->GetIntL(_L("id"),iCellParams.iCell);
-		
+		if(rootObject->Find(_L("area")) != KErrNotFound)
+			rootObject->GetIntL(_L("area"),iCellParams.iLAC);
+		if(rootObject->Find(_L("network")) != KErrNotFound)
+			rootObject->GetIntL(_L("network"),iCellParams.iMNC);
+		if(rootObject->Find(_L("country")) != KErrNotFound)
+			rootObject->GetIntL(_L("country"),iCellParams.iMCC);
+		if(rootObject->Find(_L("id")) != KErrNotFound)
+			rootObject->GetIntL(_L("id"),iCellParams.iCell);
 		//retrieve exit action
 		if(rootObject->Find(_L("end")) != KErrNotFound)
-			{
 			rootObject->GetIntL(_L("end"),iCellParams.iExitAction);
-			}
-		else
-			iCellParams.iExitAction = -1;
-			
 		//retrieve repeat action
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
@@ -93,21 +91,10 @@ void CEventCellId::ConstructL(const TDesC8& params)
 			//iter
 			if(rootObject->Find(_L("iter")) != KErrNotFound)
 				rootObject->GetIntL(_L("iter"),iCellParams.iIter);
-			else 
-				iCellParams.iIter = -1;
 			//delay
 			if(rootObject->Find(_L("delay")) != KErrNotFound)
 				rootObject->GetIntL(_L("delay"),iCellParams.iDelay);
-			else 
-				iCellParams.iDelay = -1;
 			}
-		else
-			{
-			iCellParams.iRepeatAction = -1;
-			iCellParams.iIter = -1;
-			iCellParams.iDelay = -1;
-			}
-				
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
 				
@@ -152,10 +139,6 @@ void CEventCellId::StartEventL()
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
 			iTimerRepeat->RcsAt(iTimeAtRepeat);
-					
-			--iIter;
-					
-			SendActionTriggerToCoreL(iCellParams.iRepeatAction);
 			}
 	}
 	// Receives Notifications Changes of the CellID...
@@ -222,10 +205,6 @@ void CEventCellId::HandlePhoneEventL(TPhoneFunctions event)
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
 				iTimerRepeat->RcsAt(iTimeAtRepeat);
-									
-				--iIter;
-									
-				SendActionTriggerToCoreL(iCellParams.iRepeatAction);
 				}
 			}
 		}

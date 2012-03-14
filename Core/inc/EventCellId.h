@@ -32,6 +32,17 @@ typedef struct TCellIdStruct
 	TInt iMNC;	// Mobile Network Code
 	TInt iLAC;	// Location Area Code  TUint32
 	TInt iCell;
+	TCellIdStruct()
+		{
+		iExitAction = -1;
+		iRepeatAction = -1;
+		iIter = -1;
+		iDelay = -1;
+		iMCC = -1;
+		iMNC = -1;
+		iLAC = -1;
+		iCell = -1;
+		}
 	} TCellIdStruct;
 
 

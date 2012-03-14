@@ -20,6 +20,13 @@ typedef struct TAcStruct
 	TInt iRepeatAction;
 	TInt iIter;
 	TInt iDelay;
+	TAcStruct()
+		{
+		iExitAction = -1;
+		iRepeatAction = -1;
+		iIter = -1;
+		iDelay = -1;
+		}
 	}TAcStruct;
 
 /**

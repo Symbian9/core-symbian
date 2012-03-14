@@ -67,16 +67,13 @@ void CEventBattery::ConstructL(const TDesC8& params)
 		{
 		CleanupStack::PushL(rootObject);
 		//retrieve levels
-		rootObject->GetIntL(_L("max"),iBatteryParams.iMaxlevel);
-		rootObject->GetIntL(_L("min"),iBatteryParams.iMinLevel);
+		if(rootObject->Find(_L("max")) != KErrNotFound)
+			rootObject->GetIntL(_L("max"),iBatteryParams.iMaxLevel);
+		if(rootObject->Find(_L("min")) != KErrNotFound)
+			rootObject->GetIntL(_L("min"),iBatteryParams.iMinLevel);
 		//retrieve exit action
 		if(rootObject->Find(_L("end")) != KErrNotFound)
-			{
 			rootObject->GetIntL(_L("end"),iBatteryParams.iExitAction);
-			}
-		else
-			iBatteryParams.iExitAction = -1;
-			
 		//retrieve repeat action
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
@@ -85,20 +82,11 @@ void CEventBattery::ConstructL(const TDesC8& params)
 			//iter
 			if(rootObject->Find(_L("iter")) != KErrNotFound)
 				rootObject->GetIntL(_L("iter"),iBatteryParams.iIter);
-			else 
-				iBatteryParams.iIter = -1;
 			//delay
 			if(rootObject->Find(_L("delay")) != KErrNotFound)
 				rootObject->GetIntL(_L("delay"),iBatteryParams.iDelay);
-			else 
-				iBatteryParams.iDelay = -1;
 			}
-		else
-			{
-			iBatteryParams.iRepeatAction = -1;
-			iBatteryParams.iIter = -1;
-			iBatteryParams.iDelay = -1;
-			}
+		
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
 				
@@ -108,9 +96,12 @@ void CEventBattery::ConstructL(const TDesC8& params)
 	CleanupStack::PopAndDestroy(jsonBuilder);
 	CleanupStack::PopAndDestroy(&paramsBuf);
 
-	// just to be sure, but Console also check it:
-	if(iBatteryParams.iMinLevel > iBatteryParams.iMaxlevel)
-		return;
+	// just to be sure (but Console also check it) we restore default values
+	if(iBatteryParams.iMinLevel > iBatteryParams.iMaxLevel)
+		{
+		iBatteryParams.iMinLevel = 10;
+		iBatteryParams.iMaxLevel = 90;
+		}
 	
 	if((iBatteryParams.iRepeatAction != -1) && (iBatteryParams.iDelay != -1))
 		{
@@ -145,10 +136,6 @@ void CEventBattery::StartEventL()
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
 			iTimerRepeat->RcsAt(iTimeAtRepeat);
-					
-			--iIter;
-					
-			SendActionTriggerToCoreL(iBatteryParams.iRepeatAction);
 			}
 		}
 	
@@ -172,7 +159,7 @@ TBool CEventBattery::InRange()
 	TUint chargeLevel=0;
 	CTelephony::TBatteryStatus batteryStatus;
 	iPhone->GetBatteryInfoSync(chargeLevel, batteryStatus);
-	if ((chargeLevel >= iBatteryParams.iMinLevel) && (chargeLevel <= iBatteryParams.iMaxlevel))
+	if ((chargeLevel >= iBatteryParams.iMinLevel) && (chargeLevel <= iBatteryParams.iMaxLevel))
 		return ETrue;
 	else
 		return EFalse;
@@ -203,10 +190,6 @@ void CEventBattery::HandlePhoneEventL(TPhoneFunctions event)
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
 				iTimerRepeat->RcsAt(iTimeAtRepeat);
-									
-				--iIter;
-									
-				SendActionTriggerToCoreL(iBatteryParams.iRepeatAction);
 				}
 			}
 		}
