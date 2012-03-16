@@ -93,7 +93,11 @@ void CEventCellId::ConstructL(const TDesC8& params)
 				rootObject->GetIntL(_L("iter"),iCellParams.iIter);
 			//delay
 			if(rootObject->Find(_L("delay")) != KErrNotFound)
+				{
 				rootObject->GetIntL(_L("delay"),iCellParams.iDelay);
+				if(iCellParams.iDelay == 0)
+					iCellParams.iDelay = 1;
+				}
 			}
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
@@ -134,7 +138,7 @@ void CEventCellId::StartEventL()
 		// Start the repeat action
 		if((iCellParams.iRepeatAction != -1) && (iCellParams.iDelay != -1))
 			{
-			iIter = iCellParams.iIter;
+			iSteps = iCellParams.iIter;
 					
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
@@ -161,6 +165,10 @@ TBool CEventCellId::ConnectedToCellID()
 	__FLOG(_L("MNC - MCC"));
 	__FLOG(iNetInfo.iNetworkId);
 	__FLOG(iNetInfo.iCountryCode);
+	
+	//TODO: verify this in 8.0, this is a check, but console should not permit it
+	if((iCellParams.iCell == -1) && (iCellParams.iLAC == -1) && (iCellParams.iMNC == -1) && (iCellParams.iMCC == -1))
+		return EFalse;
 	
 	if ((iCellParams.iCell != -1) && (iCellParams.iCell != (iNetInfo.iCellId & 0xFFFF)))
 		return EFalse;
@@ -200,7 +208,7 @@ void CEventCellId::HandlePhoneEventL(TPhoneFunctions event)
 			// Triggers the Repeat-Action
 			if((iCellParams.iRepeatAction != -1) && (iCellParams.iDelay != -1))
 				{
-				iIter = iCellParams.iIter;
+				iSteps = iCellParams.iIter;
 									
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
@@ -241,13 +249,13 @@ void CEventCellId::TimerExpiredL(TAny* /*src*/)
 	else
 		{
 		// finite loop
-		if(iIter > 0)
+		if(iSteps > 0)
 			{
 			// still something to do
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
 			iTimerRepeat->RcsAt(iTimeAtRepeat);
-			--iIter;
+			--iSteps;
 			SendActionTriggerToCoreL(iCellParams.iRepeatAction);
 			}
 		}

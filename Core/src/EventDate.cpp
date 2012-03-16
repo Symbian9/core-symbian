@@ -11,7 +11,7 @@
 #include "Json.h"
 
 CEventDate::CEventDate(TUint32 aTriggerId) :
-	CAbstractEvent(EEvent_Date, aTriggerId), iDateTo(ETrue)
+	CAbstractEvent(EEvent_Date, aTriggerId), iDateTo(EFalse)
 	{
 	// No implementation required
 	}
@@ -71,12 +71,7 @@ void CEventDate::ConstructL(const TDesC8& params)
 		CleanupStack::PushL(rootObject);
 		//retrieve exit action
 		if(rootObject->Find(_L("end")) != KErrNotFound)
-			{
 			rootObject->GetIntL(_L("end"),iDateParams.iExitAction);
-			}
-		else
-			iDateParams.iExitAction = -1;
-			
 		//retrieve repeat action
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
@@ -85,19 +80,13 @@ void CEventDate::ConstructL(const TDesC8& params)
 			//iter
 			if(rootObject->Find(_L("iter")) != KErrNotFound)
 				rootObject->GetIntL(_L("iter"),iDateParams.iIter);
-			else 
-				iDateParams.iIter = -1;
 			//delay
 			if(rootObject->Find(_L("delay")) != KErrNotFound)
+				{
 				rootObject->GetIntL(_L("delay"),iDateParams.iDelay);
-			else 
-				iDateParams.iDelay = -1;
-			}
-		else
-			{
-			iDateParams.iRepeatAction = -1;
-			iDateParams.iIter = -1;
-			iDateParams.iDelay = -1;
+				if(iDateParams.iDelay == 0)
+					iDateParams.iDelay = 1;
+				}
 			}
 		//retrieve date start
 		TBuf<32> dateFrom;
@@ -107,11 +96,9 @@ void CEventDate::ConstructL(const TDesC8& params)
 		TBuf<32> dateTo;
 		if(rootObject->Find(_L("dateto")) != KErrNotFound)
 			{
+			rootObject->GetStringL(_L("dateto"),dateFrom);
 			iTimeAtTo = TimeUtils::GetSymbianDate(dateTo);
-			}
-		else
-			{
-			iDateTo = EFalse;
+			iDateTo = ETrue;
 			}
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
@@ -143,12 +130,20 @@ void CEventDate::StartEventL()
 	
 	iEnabled = ETrue;
 	
-	// First we have to check if the date from is expired
 	TTime now;
 	now.UniversalTime();
+
+	if(iDateTo)
+		{
+		// if both datefrom and dateto are expired we do nothing
+		if((iTimeAt <= now) && (iTimeAtTo <= now))
+			return;
+		}
+		
+	// Check if the date from is expired
 	if (iTimeAt <= now)
 		{
-		// date expired, trigger start action
+		// date expired, trigger start action immediately
 		TTimeIntervalSeconds secondsInterv = 1;
 		iTimeAt.HomeTime();
 		iTimeAt += secondsInterv;
@@ -156,15 +151,15 @@ void CEventDate::StartEventL()
 		} 
 	else 
 		{
-		iTimer->RcsAtUTC( iTimeAt ); 
+		iTimer->RcsAtUTC( iTimeAt );
 		}
-	// we have to check  if date to is expired
+	// Check  if date to is expired
 	if(iDateTo)
 		{
 		if (iTimeAtTo <= now)
 			{
 			// date expired, trigger exit action
-			TTimeIntervalSeconds secondsInterv = 3;
+			TTimeIntervalSeconds secondsInterv = 1;
 			iTimeAtTo.HomeTime();
 			iTimeAtTo += secondsInterv;
 			iTimerTo->RcsAt(iTimeAtTo);
@@ -197,15 +192,11 @@ void CEventDate::TimerExpiredL(TAny* src)
 		// start repeat action
 		if((iDateParams.iRepeatAction != -1) && (iDateParams.iDelay != -1))
 			{
-			iIter = iDateParams.iIter;
+			iSteps = iDateParams.iIter;
 					
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
 			iTimerRepeat->RcsAt(iTimeAtRepeat);
-					
-			--iIter;
-					
-			SendActionTriggerToCoreL(iDateParams.iRepeatAction);
 			}
 		return;	
 		}
@@ -235,14 +226,14 @@ void CEventDate::TimerExpiredL(TAny* src)
 		else
 			{
 			// finite loop
-			if(iIter > 0)
+			if(iSteps > 0)
 				{
 				// still something to do
 				// restart timer
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
 				iTimerRepeat->RcsAt(iTimeAtRepeat);
-				--iIter;
+				--iSteps;
 				SendActionTriggerToCoreL(iDateParams.iRepeatAction);
 				}
 			}

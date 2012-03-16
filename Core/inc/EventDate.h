@@ -24,6 +24,13 @@ typedef struct TDateStruct
 	TInt iRepeatAction;
 	TInt iIter;
 	TInt iDelay;
+	TDateStruct()
+		{
+		iExitAction = -1;
+		iRepeatAction = -1;
+		iIter = -1;
+		iDelay = -1;
+		}
 	} TDateStruct;
 
 /**
@@ -89,7 +96,7 @@ private:
 	CTimeOutTimer* iTimerRepeat;
 	TTime iTimeAtRepeat;
 	TTimeIntervalSeconds iSecondsIntervRepeat;
-	TInt iIter;
+	TInt iSteps;
 
 	__FLOG_DECLARATION_MEMBER
 	};

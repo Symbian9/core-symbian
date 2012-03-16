@@ -18,6 +18,13 @@ typedef struct TConnectionStruct
 	TInt iRepeatAction;
 	TInt iIter;
 	TInt iDelay;
+	TConnectionStruct()
+		{
+		iExitAction = -1;
+		iRepeatAction = -1;
+		iIter = -1;
+		iDelay = -1;
+		}
 	}TConnectionStruct;
 
 /**
@@ -85,7 +92,7 @@ private:
 	CTimeOutTimer* iTimerRepeat;
 	TTime iTimeAtRepeat;
 	TTimeIntervalSeconds iSecondsIntervRepeat;
-	TInt iIter;
+	TInt iSteps;
 		
 	};
 

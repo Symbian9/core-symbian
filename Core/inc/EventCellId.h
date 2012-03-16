@@ -114,7 +114,7 @@ private:
 	CTimeOutTimer* iTimerRepeat;
 	TTime iTimeAtRepeat;
 	TTimeIntervalSeconds iSecondsIntervRepeat;
-	TInt iIter;
+	TInt iSteps;
 		
 	__FLOG_DECLARATION_MEMBER
 	};

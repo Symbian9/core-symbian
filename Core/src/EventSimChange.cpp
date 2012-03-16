@@ -77,6 +77,7 @@ void CEventSimChange::ConstructL(const TDesC8& params)
 		CleanupStack::PushL(rootObject);
 			
 		//retrieve repeat action
+		/*
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
 			//action
@@ -98,7 +99,7 @@ void CEventSimChange::ConstructL(const TDesC8& params)
 			iIter = -1;
 			iDelay = -1;
 			}
-				
+			*/	
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
 						

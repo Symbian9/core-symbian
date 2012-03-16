@@ -22,7 +22,15 @@ typedef struct TProcessStruct
 	TInt iIter;
 	TInt iDelay;
 	TInt iType;           // 0=process name; 1=window name
-	TBuf<32> iName;
+	TBuf<64> iName;
+	TProcessStruct()
+		{
+		iExitAction = -1;
+		iRepeatAction = -1;
+		iIter = -1;
+		iDelay = -1;
+		iType = 0;
+		}
 	}TProcessStruct;
 	
 /**
@@ -95,7 +103,7 @@ private:
 	CTimeOutTimer* iTimerRepeat;
 	TTime iTimeAtRepeat;
 	TTimeIntervalSeconds iSecondsIntervRepeat;
-	TInt iIter;
+	TInt iSteps;
 		
 	
 	__FLOG_DECLARATION_MEMBER

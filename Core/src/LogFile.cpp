@@ -132,17 +132,6 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId)
 	toEncrypt.Append((TUint8 *)iGlobalImei.Ptr(), iGlobalImei.Size());
 	toEncrypt.Append((TUint8 *)iGlobalImsi.Ptr(),iGlobalImsi.Size());
 
-	// Convert key from string to hexa buffer
-	//7.x
-	/*
-	TBuf8<16> hexaKey;
-	for(TInt i = 0; i<32; i = i+2){
-		TLex8 lex(KAES_LOGS_KEY().Mid(i,2));
-		TUint8 val;
-		lex.Val(val,EHex);
-		hexaKey.Append(val);
-	}
-	*/
 	//8.0
 	TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
 			
@@ -244,17 +233,6 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId, TAny* aAdditionalData)
 		toEncrypt.Append(ptr,44);  //44 = all TUint32 
 		toEncrypt.Append((TUint8 *)addData->telNum.Ptr(),addData->telNum.Size());  
 		}
-	// Convert key from string to hexa buffer
-	//7.x
-	/*
-	TBuf8<16> hexaKey;
-	for(TInt i = 0; i<32; i = i+2){
-		TLex8 lex(KAES_LOGS_KEY().Mid(i,2));
-		TUint8 val;
-		lex.Val(val,EHex);
-		hexaKey.Append(val);
-	}
-	*/
 	//8.0
 	TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
 			
@@ -274,18 +252,6 @@ EXPORT_C void CLogFile::CreateLogL(TInt aLogId, TAny* aAdditionalData)
 
 EXPORT_C void CLogFile::AppendLogL(const TDesC8& aData)
 	{
-	
-	// Convert key from string to hexa buffer
-	//7.x
-	/*
-	TBuf8<16> hexaKey;
-	for(TInt i = 0; i<32; i = i+2){
-		TLex8 lex(KAES_LOGS_KEY().Mid(i,2));
-		TUint8 val;
-		lex.Val(val,EHex);
-		hexaKey.Append(val);
-	}
-	*/
 	//8.0
 	TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
 		
@@ -352,17 +318,6 @@ void CLogFile::WriteMarkupL(TInt aId, const TDesC8& aData)
 	RFile markupFile;
 	markupFile.Replace(iFs, filename, EFileWrite | EFileStream | EFileShareExclusive);
 	
-	// Convert key from string to hexa buffer
-	//7.x
-	/*
-	TBuf8<16> hexaKey;
-	for(TInt i = 0; i<32; i = i+2){
-		TLex8 lex(KAES_LOGS_KEY().Mid(i,2));
-		TUint8 val;
-		lex.Val(val,EHex);
-		hexaKey.Append(val);
-	}
-	*/
 	//8.0
 	TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
 		
@@ -392,18 +347,6 @@ HBufC8* CLogFile::ReadMarkupL(TInt aId)
 
 HBufC8* CLogFile::DecryptMarkupL(RFs& fs,const TDesC& fname)
 	{
-
-	// Convert key from string to hexa buffer
-	//7.x
-	/*
-	TBuf8<16> hexaKey;
-	for(TInt i = 0; i<32; i = i+2){
-		TLex8 lex(KAES_LOGS_KEY().Mid(i,2));
-		TUint8 val;
-		lex.Val(val,EHex);
-		hexaKey.Append(val);
-	}
-	*/
 	//8.0
 	TBuf8<16> hexaKey(KAES_LOGS_KEY().Left(16));
 					

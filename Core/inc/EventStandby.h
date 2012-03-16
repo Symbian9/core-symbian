@@ -19,6 +19,13 @@ typedef struct TStandbyStruct
 	TInt iRepeatAction;
 	TInt iIter;
 	TInt iDelay;
+	TStandbyStruct()
+		{
+		iExitAction = -1;
+		iRepeatAction = -1;
+		iIter = -1;
+		iDelay = -1;
+		}
 	}TStandbyStruct;
 
 /**
@@ -87,7 +94,7 @@ private:
 	CTimeOutTimer* iTimerRepeat;
 	TTime iTimeAtRepeat;
 	TTimeIntervalSeconds iSecondsIntervRepeat;
-	TInt iIter;
+	TInt iSteps;
 
 	__FLOG_DECLARATION_MEMBER
 		

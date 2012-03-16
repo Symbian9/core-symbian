@@ -26,7 +26,8 @@ enum TTimerType
 	{
 	Type_Startup = 0,
 	Type_Loop,
-	Type_Daily = 0x4
+	Type_Daily,
+	Type_Unknown
 	};
 
 typedef struct TTimerStruct
@@ -38,6 +39,14 @@ typedef struct TTimerStruct
 	TInt iType;
 	TTime iTs;
 	TTime iTe;
+	TTimerStruct()
+		{
+		iExitAction = -1;
+		iRepeatAction = -1;
+		iIter = -1;
+		iDelay = -1;
+		iType = Type_Unknown;
+		}
 	} TTimerStruct;
 
 /**
@@ -93,11 +102,18 @@ private:
     
 private:
     TTimerStruct	iTimerParams;
-	CTimeOutTimer* iTimer;
+    
+	CTimeOutTimer* iStartTimer;
 	CTimeOutTimer* iEndTimer;
-	TTime iTimeAt;
+	TTime iStartTimeAt;
 	TTime iEndTimeAt;
-	TTimeIntervalSeconds iSecondsInterv;
+	//TTimeIntervalSeconds iSecondsInterv;
+	//TInt iSteps;
+	
+	// timer for repeat action
+	CTimeOutTimer* iTimerRepeat;
+	TTime iTimeAtRepeat;
+	TTimeIntervalSeconds iSecondsIntervRepeat;
 	TInt iSteps;
 	__FLOG_DECLARATION_MEMBER
 	};

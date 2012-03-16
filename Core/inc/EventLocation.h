@@ -30,6 +30,13 @@ typedef struct TLocationStruct
 	TInt	iConfDistance;
 	TReal64 iLatOrigin;	
 	TReal64	iLonOrigin;	
+	TLocationStruct()
+		{
+		iExitAction = -1;
+		iRepeatAction = -1;
+		iIter = -1;
+		iDelay = -1;
+		}
 	} TLocationStruct;
 
 	
@@ -98,7 +105,7 @@ private:
 	CTimeOutTimer* iTimerRepeat;
 	TTime iTimeAtRepeat;
 	TTimeIntervalSeconds iSecondsIntervRepeat;
-	TInt iIter;
+	TInt iSteps;
 		
 	};
 

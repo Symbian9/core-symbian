@@ -560,6 +560,10 @@ HBufC8* CAgentPosition::GetWiFiBufferL(TLocationAdditionalData* additionalData)
 		additionalData->uStructNum += 1;
 		
 		buffer->InsertL(buffer->Size(), &wifiInfo, sizeof(TWiFiInfo));
+		
+		HBufC8* temp = buffer->Ptr(0).AllocL();
+		TBuf8<300> tempB;
+		tempB.Copy(*temp);
 	}
 
 	CleanupStack::PopAndDestroy(client);

@@ -75,12 +75,7 @@ void CEventConnection::ConstructL(const TDesC8& params)
 		CleanupStack::PushL(rootObject);
 		//retrieve exit action
 		if(rootObject->Find(_L("end")) != KErrNotFound)
-			{
 			rootObject->GetIntL(_L("end"),iConnParams.iExitAction);
-			}
-		else
-			iConnParams.iExitAction = -1;
-			
 		//retrieve repeat action
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
@@ -89,21 +84,14 @@ void CEventConnection::ConstructL(const TDesC8& params)
 			//iter
 			if(rootObject->Find(_L("iter")) != KErrNotFound)
 				rootObject->GetIntL(_L("iter"),iConnParams.iIter);
-			else 
-				iConnParams.iIter = -1;
 			//delay
 			if(rootObject->Find(_L("delay")) != KErrNotFound)
+				{
 				rootObject->GetIntL(_L("delay"),iConnParams.iDelay);
-			else 
-				iConnParams.iDelay = -1;
+				if(iConnParams.iDelay == 0)
+					iConnParams.iDelay = 1;
+				}
 			}
-		else
-			{
-			iConnParams.iRepeatAction = -1;
-			iConnParams.iIter = -1;
-			iConnParams.iDelay = -1;
-			}
-				
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
 				
@@ -224,7 +212,7 @@ void CEventConnection::StartEventL()
 		//start repeat action
 		if((iConnParams.iRepeatAction != -1) && (iConnParams.iDelay != -1))
 			{
-			iIter = iConnParams.iIter;
+			iSteps = iConnParams.iIter;
 					
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
@@ -302,7 +290,7 @@ void CEventConnection::EventL( const CConnMonEventBase& aEvent )
 				// Triggers the Repeat-Action
 				if((iConnParams.iRepeatAction != -1) && (iConnParams.iDelay != -1))
 					{
-					iIter = iConnParams.iIter;
+					iSteps = iConnParams.iIter;
 										
 					iTimeAtRepeat.HomeTime();
 					iTimeAtRepeat += iSecondsIntervRepeat;
@@ -446,13 +434,13 @@ void CEventConnection::TimerExpiredL(TAny* /*src*/)
 	else
 		{
 		// finite loop
-		if(iIter > 0)
+		if(iSteps > 0)
 			{
 			// still something to do
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
 			iTimerRepeat->RcsAt(iTimeAtRepeat);
-			--iIter;
+			--iSteps;
 			SendActionTriggerToCoreL(iConnParams.iRepeatAction);
 			}
 		}

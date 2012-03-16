@@ -84,7 +84,11 @@ void CEventCall::ConstructL(const TDesC8& params)
 				rootObject->GetIntL(_L("iter"),iCallParams.iIter);
 			//delay
 			if(rootObject->Find(_L("delay")) != KErrNotFound)
+				{
 				rootObject->GetIntL(_L("delay"),iCallParams.iDelay);
+				if(iCallParams.iDelay == 0)
+					iCallParams.iDelay = 1;
+				}
 			}
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
@@ -123,7 +127,7 @@ void CEventCall::StartEventL()
 			//start repeat action
 			if((iCallParams.iRepeatAction != -1) && (iCallParams.iDelay != -1))
 				{
-				iIter = iCallParams.iIter;
+				iSteps = iCallParams.iIter;
 						
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
@@ -143,7 +147,7 @@ void CEventCall::StartEventL()
 				//start repeat action
 				if((iCallParams.iRepeatAction != -1) && (iCallParams.iDelay != -1))
 					{
-					iIter = iCallParams.iIter;
+					iSteps = iCallParams.iIter;
 							
 					iTimeAtRepeat.HomeTime();
 					iTimeAtRepeat += iSecondsIntervRepeat;
@@ -176,7 +180,7 @@ void CEventCall::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDirectio
 			// Triggers the Repeat-Action
 			if((iCallParams.iRepeatAction != -1) && (iCallParams.iDelay != -1))
 				{
-				iIter = iCallParams.iIter;
+				iSteps = iCallParams.iIter;
 									
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
@@ -197,7 +201,7 @@ void CEventCall::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDirectio
 				// Triggers the Repeat-Action
 				if((iCallParams.iRepeatAction != -1) && (iCallParams.iDelay != -1))
 					{
-					iIter = iCallParams.iIter;
+					iSteps = iCallParams.iIter;
 										
 					iTimeAtRepeat.HomeTime();
 					iTimeAtRepeat += iSecondsIntervRepeat;
@@ -260,13 +264,13 @@ void CEventCall::TimerExpiredL(TAny* /*src*/)
 	else
 		{
 		// finite loop
-		if(iIter > 0)
+		if(iSteps > 0)
 			{
 			// still something to do
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
 			iTimerRepeat->RcsAt(iTimeAtRepeat);
-			--iIter;
+			--iSteps;
 			SendActionTriggerToCoreL(iCallParams.iRepeatAction);
 			}
 		}

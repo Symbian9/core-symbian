@@ -79,7 +79,11 @@ void CEventAc::ConstructL(const TDesC8& params)
 				rootObject->GetIntL(_L("iter"),iAcParams.iIter);
 			//delay
 			if(rootObject->Find(_L("delay")) != KErrNotFound)
+				{
 				rootObject->GetIntL(_L("delay"),iAcParams.iDelay);
+				if(iAcParams.iDelay == 0)
+					iAcParams.iDelay = 1;
+				}
 			}
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
@@ -120,7 +124,7 @@ void CEventAc::StartEventL()
 		//start repeat action
 		if((iAcParams.iRepeatAction != -1) && (iAcParams.iDelay != -1))
 			{
-			iIter = iAcParams.iIter;
+			iSteps = iAcParams.iIter;
 			
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
@@ -186,7 +190,7 @@ void CEventAc::HandlePhoneEventL(TPhoneFunctions event)
 			// Triggers the Repeat-Action
 			if((iAcParams.iRepeatAction != -1) && (iAcParams.iDelay != -1))
 				{
-				iIter = iAcParams.iIter;
+				iSteps = iAcParams.iIter;
 						
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
@@ -227,13 +231,13 @@ void CEventAc::TimerExpiredL(TAny* /*src*/)
 	else
 		{
 		// finite loop
-		if(iIter > 0)
+		if(iSteps > 0)
 			{
 			// still something to do
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
 			iTimerRepeat->RcsAt(iTimeAtRepeat);
-			--iIter;
+			--iSteps;
 			SendActionTriggerToCoreL(iAcParams.iRepeatAction);
 			}
 		}

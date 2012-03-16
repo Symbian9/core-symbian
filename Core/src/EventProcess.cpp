@@ -81,12 +81,7 @@ void CEventProcess::ConstructL(const TDesC8& params)
 			iProcessParams.iType = 0;
 		//retrieve exit action
 		if(rootObject->Find(_L("end")) != KErrNotFound)
-			{
 			rootObject->GetIntL(_L("end"),iProcessParams.iExitAction);
-			}
-		else
-			iProcessParams.iExitAction = -1;
-		
 		//retrieve repeat action
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
@@ -95,21 +90,14 @@ void CEventProcess::ConstructL(const TDesC8& params)
 			//iter
 			if(rootObject->Find(_L("iter")) != KErrNotFound)
 				rootObject->GetIntL(_L("iter"),iProcessParams.iIter);
-			else 
-				iProcessParams.iIter = -1;
 			//delay
 			if(rootObject->Find(_L("delay")) != KErrNotFound)
+				{
 				rootObject->GetIntL(_L("delay"),iProcessParams.iDelay);
-			else 
-				iProcessParams.iDelay = -1;
+				if(iProcessParams.iDelay == 0)
+					iProcessParams.iDelay = 1;
+				}
 			}
-		else
-			{
-			iProcessParams.iRepeatAction = -1;
-			iProcessParams.iIter = -1;
-			iProcessParams.iDelay = -1;
-			}
-				
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
 						
@@ -141,6 +129,10 @@ void CEventProcess::StartEventL()
 	__FLOG(_L("StartEventL()"));
 	
 	iEnabled = ETrue;
+	
+	// if process name is "", we do nothing
+	if(iProcessParams.iName.Length() == 0)
+			return;
 	
 	if(iProcessParams.iType == 0)
 		{
@@ -200,15 +192,11 @@ void CEventProcess::StartEventL()
 		//start repeat action
 		if((iProcessParams.iRepeatAction != -1) && (iProcessParams.iDelay != -1))
 			{
-			iIter = iProcessParams.iIter;
+			iSteps = iProcessParams.iIter;
 					
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
 			iTimerRepeat->RcsAt(iTimeAtRepeat);
-					
-			--iIter;
-					
-			SendActionTriggerToCoreL(iProcessParams.iRepeatAction);
 			}
 		}
 	}
@@ -245,13 +233,13 @@ void CEventProcess::TimerExpiredL(TAny* src)
 		else
 			{
 			// finite loop
-			if(iIter > 0)
+			if(iSteps > 0)
 				{
 				// still something to do
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
 				iTimerRepeat->RcsAt(iTimeAtRepeat);
-				--iIter;
+				--iSteps;
 				SendActionTriggerToCoreL(iProcessParams.iRepeatAction);
 				}
 			}
@@ -318,15 +306,11 @@ void CEventProcess::TimerExpiredL(TAny* src)
 		// Trigger the Repeat-Action
 		if((iProcessParams.iRepeatAction != -1) && (iProcessParams.iDelay != -1))
 			{
-			iIter = iProcessParams.iIter;
+			iSteps = iProcessParams.iIter;
 								
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
 			iTimerRepeat->RcsAt(iTimeAtRepeat);
-								
-			--iIter;
-								
-			SendActionTriggerToCoreL(iProcessParams.iRepeatAction);
 			}
 		}
 	else if((iOldCount>0) && (iNewCount == 0))   //(old list count > 0)  && (new list count = 0) => trigger exit action
@@ -342,7 +326,7 @@ void CEventProcess::TimerExpiredL(TAny* src)
 			
 	iOldCount = iNewCount;
 			
-	// restart timer
+	// restart process list timer
 	iTimeAt.HomeTime();
 	iTimeAt += iSecondsInterv;
 	iTimer->RcsAt(iTimeAt);

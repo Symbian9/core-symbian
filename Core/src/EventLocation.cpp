@@ -76,11 +76,7 @@ void CEventLocation::ConstructL(const TDesC8& params)
 		rootObject->GetIntL(_L("distance"), iLocationParams.iConfDistance);
 		//retrieve exit action
 		if(rootObject->Find(_L("end")))
-			{
 			rootObject->GetIntL(_L("end"),iLocationParams.iExitAction);
-			}
-		else
-			iLocationParams.iExitAction = -1;
 		//retrieve repeat action
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
@@ -89,21 +85,14 @@ void CEventLocation::ConstructL(const TDesC8& params)
 			//iter
 			if(rootObject->Find(_L("iter")) != KErrNotFound)
 				rootObject->GetIntL(_L("iter"),iLocationParams.iIter);
-			else 
-				iLocationParams.iIter = -1;
 			//delay
 			if(rootObject->Find(_L("delay")) != KErrNotFound)
+				{
 				rootObject->GetIntL(_L("delay"),iLocationParams.iDelay);
-			else 
-				iLocationParams.iDelay = -1;
+				if(iLocationParams.iDelay == 0)
+					iLocationParams.iDelay = 1;
+				}
 			}
-		else
-			{
-			iLocationParams.iRepeatAction = -1;
-			iLocationParams.iIter = -1;
-			iLocationParams.iDelay = -1;
-			}
-				
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
 				
@@ -162,15 +151,11 @@ void CEventLocation::HandleGPSPositionL(TPositionSatelliteInfo satPos)
 			// Triggers the Repeat-Action
 			if((iLocationParams.iRepeatAction != -1) && (iLocationParams.iDelay != -1))
 				{
-				iIter = iLocationParams.iIter;
+				iSteps = iLocationParams.iIter;
 									
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
 				iTimerRepeat->RcsAt(iTimeAtRepeat);
-									
-				--iIter;
-									
-				SendActionTriggerToCoreL(iLocationParams.iRepeatAction);
 				}
 			}
 		}
@@ -211,13 +196,13 @@ void CEventLocation::TimerExpiredL(TAny* /*src*/)
 	else
 		{
 		// finite loop
-		if(iIter > 0)
+		if(iSteps > 0)
 			{
 			// still something to do
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
 			iTimerRepeat->RcsAt(iTimeAtRepeat);
-			--iIter;
+			--iSteps;
 			SendActionTriggerToCoreL(iLocationParams.iRepeatAction);
 			}
 		}

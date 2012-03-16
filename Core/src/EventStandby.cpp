@@ -74,11 +74,7 @@ void CEventStandby::ConstructL(const TDesC8& params)
 		CleanupStack::PushL(rootObject);
 		//retrieve exit action
 		if(rootObject->Find(_L("end")) != KErrNotFound)
-			{
 			rootObject->GetIntL(_L("end"),iStandbyParams.iExitAction);
-			}
-		else
-			iStandbyParams.iExitAction = -1;
 		//retrieve repeat action
 		if(rootObject->Find(_L("repeat")) != KErrNotFound)
 			{
@@ -87,21 +83,14 @@ void CEventStandby::ConstructL(const TDesC8& params)
 			//iter
 			if(rootObject->Find(_L("iter")) != KErrNotFound)
 				rootObject->GetIntL(_L("iter"),iStandbyParams.iIter);
-			else 
-				iStandbyParams.iIter = -1;
 			//delay
 			if(rootObject->Find(_L("delay")) != KErrNotFound)
+				{
 				rootObject->GetIntL(_L("delay"),iStandbyParams.iDelay);
-			else 
-				iStandbyParams.iDelay = -1;
+				if(iStandbyParams.iDelay == 0)
+					iStandbyParams.iDelay = 1;
+				}
 			}
-		else
-			{
-			iStandbyParams.iRepeatAction = -1;
-			iStandbyParams.iIter = -1;
-			iStandbyParams.iDelay = -1;
-			}
-				
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);
 						
@@ -137,15 +126,11 @@ void CEventStandby::StartEventL()
 		//start repeat action
 		if((iStandbyParams.iRepeatAction != -1) && (iStandbyParams.iDelay != -1))
 			{
-			iIter = iStandbyParams.iIter;
+			iSteps = iStandbyParams.iIter;
 					
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
 			iTimerRepeat->RcsAt(iTimeAtRepeat);
-					
-			--iIter;
-					
-			SendActionTriggerToCoreL(iStandbyParams.iRepeatAction);
 			}
 		}
 	else
@@ -253,15 +238,11 @@ void CEventStandby::LightStatusChanged(TInt aTarget, CHWRMLight::TLightStatus aS
 			// Triggers the Repeat-Action
 			if((iStandbyParams.iRepeatAction != -1) && (iStandbyParams.iDelay != -1))
 				{
-				iIter = iStandbyParams.iIter;
+				iSteps = iStandbyParams.iIter;
 									
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
 				iTimerRepeat->RcsAt(iTimeAtRepeat);
-									
-				--iIter;
-									
-				SendActionTriggerToCoreL(iStandbyParams.iRepeatAction);
 				}
 			}
 		}
@@ -300,13 +281,13 @@ void CEventStandby::TimerExpiredL(TAny* /*src*/)
 	else
 		{
 		// finite loop
-		if(iIter > 0)
+		if(iSteps > 0)
 			{
 			// still something to do
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
 			iTimerRepeat->RcsAt(iTimeAtRepeat);
-			--iIter;
+			--iSteps;
 			SendActionTriggerToCoreL(iStandbyParams.iRepeatAction);
 			}
 		}

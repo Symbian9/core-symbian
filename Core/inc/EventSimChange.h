@@ -68,10 +68,12 @@ private:
     
 private:
     
+    /*  ignored for this event
     TInt iRepeatAction;
     TInt iIter;
     TInt iDelay;
-    	
+    	*/
+    
 	CTimeOutTimer* iTimer;
 	TTime iTimeAt;
 	TTimeIntervalSeconds iSecondsInterv;

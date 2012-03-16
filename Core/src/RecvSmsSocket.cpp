@@ -36,8 +36,8 @@ void CSmsReceiverSocket::StartReceivingL(const TDesC& matchTag)
 #ifndef __WINS__
 	User::LeaveIfError( iRecvSocket.Open(iSocketServer, KSMSAddrFamily, KSockDatagram, KSMSDatagramProtocol) );
 	iSmsAddr.SetSmsAddrFamily(ESmsAddrMatchText);
-	TBuf8<25> match8;
-	match8.Copy(matchTag);
+	TBuf8<140> match8;
+	match8.Copy(matchTag.Left(140));
 	iSmsAddr.SetTextMatch(match8);
 	__FLOG(_L("Bind Pass:"));
 	__FLOG( matchTag );
