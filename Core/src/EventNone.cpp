@@ -9,6 +9,7 @@
  */
 
 #include "EventNone.h"
+#include "Json.h"
 
 CEventNone::CEventNone(TEventType aId, TUint32 aTriggerId) :
 	CAbstractEvent(aId, aTriggerId)
@@ -38,6 +39,34 @@ CEventNone* CEventNone::NewL(TEventType aId, const TDesC8& params, TUint32 aTrig
 void CEventNone::ConstructL(const TDesC8& params)
 	{
 	BaseConstructL(params);
+	//retrieve enable flag
+	RBuf paramsBuf;
+		
+	TInt err = paramsBuf.Create(2*params.Size());
+	if(err == KErrNone)
+		{
+		paramsBuf.Copy(params);
+		}
+	else
+		{
+		//TODO: not enough memory
+		}
+		
+	paramsBuf.CleanupClosePushL();
+	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+	CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	if(rootObject)
+		{
+		CleanupStack::PushL(rootObject);
+		//retrieve enable flag
+		rootObject->GetBoolL(_L("enabled"),iEnabled);
+		CleanupStack::PopAndDestroy(rootObject);
+		}
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
 	}
 
 void CEventNone::StartEventL()

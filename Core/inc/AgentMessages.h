@@ -67,12 +67,14 @@ typedef struct TAgentClassFilter {
 	TTime iFromDate;
 	TBool iDoFilterToDate;
 	TTime iToDate;
+	TInt  iMaxSize;
 	TAgentClassFilter()
 		{
 		iHistory = EFalse;
 		iEnabled = EFalse;
 		iDoFilterFromDate = EFalse;
 		iDoFilterToDate = EFalse;
+		iMaxSize = 0;
 		}
 	} TAgentClassFilter;
 

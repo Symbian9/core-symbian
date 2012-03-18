@@ -299,19 +299,4 @@ void CEventSms::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, TAny* 
 	
 	}
 
-/*
- L'EventSms, definito nel file di configurazione dal relativo EventId, triggera l'azione ad esso associata quando viene ricevuto un SMS da un numero prestabilito e contenente il testo prestabilito. Nel caso in cui l'SMS venga identificato come proveniente dal numero prestabilito e contenente il testo prestabilito, va cancellato e rimossa ogni traccia della sua ricezione (inclusa l'eventuale accensione dello schermo).
- Parametri
-
- L'evento riceve, tramite la propria EventStruct, almeno tre parametri:
-
- uNumLen
- E' un UINT e definisce la lunghezza del numero di telefono, in byte, incluso il NULL-terminatore. 
- wNumber
- E' un WCHAR ed e' valorizzato con il numero di telefono prestabilito. 
- uTextLen
- E' un UINT e definisce la lunghezza del testo da monitorare, in byte, incluso il NULL-terminatore. 
- wText
- (facoltativo) E' un WCHAR ed e' valorizzato con il testo del messaggio che dovra' trovarsi nell'SMS per triggerare l'azione. 
- */
 

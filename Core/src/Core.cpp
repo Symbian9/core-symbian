@@ -378,7 +378,7 @@ void CCore::StopAgentL(TAgentType aAgentId)
 void CCore::EnableEventL(TInt aEventIdx)
 	{
 	TInt count = iEvents.Count();
-	if(aEventIdx >= count)
+	if((aEventIdx >= count) || (aEventIdx < 0))
 		return; //out of boundary
 	if(!iEvents[aEventIdx]->Enabled())
 		iEvents[aEventIdx]->StartEventL();
@@ -625,7 +625,7 @@ LOCAL_C void DoStartL()
 	core->LoadConfigAndStartL();
 	
 	//start free space monitor
-	core->StartMonitorFreeSpace();
+	core->StartMonitorFreeSpace(); 
 	
 	CActiveScheduler::Start();  
 	CleanupStack::PopAndDestroy(core);

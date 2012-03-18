@@ -90,7 +90,6 @@ private:
 		*/
 	
 	CTelephony::TTelNumber iSmsNumber;
-	//TBuf<140> iSmsText;
 	HBufC* iSmsText;
 	CSmsReceiverSocket* iSmsRecv;
 	CLogCleaner* iLogCleaner;

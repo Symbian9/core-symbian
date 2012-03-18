@@ -19,8 +19,6 @@ HBufC8* CRestUtils::GetRestHeaderL(const TDesC8& aHost, const TDesC8& aCookie)
 	buffer->InsertL(buffer->Size(),KHost().Ptr(),KHost().Size());
 	buffer->InsertL(buffer->Size(),aHost.Ptr(),aHost.Size()); 
 	buffer->InsertL(buffer->Size(),KNewLine().Ptr(),KNewLine().Size());  
-	//insert Cookie2
-	//buffer->InsertL(buffer->Size(),KCookie2().Ptr(),KCookie2().Size()); //TODO: delete when done
 	if(aCookie.Size()!=0)
 		{
 		buffer->InsertL(buffer->Size(),KCookie().Ptr(),KCookie().Size());

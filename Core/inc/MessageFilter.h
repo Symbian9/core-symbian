@@ -71,8 +71,8 @@ public:
 	TBool 	iUntilFilter;
 		
 	// meaningfull only for email filter
-	TInt32 	iMaxMessageSize;               	// 0 = accept all messages
-	TInt32 	iMaxMessageBytesToLog;			// 0 = takes all message
+	TInt32 	iMaxMessageSize;               	
+	TInt32 	iMaxMessageBytesToLog;			
 	
 	};
 

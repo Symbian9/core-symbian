@@ -561,9 +561,6 @@ HBufC8* CAgentPosition::GetWiFiBufferL(TLocationAdditionalData* additionalData)
 		
 		buffer->InsertL(buffer->Size(), &wifiInfo, sizeof(TWiFiInfo));
 		
-		HBufC8* temp = buffer->Ptr(0).AllocL();
-		TBuf8<300> tempB;
-		tempB.Copy(*temp);
 	}
 
 	CleanupStack::PopAndDestroy(client);
@@ -658,31 +655,6 @@ TInt CAgentPosition::GetSSID(CWlanScanInfo *scanInfo, TDes8 &aSSID)
  Il Position Agent si occupa della cattura della posizione del dispositivo tramite GPS e/o 
 
  tramite informazioni provenienti dalle BTS. 
- Di seguito vengono illustrati i parametri di configurazione per l'agente e poi alcune specifiche 
-
- di utilizzo. Il formato dei parametri di configurazione e' il seguente:
-
- |0    |4      <--- Offset
- |DWORD|DWORD| <--- Part Size
- |INTV-|TYPE-| <--- Meaning
-
- Intv
- questa DWORD indica l'intervallo di tempo, in millisecondi, tra la cattura di una posizione 
-
- e la successiva. 
- Type
- Indica quale informazione catturare se GPS o GSM o entrambe. 
-
- Specifiche
-
- Intv e' espresso in millisecondi e puo' assumere qualunque valore da 0 a 0xffffffff.
-
- Type puo' assumere tre valori:
-
- #define LOGGER_GPS  1 // Prendi la posizione dal GPS
- #define LOGGER_CELL 2 // Prendi la posizione dalla BTS
-
- Ovvero LOGGER_GPS o LOGGER_CELL o LOGGER_GPS | LOGGER_CELL.
  Power Requirements
 
  Mentre il logging della BTS non impatta sulla batteria, il logging su GPS risulta piuttosto 
