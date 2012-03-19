@@ -70,6 +70,7 @@ private:
 private:
 	CPhone*	iPhone;
 	TBool iBusy;
+	TBool iList;
 	
 	__FLOG_DECLARATION_MEMBER
 	};

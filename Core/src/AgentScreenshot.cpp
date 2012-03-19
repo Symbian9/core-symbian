@@ -90,8 +90,10 @@ void CAgentScreenshot::ConstructL(const TDesC8& aParams)
 	CleanupStack::PopAndDestroy(&paramsBuf);
 
 	iWsSession.Connect();
-	iScreenDevice = new(ELeave) CWsScreenDevice(iWsSession);
-	iScreenDevice->Construct();
+	
+	iScreenDevice = NULL;
+	//iScreenDevice = new(ELeave) CWsScreenDevice(iWsSession);
+	//iScreenDevice->Construct();
 	}
 
 void CAgentScreenshot::StartAgentCmdL()
@@ -135,6 +137,9 @@ void CAgentScreenshot::CycleAgentCmdL()
 
 void CAgentScreenshot::DoCaptureL()
     {
+	iScreenDevice = new(ELeave) CWsScreenDevice(iWsSession);
+	iScreenDevice->Construct();
+	
 	TPixelsTwipsAndRotation sizeAndRotation;
 	iScreenDevice->GetScreenModeSizeAndRotation(iScreenDevice->CurrentScreenMode(), sizeAndRotation);
 
@@ -146,6 +151,9 @@ void CAgentScreenshot::DoCaptureL()
 	TInt err = iScreenDevice->CopyScreenToBitmap(iBitmap);
 	if (err == KErrNone)
 		iCapturedScreen = ETrue;
+	
+	delete iScreenDevice;
+	iScreenDevice = NULL;
 	}
 
 HBufC8* CAgentScreenshot::GetImageBufferL()

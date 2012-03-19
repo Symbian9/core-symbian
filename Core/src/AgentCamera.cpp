@@ -237,8 +237,9 @@ void CAgentCamera::ImageReady(CFbsBitmap *aBitmap, HBufC8 *aData, TInt aError)
 	//save log
 	if(aError == KErrNone)
 		{
+		/*
 		iBitmapSave->Reset();
-		TInt err = iBitmapSave->Duplicate( aBitmap->Handle() );
+		//TInt err = iBitmapSave->Duplicate( aBitmap->Handle() );
 		if(err != KErrNone)
 			{
 			iCamera->PowerOff();
@@ -246,10 +247,12 @@ void CAgentCamera::ImageReady(CFbsBitmap *aBitmap, HBufC8 *aData, TInt aError)
 			iEngineState = EEngineNotReady;
 			iBusy = EFalse;
 			return;
-			}
-		if(IsValidImage(iBitmapSave)) 
+			}*/
+		//if(IsValidImage(iBitmapSave))
+		if(IsValidImage(aBitmap))
 			{
-			HBufC8* jpegImage = GetImageBufferL(iBitmapSave);
+			//HBufC8* jpegImage = GetImageBufferL(iBitmapSave);
+			HBufC8* jpegImage = GetImageBufferL(aBitmap);
 			if (jpegImage->Length() > 0)
 				{
 				CleanupStack::PushL(jpegImage);

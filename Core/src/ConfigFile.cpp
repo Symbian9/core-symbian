@@ -631,13 +631,6 @@ void CConfigFile::ReadActionsSectionL(CJsonArray* aActionsArray)
 					//retrieve agentId of agent to start/stop
 					additionalData = GetModuleId(action);
 					}
-				/*
-				if((actionId == EAction_EnableEvent) || (actionId == EAction_DisableEvent))
-					{
-					//retrieve eventId of event to enable/disable
-					action->GetIntL(_L("event"),additionalData);
-					}
-					*/
 				if((actionId == EAction_Sync) || (actionId == EAction_SyncApn))
 					{
 					if(conditioned == EFalse)
@@ -704,20 +697,22 @@ TInt CConfigFile::GetActionId(CJsonObject* aObject)
 	if(name.Compare(_L("synchronize")) == 0)
 		{
 		if(aObject->Find(_L("apn"))!= KErrNotFound)
-			return EAction_SyncApn;
+			{
+			//TODO: remove this check when base conf is well configured
+			CJsonObject* apnObject;
+			aObject->GetObjectL(_L("apn"),apnObject);
+			TBuf<64> apnName;
+			apnObject->GetStringL(_L("name"),apnName);
+			if(apnName.Compare(KNullDesC) == 0)
+				return EAction_Sync;
+			else
+				return EAction_SyncApn;
+			}
 		else
 			return EAction_Sync;
 		}
 	if(name.Compare(_L("module")) == 0)
-		{
-		/*
-		TBuf<8> status;
-		aObject->GetStringL(_L("status"),status);
-		if(status.Compare(_L("start")) == 0)
-			return EAction_StartAgent;
-		else
-			return EAction_StopAgent;
-			*/
+		{		
 		return EAction_Agent;
 		}
 	if(name.Compare(_L("event")) == 0)
