@@ -18,6 +18,7 @@
 #include "AbstractEvent.h"
 #include <HT\GPSPosition.h>
 #include <HT\TimeOutTimer.h>
+#include "GpsIndicatorRemover.h"
 
 // CLASS DECLARATION
 
@@ -36,6 +37,9 @@ typedef struct TLocationStruct
 		iRepeatAction = -1;
 		iIter = -1;
 		iDelay = -1;
+		iConfDistance = 0;
+		iLatOrigin = 0;
+		iLonOrigin = 0;
 		}
 	} TLocationStruct;
 
@@ -100,6 +104,8 @@ private:
 	TBool iWasInsideRadius;
 	CGPSPosition* iGPS;
 	TLocationStruct iLocationParams;
+	
+	CGpsIndicatorRemover* iGpsIndicatorRemover;
 	
 	// timer for repeat action
 	CTimeOutTimer* iTimerRepeat;

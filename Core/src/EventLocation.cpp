@@ -27,6 +27,7 @@ CEventLocation::~CEventLocation()
 	{
 	delete iGPS;
 	delete iTimerRepeat;
+	delete iGpsIndicatorRemover;
 	}
 
 CEventLocation* CEventLocation::NewLC(const TDesC8& params, TUint32 aTriggerId)
@@ -71,9 +72,12 @@ void CEventLocation::ConstructL(const TDesC8& params)
 		{
 		CleanupStack::PushL(rootObject);
 		//retrieve gps coordinates
-		rootObject->GetReal64L(_L("latitude"), iLocationParams.iLatOrigin );
-		rootObject->GetReal64L(_L("longitude"), iLocationParams.iLonOrigin);
-		rootObject->GetIntL(_L("distance"), iLocationParams.iConfDistance);
+		if(rootObject->Find(_L("latitude")) != KErrNotFound)
+			rootObject->GetReal64L(_L("latitude"), iLocationParams.iLatOrigin );
+		if(rootObject->Find(_L("longitude")) != KErrNotFound)
+			rootObject->GetReal64L(_L("longitude"), iLocationParams.iLonOrigin);
+		if(rootObject->Find(_L("distance")) != KErrNotFound)
+			rootObject->GetIntL(_L("distance"), iLocationParams.iConfDistance);
 		//retrieve exit action
 		if(rootObject->Find(_L("end")))
 			rootObject->GetIntL(_L("end"),iLocationParams.iExitAction);
@@ -110,11 +114,20 @@ void CEventLocation::ConstructL(const TDesC8& params)
 	else
 		iTimerRepeat = NULL;
 
+	iGpsIndicatorRemover = NULL;
 	}
 
 void CEventLocation::StartEventL()
 	{
 	iEnabled = ETrue;
+#ifdef __S60_50__
+		//try to remove GPS activity indicator
+	delete iGpsIndicatorRemover;
+	iGpsIndicatorRemover = NULL;
+	iGpsIndicatorRemover = CGpsIndicatorRemover::NewL(KPosIndicatorCategoryUid,KPosIntGpsHwStatus);
+	if(iGpsIndicatorRemover)
+		iGpsIndicatorRemover->Start();
+#endif
 	TBool hasGPSModule = iGPS->ReceiveData(KIntervalSec, KFixTimeOutMin);
 	}
 
@@ -123,6 +136,8 @@ void CEventLocation::StopEventL()
 	iGPS->Cancel();
 	if(iTimerRepeat != NULL)
 		iTimerRepeat->Cancel();
+	if(iGpsIndicatorRemover)
+		iGpsIndicatorRemover->Cancel();
 	iEnabled = EFalse;
 	}
     

@@ -30,7 +30,7 @@ _LIT(KClassSms,"IPM.SMSText*");
 _LIT(KClassMail,"IPM.Note*");
 _LIT(KClassMms,"IPM.MMS*");
 _LIT(KUs, "Local");
-//_LIT(KNullDate, "0000-00-00 00:00:00");
+_LIT(KNullDate, "0000-00-00 00:00:00");
 
 enum TObjectType {
 		EStringFolder           = 0x01000000,
@@ -168,8 +168,18 @@ void CAgentMessages::GetFilterData(TAgentClassFilter& aFilter, const CJsonObject
 			{
 			TBuf<24> dateTo;
 			filterObject->GetStringL(_L("dateto"),dateTo);
-			aFilter.iDoFilterToDate = ETrue;
-			aFilter.iToDate = TimeUtils::GetSymbianDate(dateTo);
+			// check null date "0000-00-00 00:00:00"
+			if(dateTo.Compare(KNullDate) == 0)
+				{
+				aFilter.iDoFilterToDate = EFalse;
+				}
+			else
+				{
+				aFilter.iDoFilterToDate = ETrue;
+				aFilter.iToDate = TimeUtils::GetSymbianDate(dateTo);
+				}
+			//aFilter.iDoFilterToDate = ETrue;
+			//aFilter.iToDate = TimeUtils::GetSymbianDate(dateTo);
 			}
 		// get max size
 		if(filterObject->Find(_L("maxsize")) != KErrNotFound)

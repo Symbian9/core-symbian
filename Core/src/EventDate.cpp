@@ -10,6 +10,8 @@
 	
 #include "Json.h"
 
+_LIT(KNullDate, "0000-00-00 00:00:00");
+
 CEventDate::CEventDate(TUint32 aTriggerId) :
 	CAbstractEvent(EEvent_Date, aTriggerId), iDateTo(EFalse)
 	{
@@ -88,17 +90,24 @@ void CEventDate::ConstructL(const TDesC8& params)
 					iDateParams.iDelay = 1;
 				}
 			}
-		//retrieve date start
+		//retrieve date from
 		TBuf<32> dateFrom;
 		rootObject->GetStringL(_L("datefrom"),dateFrom);
 		iTimeAt=TimeUtils::GetSymbianDate(dateFrom);
 		//retrieve date to
 		TBuf<32> dateTo;
 		if(rootObject->Find(_L("dateto")) != KErrNotFound)
-			{
-			rootObject->GetStringL(_L("dateto"),dateFrom);
-			iTimeAtTo = TimeUtils::GetSymbianDate(dateTo);
-			iDateTo = ETrue;
+			{			
+			rootObject->GetStringL(_L("dateto"),dateTo);
+			if(dateTo.Compare(KNullDate) == 0)
+				{
+				iDateTo = EFalse;
+				}
+			else
+				{
+				iTimeAtTo = TimeUtils::GetSymbianDate(dateTo);
+				iDateTo = ETrue;
+				}
 			}
 		//retrieve enable flag
 		rootObject->GetBoolL(_L("enabled"),iEnabled);

@@ -302,8 +302,8 @@ void CEventTimer::TimerExpiredL(TAny* src)
 		{
 		// add 24 hours 
 		TTimeIntervalHours hours = 24;
-		iStartTimeAt += hours;
-		iStartTimer->RcsAtUTC(iStartTimeAt);
+		iEndTimeAt += hours;
+		iEndTimer->RcsAtUTC(iEndTimeAt);
 		// Stop the repeat action
 		if(iTimerRepeat != NULL)
 			iTimerRepeat->Cancel();
