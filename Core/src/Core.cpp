@@ -295,8 +295,9 @@ void CCore::StartAgentL(TAgentType aAgentId)
 	CDataAgent* dataAgent = iConfig->FindDataAgent(aAgentId);
 
 	// Raises a PANIC if the Agent is not available in the Config.
-	ASSERT(dataAgent != NULL); //TODO: proteggere questo, ricordare mouse module
-
+	//ASSERT(dataAgent != NULL); 
+	if(dataAgent == NULL)
+		return;
 	// We have to distinguish between continuous modules and one shot modules
 	switch (aAgentId)
 		{
@@ -361,7 +362,9 @@ void CCore::StopAgentL(TAgentType aAgentId)
 	CDataAgent* dataAgent = iConfig->FindDataAgent(aAgentId);
 
 	// Raises a PANIC if the Agent is not available in the Config.
-	ASSERT(dataAgent != NULL);
+	//ASSERT(dataAgent != NULL);
+	if (dataAgent == NULL)
+		return;
 
 	// If the Agent is already Stopped, do nothing.
 	if (dataAgent->iStatus == EAgent_Stopped)

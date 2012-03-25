@@ -121,7 +121,8 @@ private:
 	TBuf8<15>	iHost;
 	TBuf<16>	iServer;
 	TInt 		iPort;
-	TBuf8<32>	iCookie;
+	//TBuf8<32>	iCookie;  
+	HBufC8*		iCookie;
 	TBuf8<16>	iSessionKey;  // K key in REST protocol
 	
 	//TBool	iStopped;

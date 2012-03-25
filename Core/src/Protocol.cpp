@@ -30,7 +30,7 @@ CProtocol::CProtocol(MProtocolNotifier& aNotifier) :
 	iNotifier(aNotifier),iStates(2)
 	{
 	iHost.Zero();
-	iCookie.Zero();
+	//iCookie.Zero();
 	iSessionKey.Zero();
 	//iStopped = EFalse;
 	}
@@ -42,6 +42,7 @@ CProtocol::~CProtocol()
 	iStates.Close();
 	delete iNetwork;
 	delete iUserMonitor;
+	delete iCookie;
 	__FLOG(_L("EndDestructor"));
 	__FLOG_CLOSE;
 	}
@@ -67,6 +68,7 @@ void CProtocol::ConstructL()
 	__FLOG(_L("------------"));
 	
 	iCurrentState = CStateNone::NewL(*this);
+	iCookie = NULL;
 	
 	iUserMonitor = NULL;
 	}
@@ -324,12 +326,24 @@ void CProtocol::EndProtocolL(TInt aError)
 
 HBufC8* CProtocol::GetRequestHeaderL()
 	{
-	return CRestUtils::GetRestHeaderL(iHost,iCookie);
+	HBufC8* result;
+	if(iCookie == NULL)
+		{
+		result = CRestUtils::GetRestHeaderL(iHost,KNullDesC8);
+		}
+	else
+		{
+		result = CRestUtils::GetRestHeaderL(iHost,*iCookie);
+		}
+	return result;
 	}
 
 void CProtocol::SetCookie(const TDesC8& aCookie)
 	{
-	iCookie.Copy(aCookie);
+	delete iCookie;
+	iCookie = HBufC8::NewL(aCookie.Size());
+	iCookie->Des().Copy(aCookie);
+	//iCookie.Copy(aCookie);
 	}
 
 void CProtocol::SetKey(const TDesC8& aKey)

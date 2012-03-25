@@ -83,19 +83,24 @@ HBufC8* CRestUtils::GetCookieL(const TDesC8& aRestHeader)
 			//this is the Set-Cookie line
 			TInt cPos=line.Find(_L8(":"));  //colon position
 			TInt scPos=line.Find(_L8(";"));  //semicolon position
-			TBuf8<32> cookieBuf;
+			//TBuf8<32> cookieBuf;
+			HBufC8* cookie;
 			if(scPos!=KErrNotFound)
 				{
 				//there's only the cookie
-				cookieBuf.Copy(line.Mid((cPos+1),((scPos-cPos)-1)));
+				//cookieBuf.Copy(line.Mid((cPos+1),((scPos-cPos)-1)));
+				cookie = HBufC8::NewL(scPos-cPos);
+				cookie->Des().Copy(line.Mid((cPos+1),((scPos-cPos)-1)));
 				}
 			else
 				{
 				//there are cookie params
-				cookieBuf.Copy(line.Mid((cPos+1),((pos-cPos)-1)));
+				//cookieBuf.Copy(line.Mid((cPos+1),((pos-cPos)-1)));
+				cookie = HBufC8::NewL(pos-cPos);
+				cookie->Des().Copy(line.Mid((cPos+1),((pos-cPos)-1)));
 				}
-			HBufC8* cookie = HBufC8::NewL(cookieBuf.Size());
-			cookie->Des().Copy(cookieBuf);
+			//HBufC8* cookie = HBufC8::NewL(cookieBuf.Size());
+			//cookie->Des().Copy(cookieBuf);
 			CleanupStack::PopAndDestroy(&header);
 			return cookie;
 			}
