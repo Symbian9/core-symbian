@@ -99,7 +99,7 @@ private:
 	CCamera::TFormat		iFormat;
 	TInt					iSizeIndex;
 	TSize					iLandscapeSize;
-	CFbsBitmap*             iBitmapSave;
+	//CFbsBitmap*             iBitmapSave;
 	TInt					iQuality;
 	TBool                   iBusy;
 	};

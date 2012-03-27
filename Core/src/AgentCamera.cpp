@@ -36,7 +36,7 @@ CAgentCamera::~CAgentCamera()
 		iCamera->Release();
 		}
 	delete iCamera;
-	delete iBitmapSave;
+	//delete iBitmapSave;
 	}
 
 CAgentCamera* CAgentCamera::NewLC(const TDesC8& params)
@@ -140,7 +140,7 @@ void CAgentCamera::ConstructL(const TDesC8& params)
 		    }
 		}
 	iLandscapeSize.SetSize(240,198); //these values are a compromise among various tested devices, it's useless anyway because we don't draw viewfinder	
-	iBitmapSave = new (ELeave) CFbsBitmap;
+	//iBitmapSave = new (ELeave) CFbsBitmap;
 	}
 
 void CAgentCamera::StartAgentCmdL()
@@ -171,7 +171,7 @@ void CAgentCamera::StopAgentCmdL()
 			}
 		iCamera->PowerOff();
 		iCamera->Release();
-		iBitmapSave->Reset();
+		//iBitmapSave->Reset();
 		iEngineState = EEngineNotReady;
 		}
 	iBusy = EFalse;
@@ -232,6 +232,7 @@ void CAgentCamera::ViewFinderFrameReady(CFbsBitmap &aFrame)
 	iCamera->CaptureImage();  // calls ImageReady when completes
 	}
 
+//http://www.developer.nokia.com/Community/Discussion/showthread.php?118881-Using-Camera-API-requires-too-much-memory&highlight=camera
 void CAgentCamera::ImageReady(CFbsBitmap *aBitmap, HBufC8 *aData, TInt aError)
 	{
 	//save log
@@ -274,6 +275,8 @@ void CAgentCamera::ImageReady(CFbsBitmap *aBitmap, HBufC8 *aData, TInt aError)
 			}
 		}
 	
+	aBitmap->Reset();  // important! use this line otherwise a memory leak will occure!
+	
 	//release camera
 	iCamera->PowerOff();
 	iCamera->Release();
@@ -314,6 +317,8 @@ CCamera::TFormat CAgentCamera::ImageFormatMax()
  */
 HBufC8* CAgentCamera::GetImageBufferL(CFbsBitmap* aBitmap)
 	{
+		//http://www.developer.nokia.com/Community/Wiki/How_to_decode_images_synchronously
+			
 		if (aBitmap == NULL)
 			return HBufC8::NewL(0); 
 
