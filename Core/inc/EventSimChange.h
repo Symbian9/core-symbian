@@ -11,7 +11,7 @@
 #include "AbstractEvent.h"
 #include <HT\LogFile.h>
 #include <HT\TimeOutTimer.h>
-#include <centralrepository.h>
+#include <HT\Phone.h>
 
 /**
  *  CEventSimChange
@@ -80,7 +80,7 @@ private:
 	RFs	iFs;
 	CLogFile*	iLogFile;
 	
-	CRepository* iCenRep;
+	CPhone* iPhone;
 	
 	//__FLOG_DECLARATION_MEMBER
 	};

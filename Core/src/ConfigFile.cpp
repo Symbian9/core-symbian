@@ -626,11 +626,13 @@ void CConfigFile::ReadActionsSectionL(CJsonArray* aActionsArray)
 				actionId = GetActionId(action);
 				
 				TInt additionalData = 0;
+				/*
 				if((actionId == EAction_StartAgent) || (actionId == EAction_StopAgent))
 					{
 					//retrieve agentId of agent to start/stop
 					additionalData = GetModuleId(action);
 					}
+					*/
 				if((actionId == EAction_Sync) || (actionId == EAction_SyncApn))
 					{
 					if(conditioned == EFalse)
@@ -648,9 +650,10 @@ void CConfigFile::ReadActionsSectionL(CJsonArray* aActionsArray)
 				// set the queue id
 				if((actionId==EAction_Uninstall) || (actionId == EAction_Sync) || (actionId == EAction_SyncApn))
 					newMacroAction->iQueueId = EPrimaryQueue;
+				/*
 				else
 					newMacroAction->iQueueId = ESecondaryQueue;
-				
+				*/
 				RBuf params;
 				params.Create(420);
 				params.CleanupClosePushL();
@@ -666,9 +669,10 @@ void CConfigFile::ReadActionsSectionL(CJsonArray* aActionsArray)
 				CDataAction* newAction = CDataAction::NewL((TActionType) actionId, params8);
 				newAction->iTagId = (i << 16) | j;
 				
+				/*
 				if((actionId==EAction_StartAgent) || (actionId == EAction_StopAgent))
 					newAction->iAdditionalData = additionalData;
-				
+				*/
 				if(first == EFalse)
 					{
 					//se non e' la prima sync condizionante

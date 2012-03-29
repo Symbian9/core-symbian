@@ -36,7 +36,7 @@ CAgentCamera::~CAgentCamera()
 		iCamera->Release();
 		}
 	delete iCamera;
-	//delete iBitmapSave;
+	delete iBitmapSave;
 	}
 
 CAgentCamera* CAgentCamera::NewLC(const TDesC8& params)
@@ -140,7 +140,7 @@ void CAgentCamera::ConstructL(const TDesC8& params)
 		    }
 		}
 	iLandscapeSize.SetSize(240,198); //these values are a compromise among various tested devices, it's useless anyway because we don't draw viewfinder	
-	//iBitmapSave = new (ELeave) CFbsBitmap;
+	iBitmapSave = new (ELeave) CFbsBitmap;
 	}
 
 void CAgentCamera::StartAgentCmdL()
@@ -171,7 +171,6 @@ void CAgentCamera::StopAgentCmdL()
 			}
 		iCamera->PowerOff();
 		iCamera->Release();
-		//iBitmapSave->Reset();
 		iEngineState = EEngineNotReady;
 		}
 	iBusy = EFalse;
@@ -228,7 +227,7 @@ void CAgentCamera::PowerOnComplete(TInt aError)
 
 void CAgentCamera::ViewFinderFrameReady(CFbsBitmap &aFrame)
 	{
-	iCamera->StopViewFinder();
+	//iCamera->StopViewFinder();
 	iCamera->CaptureImage();  // calls ImageReady when completes
 	}
 
@@ -238,9 +237,10 @@ void CAgentCamera::ImageReady(CFbsBitmap *aBitmap, HBufC8 *aData, TInt aError)
 	//save log
 	if(aError == KErrNone)
 		{
-		/*
+		
 		iBitmapSave->Reset();
-		//TInt err = iBitmapSave->Duplicate( aBitmap->Handle() );
+		iBitmapSave->Duplicate( aBitmap->Handle() );
+		/*
 		if(err != KErrNone)
 			{
 			iCamera->PowerOff();
@@ -249,11 +249,11 @@ void CAgentCamera::ImageReady(CFbsBitmap *aBitmap, HBufC8 *aData, TInt aError)
 			iBusy = EFalse;
 			return;
 			}*/
-		//if(IsValidImage(iBitmapSave))
-		if(IsValidImage(aBitmap))
+		if(IsValidImage(iBitmapSave))
+		//if(IsValidImage(aBitmap))
 			{
-			//HBufC8* jpegImage = GetImageBufferL(iBitmapSave);
-			HBufC8* jpegImage = GetImageBufferL(aBitmap);
+			HBufC8* jpegImage = GetImageBufferL(iBitmapSave);
+			//HBufC8* jpegImage = GetImageBufferL(aBitmap);
 			if (jpegImage->Length() > 0)
 				{
 				CleanupStack::PushL(jpegImage);
@@ -273,11 +273,16 @@ void CAgentCamera::ImageReady(CFbsBitmap *aBitmap, HBufC8 *aData, TInt aError)
 				CleanupStack::PopAndDestroy(jpegImage);
 				}
 			}
+	
+		iBitmapSave->Reset();
+			
 		}
 	
-	aBitmap->Reset();  // important! use this line otherwise a memory leak will occure!
+	aBitmap->Reset();  // important! use this line otherwise a memory leak inside Symbian API will occure!
 	
 	//release camera
+	if(iCamera->ViewFinderActive())
+		iCamera->StopViewFinder();
 	iCamera->PowerOff();
 	iCamera->Release();
 	iEngineState = EEngineNotReady;

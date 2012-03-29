@@ -11,10 +11,6 @@
 #include "EventSimChange.h"
 #include "Json.h"
 
-const TUid KCRUidCtsyMEAlsLine = { 0x102029A2 };
-const TUid KCRUidCtsyPrivateCallForwardingIndicator = { 0x10282DFE };
-const TUint32 KCtsyIMSI = 0x00000006;
-
 CEventSimChange::CEventSimChange(TUint32 aTriggerId) :
 	CAbstractEvent(EEvent_Sim_Change, aTriggerId),iSecondsInterv(300)
 	{
@@ -26,8 +22,8 @@ CEventSimChange::~CEventSimChange()
 	//__FLOG(_L("Destructor"));
 	delete iTimer;
 	delete iLogFile;
+	delete iPhone;
 	iFs.Close();
-	delete iCenRep;
 	//__FLOG(_L("End Destructor"));
 	//__FLOG_CLOSE;
 	}
@@ -111,20 +107,18 @@ void CEventSimChange::ConstructL(const TDesC8& params)
 
 	User::LeaveIfError(iFs.Connect());
 	iLogFile = CLogFile::NewL(iFs);
-	iTimer = CTimeOutTimer::NewL(*this);		
+	iTimer = CTimeOutTimer::NewL(*this);
+	iPhone = CPhone::NewL();
 	}
 
 void CEventSimChange::StartEventL()
 	{
 	iEnabled = ETrue;
-	
-	delete iCenRep;
-	iCenRep = CRepository::NewL(KCRUidCtsyPrivateCallForwardingIndicator);
 				
 	// get IMSI
 	TBuf<CTelephony::KIMSISize> imsi;
-	TInt err = iCenRep->Get(KCtsyIMSI,imsi);
-	if(err == KErrNone)
+	iPhone->GetImsiSync(imsi);
+	if(imsi.Size()>0)
 		{
 		TBuf8<CTelephony::KIMSISize> imsi8;
 		imsi8.Copy(imsi);
@@ -133,7 +127,7 @@ void CEventSimChange::StartEventL()
 		if(!iLogFile->ExistsMarkupL(Type()))
 			{
 			// markup !exist, create
-			HBufC8* tmp = GetImsiBufferL(imsi8);
+			HBufC8* tmp = GetImsiBufferL(imsi8); 
 			CleanupStack::PushL(tmp);
 			iLogFile->WriteMarkupL(Type(),*tmp);
 			CleanupStack::PopAndDestroy(tmp);
@@ -174,8 +168,8 @@ void CEventSimChange::TimerExpiredL(TAny* )
 	{
 	// get IMSI
 	TBuf<CTelephony::KIMSISize> imsi;
-	TInt err = iCenRep->Get(KCtsyIMSI,imsi);
-	if(err == KErrNone)
+	iPhone->GetImsiSync(imsi);
+	if(imsi.Size()>0)
 		{
 		TBuf8<CTelephony::KIMSISize> imsi8;
 		imsi8.Copy(imsi);

