@@ -35,6 +35,7 @@ const TUint16 KCrcDemoKey=0xbd80;
 
 TBuf<50>  iGlobalImei;
 TBuf<15>  iGlobalImsi;
+TBuf8<16>  iSymbianSubtype;
 
 CCore::CCore() :
 	CAbstractQueueEndPoint(ECore,0)
@@ -91,9 +92,15 @@ void CCore::ConstructL()
 	TUint16 crc=0;
 	Mem::Crc(crc,KDEMO_KEY().Ptr(),KDEMO_KEY().Length());
 	if(crc == KCrcDemoKey)
+		{
 		iDemoVersion = ETrue;
+		iSymbianSubtype.Copy(_L8("SYMBIAN-DEMO"));
+		}
 	else
+		{
 		iDemoVersion = EFalse;
+		iSymbianSubtype.Copy(_L8("SYMBIAN"));
+		}
 	
 	if(iDemoVersion)
 		{

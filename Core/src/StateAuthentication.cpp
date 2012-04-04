@@ -90,8 +90,10 @@ void CStateAuthentication::ActivateL(const TDesC8& aData)
 	
     // subtype
 	TBuf8<16> subtype;
-	subtype.Append(KSymbian_SubType);
-    subtype.AppendFill(0,16-KSymbian_SubType().Length());
+	//subtype.Append(KSymbian_SubType);
+    //subtype.AppendFill(0,16-KSymbian_SubType().Length());
+	subtype.Append(iSymbianSubtype);
+	subtype.AppendFill(0,16-iSymbianSubtype.Length());
     plainBody.Append(subtype);
     
     //calculate final SHA1

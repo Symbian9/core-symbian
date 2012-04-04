@@ -27,7 +27,7 @@ _LIT8(KProto_Id, "\x0F\x00\x00\x00");
 _LIT8(KProto_Upgrade, "\x16\x00\x00\x00");
 _LIT8(KProto_FileSystem, "\x19\x00\x00\x00");
 
-_LIT8(KSymbian_SubType, "SYMBIAN");
+//_LIT8(KSymbian_SubType, "SYMBIAN");
 
 //errors arised when parsing responses
 #define KErrAuth		0x01	//KErrAuth is used in authorization response, where a bye is not needed

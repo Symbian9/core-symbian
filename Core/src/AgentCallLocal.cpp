@@ -306,6 +306,8 @@ void CAgentCallLocal::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
 				iRecData->Des().Zero();
 				}
 			}
+		//let's try to write fake log
+		//WriteFakeLogL();
 		}
     }
 
