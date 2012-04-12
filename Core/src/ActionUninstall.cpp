@@ -102,15 +102,6 @@ void CActionUninstall::InstallAppL(){
 	optionsPckg = options;
 	
 	// Create path
-	/*
-	TBuf<48> path;
-	path.Append(_L("C:\\Private\\"));
-	TBuf<12> uid;
-	uid.Copy(KUidCore);
-	uid.Copy(uid.Mid(2,uid.Length()-2));
-	path.Append(uid);
-	path.Append(_L("\\Uninstaller.sisx"));
-	*/
 	TFileName path;
 	TInt err = GetPrivatePath(path);
 	path.Append(_L("Uninstaller.sisx"));

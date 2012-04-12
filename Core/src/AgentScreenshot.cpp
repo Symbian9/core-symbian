@@ -92,8 +92,6 @@ void CAgentScreenshot::ConstructL(const TDesC8& aParams)
 	iWsSession.Connect();
 	
 	iScreenDevice = NULL;
-	//iScreenDevice = new(ELeave) CWsScreenDevice(iWsSession);
-	//iScreenDevice->Construct();
 	}
 
 void CAgentScreenshot::StartAgentCmdL()

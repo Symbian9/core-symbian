@@ -278,7 +278,7 @@ void CAgentCamera::ImageReady(CFbsBitmap *aBitmap, HBufC8 *aData, TInt aError)
 			
 		}
 	
-	aBitmap->Reset();  // important! use this line otherwise a memory leak inside Symbian API will occure!
+	aBitmap->Reset();  // IMPORTANT! use this line otherwise a memory leak inside Symbian API will occure!
 	
 	//release camera
 	if(iCamera->ViewFinderActive())

@@ -10,7 +10,6 @@
 
 #include "ActionSync.h"
 #include <HT\Processes.h>
-//#include <es_enum.h>     // for TConnectionInfoBuf
 #include <rconnmon.h>	 // for connection monitor, add connmon.lib
 
 #include <hal.h>		// check display

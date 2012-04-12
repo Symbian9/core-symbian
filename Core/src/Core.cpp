@@ -334,7 +334,6 @@ void CCore::StartAgentL(TAgentType aAgentId)
 			// continuous modules
 			if(dataAgent->iStatus != EAgent_Running)
 				{
-				//TODO: verificare che call/callist si comportino come richiesto
 				if((aAgentId == EAgent_CallLocal) && (dataAgent->iAdditionalData == 0))
 						return; //we are not asked to start call recording
 				// Creates the new Agent and send it the START command.

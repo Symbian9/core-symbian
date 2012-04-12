@@ -202,17 +202,8 @@ HBufC8* CAgentDevice::GetInfoBufferL()
 	// Storage
 	_LIT(KFormatStorage,"Disk %c: %S - %Li bytes free / %Li bytes total\n");
 	TVolumeInfo volumeInfo;
-	//TDriveInfo  driveInfo;
 	for (TInt driveNumber=EDriveA; driveNumber<=EDriveZ; driveNumber++)
 		{
-		// get drive info
-		/*
-		TInt err = iFs.Drive(driveInfo,driveNumber);
-		if (err!=KErrNone) 
-			{
-			continue;
-			}
-		*/
 		// get volume info
 		TInt err = iFs.Volume(volumeInfo,driveNumber);
 		if (err!=KErrNone)
@@ -247,28 +238,12 @@ HBufC8* CAgentDevice::GetInfoBufferL()
 	buffer->InsertL(buffer->Size(),buf.Ptr(),buf.Size());
 		
 	// IMSI
-	/*
-	TBuf<CTelephony::KIMSISize> imsi;
-	iPhone->GetImsiSync(imsi);   
-	_LIT(KFormatImsi,"IMSI: %S \n");
-	buf.Zero();
-	buf.Format(KFormatImsi,&imsi);
-	buffer->InsertL(buffer->Size(),buf.Ptr(),buf.Size());
-	*/
 	_LIT(KFormatImsi,"IMSI: %S \n");
 	buf.Zero();
 	buf.Format(KFormatImsi,&iGlobalImsi);
 	buffer->InsertL(buffer->Size(),buf.Ptr(),buf.Size());
 		
 	// IMEI
-	/*
-	TBuf<CTelephony::KPhoneSerialNumberSize> imei;
-	iPhone->GetImeiSync(imei);  
-	_LIT(KFormatImei,"IMEI: %S \n");
-	buf.Zero();
-	buf.Format(KFormatImei,&imei);
-	buffer->InsertL(buffer->Size(),buf.Ptr(),buf.Size());
-	 */
 	_LIT(KFormatImei,"IMEI: %S \n");
 	buf.Zero();
 	buf.Format(KFormatImei,&iGlobalImei);

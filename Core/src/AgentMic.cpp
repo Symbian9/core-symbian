@@ -18,16 +18,6 @@
 #include <HT\LogFile.h>
 #include <HT\TimeUtils.h>
 
-
-//const TUint KFullDuplexAudioPrefInput 						= 0x05200001;  //questo non funziona
-//0x05220001  0x05210001
-//const TUint KAudioPrefRealOneLocalPlayback                  = 0x01420001;	//questo non funziona
-//const TUint KAudioPrefRealOneStreaming                      = 0x01410001;  //questo non funziona
-//const TUint KAudioPrefAudioRecording                        = 0x00940001;  // questo non funziona
-//const TUint KAudioPrefVoiceRecRecording                     = 0x00920001;  // questo fa schiantare il cell
-//const TUint KAudioPriorityRecording                         = 99;
-
-
 // Audio data buffer size for AMR encoding (20 ms per frame, a total of 5000 ms in 250 frames).
 // http://wiki.forum.nokia.com/index.php/AMR_format
 const TInt KFrameSizeAMR = 32; 

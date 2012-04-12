@@ -64,6 +64,7 @@ enum TObjectTaskTypes
  #define FLAG_ALLDAY   0x00000040
  #define FLAG_ISTASK   0x00000080
 
+#define KVersionCalendar 0x01000000
 
 CAgentCalendar::CAgentCalendar() :
 	CAbstractAgent(EAgent_Calendar)
@@ -169,8 +170,6 @@ void CAgentCalendar::StartAgentCmdL()
 	
 	iCalUidArray.Reset();
 	iCalView->GetIdsModifiedSinceDateL(iTimestamp, iCalUidArray);
-	
-	//TInt count = iCalUidArray.Count();   // delete
 	
 	iCalIndex = 0;
 	iLongTask->NextRound();
@@ -389,6 +388,7 @@ HBufC8* CAgentCalendar::GetCalEntryBufferL(const CCalEntry& calEntry)
 	}
 	// adds header data to buffer
 	THeader header;
+	header.dwVersion = KVersionCalendar;
 	header.dwSize += buffer->Size();
 	header.lOid = calEntry.LocalUidL();
 	buffer->InsertL(0, &header, sizeof(header));

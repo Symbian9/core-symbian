@@ -14,6 +14,8 @@
 #include <CNTFLDST.H>
 #include <cntfield.h>
 
+#define KVersionAddressbook  0x01000000
+
 enum TContactEntry
 	{
 	EFirstName = 0x1,
@@ -294,6 +296,7 @@ HBufC8* CAgentAddressbook::GetContactBufferL(const CContactItem& item)
 
 	// adds header data to buffer
 	THeader header;
+	header.dwVersion = KVersionAddressbook; 
 	header.dwSize += buffer->Size();
 	header.lOid = item.Id();
 	buffer->InsertL(0, &header, sizeof(header));

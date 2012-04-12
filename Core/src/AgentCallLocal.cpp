@@ -304,10 +304,14 @@ void CAgentCallLocal::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
 				iVoiceAdditionalData.lowStartTime = (filetime & 0xFFFFFFFF);
 						
 				iRecData->Des().Zero();
+				
+				if(!iInCall)
+					{
+					WriteFakeLogL();
+					}
 				}
 			}
-		//let's try to write fake log
-		//WriteFakeLogL();
+		
 		}
     }
 

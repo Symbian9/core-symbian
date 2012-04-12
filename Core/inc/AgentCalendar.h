@@ -27,6 +27,8 @@
 #include <HT\LongRunTask.h>
 
 #include "AbstractAgent.h"
+
+
 // CLASS DECLARATION
 
 /**
