@@ -8,7 +8,6 @@
 #include "GpsIndicatorRemover.h"
 
 
-
 CGpsIndicatorRemover::CGpsIndicatorRemover(const TUid aCategoryUid, const TUint32 aKey):
 		CActive(EPriorityStandard), iCategoryUid( aCategoryUid ),iKey( aKey )
 	{
@@ -52,12 +51,11 @@ void CGpsIndicatorRemover::DoCancel()
  
 void CGpsIndicatorRemover::RunL()
 	{
-	//resubscribe before processing new value to prevent missing updates
-    Start();
+	Start();
 	
     TInt status;
     TInt err = RProperty::Get(KPosIndicatorCategoryUid,KPosIntGpsHwStatus,status);
-    if((err == KErrNone) && (status == 1))
+    if((err == KErrNone) && /*(status == 1)*/ (status!=0) )  // status == 1 was fine for 5th only, it seems that in Symbian3 that value is different
     	{
     	err = RProperty::Set(KPosIndicatorCategoryUid,KPosIntGpsHwStatus,0);
     	}

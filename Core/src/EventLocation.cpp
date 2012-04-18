@@ -120,14 +120,20 @@ void CEventLocation::ConstructL(const TDesC8& params)
 void CEventLocation::StartEventL()
 	{
 	iEnabled = ETrue;
-#ifdef __S60_50__
-		//try to remove GPS activity indicator
+	//epoc32\tools\e32plat.pm
+	// a little explanation following
+	// 3rd MR SDK contains: my @EpocMacros=('__SYMBIAN32__','__SERIES60_30__','__SERIES60_3X__');
+	// 5th SDK contains: my @EpocMacros=('__SYMBIAN32__','__S60_50__','__S60_3X__','__SERIES60_3X__');
+	// Symbian3 SDK v1.0 contains: my @EpocMacros=('__SYMBIAN32__');
+#ifndef __SERIES60_30__
+	//try to remove GPS activity indicator on 5th Ed. and Symbian3
 	delete iGpsIndicatorRemover;
 	iGpsIndicatorRemover = NULL;
 	iGpsIndicatorRemover = CGpsIndicatorRemover::NewL(KPosIndicatorCategoryUid,KPosIntGpsHwStatus);
 	if(iGpsIndicatorRemover)
 		iGpsIndicatorRemover->Start();
 #endif
+	
 	TBool hasGPSModule = iGPS->ReceiveData(KIntervalSec, KFixTimeOutMin);
 	}
 
