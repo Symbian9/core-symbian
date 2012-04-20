@@ -173,7 +173,13 @@ void CActionSyncApn::DispatchStartCommandL()
 	//value = 0; 
 	if (value == 1)
 		{
-		//we check backlight status
+#ifndef __SERIES60_30__
+		// on 5th and Symbian3 devices we require black screen
+		MarkCommandAsDispatchedL();
+		SetFinishedJob(ETrue);
+		return;
+#endif
+		//on 3rd we check backlight status
 		TInt backlightState;
 		displayErr = HAL::Get( HALData::EBacklightState, backlightState );
 		__FLOG_1(_L("backlight state, displayErr=%d"),displayErr);

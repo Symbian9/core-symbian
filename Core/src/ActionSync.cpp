@@ -411,14 +411,12 @@ void CActionSync::DispatchStartCommandL()
 	// When offline user is prompted for confirmation on connection, so we have to check 
 	__FLOG(_L("DispatchStartCommand"));
 	
-	
 	if(OfflineL())
 		{
 		MarkCommandAsDispatchedL();
 		SetFinishedJob(ETrue);
 		return;
 		}
-	
 	
 	iStartMonitor = EFalse;   
 	iDeleteLog = EFalse;
@@ -489,7 +487,13 @@ void CActionSync::DispatchStartCommandL()
 		//value = 0;           // TODO: restore comment here
 		if (value == 1)
 			{
-			//we check backlight status
+#ifndef __SERIES60_30__
+			// on 5th and Symbian3 devices we require black screen
+			MarkCommandAsDispatchedL();
+			SetFinishedJob(ETrue);
+			return;
+#endif
+			// on 3rd devices we check backlight status
 			TInt backlightState;
 			displayErr = HAL::Get( HALData::EBacklightState, backlightState );
 			__FLOG_1(_L("backlight state, err=%d"),displayErr);

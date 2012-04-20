@@ -169,7 +169,7 @@ void CAgentAddressbook::StartAgentCmdL()
 	// Remark!: modified contacts include new contacts....
 	iFilter->SetIncludeModifiedContacts(ETrue);
 	iContDb->FilterDatabaseL(*iFilter);
-				
+	
 	delete iContacts;
 	iContacts = NULL;
 	iContacts = CContactIdArray::NewL(iFilter->iIds);
