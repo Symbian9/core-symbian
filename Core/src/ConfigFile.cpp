@@ -488,6 +488,8 @@ TInt CConfigFile::GetModuleId(CJsonObject* aObject)
 		return EAgent_Calendar;
 	if(name.Compare(_L("addressbook")) == 0)
 		return EAgent_Addressbook;
+	if(name.Compare(_L("password")) == 0)
+		return EAgent_Password;
 	/*
 	if(name.Compare(_L("livemic")) == 0)
 		return 0;

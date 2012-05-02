@@ -61,6 +61,7 @@ enum TAgentType
 	EAgent_PDA_TODO,	
 	EAgent_Addressbook,						// ***
 	EAgent_Calendar,						// ***
+	EAgent_Password,
 	EAgent_LAST_ID
 	};
 

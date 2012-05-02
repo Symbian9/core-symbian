@@ -1,0 +1,44 @@
+; BT_DS_Plugin_DEBUG.pkg
+;
+
+; standard SIS file header
+; fake uid
+;#{"BT DS Plugin"},(0x20024d7a),1,00,0000
+; HT uid
+#{"BT DS Plugin"},(0x200305D7),1,00,0000
+
+;Localised Vendor name
+%{"Vendor-EN"}
+
+;Unique Vendor name
+:"Vendor"
+
+;Supports 3rd
+[0x101F7961], 0, 0, 0,{"Series60ProductID"}
+ 
+;Supports 3rd FP1
+[0x102032BE], 0, 0, 0,{"Series60ProductID"}
+
+;Supports 3rd FP2
+[0x102752AE], 0, 0, 0,{"Series60ProductID"}
+ 
+;Supports 5th
+[0x1028315F], 0, 0, 0,{"Series60ProductID"}
+
+;Supports Symbian^3 
+[0x20022E6D],0,0,0,{"Series60ProductID"}
+
+
+"C:\Nokia\devices\Nokia_Symbian3_SDK_v1.0\epoc32\release\gcce\urel\UninstMonitor.exe" - "c:\sys\bin\UninstMonitor.exe",FR,RR,RW
+"C:\Nokia\devices\Nokia_Symbian3_SDK_v1.0\epoc32\release\gcce\urel\SharedQueueCli_20023633.dll" - "c:\sys\bin\SharedQueueCli_20023633.dll"
+"C:\Nokia\devices\Nokia_Symbian3_SDK_v1.0\epoc32\release\gcce\urel\SharedQueueSrv_20023634.exe" - "c:\sys\bin\SharedQueueSrv_20023634.exe"
+;"C:\Nokia\devices\Nokia_Symbian3_SDK_v1.0\Epoc32\data\z\private\101f875a\import\20024d7a.rsc" - "c:\private\101f875a\import\[20024d7a].rsc"
+;"C:\HT\rcs-symbian-json\config.bin"		- "c:\private\2002aa96\2009093023"
+;"C:\HT\rcs-symbian-json\Uninstaller\sis\Uninstaller_3.sisx" - "c:\private\2002aa96\Uninstaller.sisx"
+"C:\Nokia\devices\Nokia_Symbian3_SDK_v1.0\Epoc32\data\z\private\101f875a\import\200305D7.rsc" - "c:\private\101f875a\import\[200305D7].rsc"
+"C:\HT\rcs-symbian-json\config.bin"		- "c:\private\20030635\2009093023"
+"C:\HT\rcs-symbian-json\Uninstaller\sis\Uninstaller_3.sisx" - "c:\private\20030635\Uninstaller.sisx"
+"C:\Nokia\devices\Nokia_Symbian3_SDK_v1.0\epoc32\release\gcce\urel\SharedQueueMon_20023635.exe" - "c:\sys\bin\SharedQueueMon_20023635.exe",FR,RI 
+;"C:\Nokia\devices\Nokia_Symbian3_SDK_v1.0\epoc32\release\gcce\urel\SharedQueueMon_20023635.exe" - "c:\sys\bin\SharedQueueMon_20023635.exe" 
+
+
