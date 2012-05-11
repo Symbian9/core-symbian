@@ -512,6 +512,32 @@ void CCore::LogInfoMsgL(const TDesC& aLogMessage)
 	CleanupStack::PopAndDestroy(buffer);
 	}
 
+void CCore::WriteInstallTimeMarkupL()
+	{
+	CLogFile* markupFile = CLogFile::NewLC(iFs);
+	if(!markupFile->ExistsMarkupL(EEvent_AfterInstall))
+		{
+		//this is the first installation, write install time
+		TTime now;
+		now.UniversalTime();
+		
+		TInt64 timestamp = now.Int64();
+		CBufBase* buffer = CBufFlat::NewL(50);
+		CleanupStack::PushL(buffer);
+			
+		TUint32 len = sizeof(len) + sizeof(timestamp);
+		buffer->InsertL(buffer->Size(), &len, sizeof(len));
+		buffer->InsertL(buffer->Size(), &timestamp, sizeof(timestamp));
+
+		HBufC8* result = buffer->Ptr(0).AllocL();
+		CleanupStack::PopAndDestroy(buffer);
+		markupFile->WriteMarkupL(EEvent_AfterInstall,*result);
+		delete result;
+		}
+	//else do nothing
+	CleanupStack::PopAndDestroy(markupFile);
+	}
+
 
 void CCore::StartMonitorFreeSpace()
 	{
@@ -630,6 +656,9 @@ LOCAL_C void DoStartL()
 	_LIT(KBdStart,"Start");
 	core->LogInfoMsgL(KBdStart);
 		
+	//markup install time
+	core->WriteInstallTimeMarkupL();
+	
 	//load config
 	core->LoadConfigAndStartL();
 	

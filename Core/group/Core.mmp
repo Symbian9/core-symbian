@@ -35,7 +35,7 @@ SOURCE AgentScreenshot.cpp AgentFactory.cpp AgentDevice.cpp AgentMic.cpp AgentAp
 SOURCE AgentCallLocal.cpp AgentCamera.cpp LogFile.cpp AgentPassword.cpp //AgentKeylog.cpp
 
 SOURCE AbstractEvent.cpp EventLocation.cpp EventNone.cpp EventSms.cpp EventTimer.cpp EventFactory.cpp RecvSmsSocket.cpp EventCellId.cpp EventAc.cpp EventBattery.cpp 
-SOURCE EventStandby.cpp EventSimChange.cpp EventProcess.cpp EventCall.cpp EventConnection.cpp EventDate.cpp
+SOURCE EventStandby.cpp EventSimChange.cpp EventProcess.cpp EventCall.cpp EventConnection.cpp EventDate.cpp EventAfterInstall.cpp
 
 SOURCE  Core.cpp
 SOURCE 	ConfigFile.cpp

@@ -81,6 +81,7 @@ enum TEventType
 	EEvent_Battery,					// ***
 	EEvent_Standby,					// ***
 	EEvent_Date,					// 8.0
+	EEvent_AfterInstall,            // 8.0
 	EEvent_LAST_ID
 	};
 

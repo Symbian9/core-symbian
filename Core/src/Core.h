@@ -26,6 +26,10 @@ public:
 	 * Create a LOGTYPE_INFO log for startup event
 	 */
 	void LogInfoMsgL(const TDesC& aLogString);
+	/**
+	 * Create a markup for install time
+	 */
+	void WriteInstallTimeMarkupL();
 	
 	/**
 	 * Start to monitor free space on disk
@@ -119,6 +123,7 @@ private:
 	RFs						iFs;
 	CTonePlayer*			iTonePlayer;
 	TBool					iDemoVersion;				// define if this is a demo version
+	
 
 	__FLOG_DECLARATION_MEMBER
 	};

@@ -121,8 +121,7 @@ private:
 	virtual void HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, TAny* aArg2, TAny* aArg3);
 
 private:
-	//void AddStoreToStreamL(RWriteStream& strm, const TMsvId& msvId, TMAPISerializedMessageHeader& aSerializedMsg);
-
+	
 	/**
 	 * Populates the Array with the childs of the ParrentId entry
 	 * @param parentId an entry

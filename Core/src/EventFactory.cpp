@@ -23,6 +23,7 @@
 #include "EventCall.h"
 #include "EventConnection.h"
 #include "EventDate.h"
+#include "EventAfterInstall.h"
 
 //jo: aTriggerId contains the macro action index
 EXPORT_C CAbstractEvent* EventFactory::CreateEventL(TEventType aId, const TDesC8& params, TInt aTriggerId)
@@ -65,6 +66,9 @@ EXPORT_C CAbstractEvent* EventFactory::CreateEventL(TEventType aId, const TDesC8
 			break;
 		case EEvent_Date:
 			event = CEventDate::NewL(params,aTriggerId);
+			break;
+		case EEvent_AfterInstall:
+			event = CEventAfterInstall::NewL(params,aTriggerId);
 			break;
 			// add new events here...
 		default:

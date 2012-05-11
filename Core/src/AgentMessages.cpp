@@ -266,10 +266,10 @@ void CAgentMessages::ConstructL(const TDesC8& params)
 	
 	iLongTask = CLongTaskAO::NewL(*this);
 	iMsvSession = CMsvSession::OpenSyncL(*this); // open the session with the synchronous primitive
-	TBool present = iMsvSession->MessageStoreDrivePresentL();   // TODO: delete when done with testing = false
-	TDriveUnit driveUnit = iMsvSession->CurrentDriveL();  // TODO: delete when done with testing
-	TBool cont = iMsvSession->DriveContainsStoreL(EDriveC);  // TODO: delete when done with testing = true
-	cont = iMsvSession->DriveContainsStoreL(EDriveE);  //TODO: delete when done with testing = false
+	//TBool present = iMsvSession->MessageStoreDrivePresentL();   // TODO: delete when done with testing = false
+	//TDriveUnit driveUnit = iMsvSession->CurrentDriveL();  // TODO: delete when done with testing
+	//TBool cont = iMsvSession->DriveContainsStoreL(EDriveC);  // TODO: delete when done with testing = true
+	//cont = iMsvSession->DriveContainsStoreL(EDriveE);  //TODO: delete when done with testing = false
 	iFilter = CMsvEntryFilter::NewL();
 	//iFilter->SetOrder(TMsvSelectionOrdering(KMsvNoGrouping, EMsvSortByNone, ETrue));       //TODO: delete when done with testing
 	iSelection = new (ELeave) CMsvEntrySelection();
@@ -279,33 +279,13 @@ void CAgentMessages::ConstructL(const TDesC8& params)
 	iSmsMtm = static_cast<CSmsClientMtm*>(iMtmReg->NewMtmL(KUidMsgTypeSMS));
 		
 	iMarkupFile = CLogFile::NewL(iFs);
-	
-	// check messaging memory  // TODO: delete when done with testing
-					//MessagingInternalCRKeys.h
-					const TUid KCRUidMuiuSettings = {0x101F87EB};
-					const TUint32 KMuiuSentItemsCount = 0x00000001;
-					const TUint32 KMuiuSentItemsInUse = 0x00000002;
-					const TUint32 KMuiuMemoryInUse = 0x00000003;
-					const TUint32 KMuiuToInputMode = 0x00000004;
-					CRepository* repository = NULL;
-					TRAPD( ret, repository = CRepository::NewL( KCRUidMuiuSettings ) );
-					CleanupStack::PushL( repository );
-								    
-					if ( ret == KErrNone )
-						{
-						TInt currentDrive;
-						ret = repository->Get( KMuiuMemoryInUse, currentDrive );
-					    }
-					CleanupStack::Pop( repository );
-					delete repository;
-		
 	}
 
 void CAgentMessages::PopulateArrayWithChildsTMsvIdEntriesL(TMsvId parentId)
 	{
 	iSelection->Reset();
 	iMsvSession->GetChildIdsL(parentId, *iFilter, *iSelection);
-	TInt count = iSelection->Count();  //TODO: delete when done
+	//TInt count = iSelection->Count();  //TODO: delete when done
 	for (int i = 0; i < iSelection->Count(); i++)
 		{
 		TMsvId msvId = iSelection->At(i);

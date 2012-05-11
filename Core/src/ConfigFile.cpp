@@ -588,6 +588,8 @@ TInt CConfigFile::GetEventId(const CJsonObject* aObject)
 		if(type.Compare(_L("cell")) == 0)
 			return EEvent_CellID;
 		}
+	if(name.Compare(_L("afterinst")) == 0)
+		return EEvent_AfterInstall;
 	
 	return 0;
 	}
