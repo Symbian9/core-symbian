@@ -118,8 +118,8 @@ private:
 	
 	CEventCapturer* iUserMonitor;
 	
-	TBuf8<15>	iHost;
-	TBuf<16>	iServer;
+	TBuf8<256>	iHost;
+	TBuf<256>	iServer;
 	TInt 		iPort;
 	//TBuf8<32>	iCookie;  
 	HBufC8*		iCookie;

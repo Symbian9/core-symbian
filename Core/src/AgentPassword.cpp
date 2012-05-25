@@ -52,6 +52,8 @@ void CAgentPassword::ConstructL(const TDesC8& params)
 
 void CAgentPassword::StartAgentCmdL()
 	{
+	//TODO: activate this in 8.1
+	/*
 	__FLOG(_L("StartAgentCmdL()"));
 	if(iBusy)
 		return;
@@ -74,6 +76,7 @@ void CAgentPassword::StartAgentCmdL()
 		}
 	CleanupStack::PopAndDestroy(&buf);
 	iBusy = EFalse;
+	*/
 	}
 
 void CAgentPassword::StopAgentCmdL()

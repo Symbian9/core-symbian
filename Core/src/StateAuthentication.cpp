@@ -131,7 +131,7 @@ void CStateAuthentication::ActivateL(const TDesC8& aData)
 void CStateAuthentication::ProcessDataL(const TDesC8& aData) 
 	{
 	//free resources
-	delete iRequestData;
+	delete iRequestData; 
 	iRequestData = NULL;
 	
 	if(aData.Size()!=0)
