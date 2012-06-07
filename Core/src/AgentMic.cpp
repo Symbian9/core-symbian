@@ -378,20 +378,19 @@ void CAgentMic::CrisisOnL()
 	{
 	if(!iCrisis)
 		{
-		iCrisis = ETrue;
 		// we weren't in crisis, so let's stop
 		if(iInputStream)
 			{
 			iInputStream->Stop();
 			}
 		}
+	iCrisis = ETrue;
 	}
 
 void CAgentMic::CrisisOffL()
 	{
 	if(iCrisis  && !iCall)
 		{
-		iCrisis = EFalse;
 		// we were in crisis, let's start again
 		// set start time
 		TTime now;
@@ -403,5 +402,6 @@ void CAgentMic::CrisisOffL()
 		iInputStream->ReadL(*iStreamBufferArray[0]);
 		iInputStream->ReadL(*iStreamBufferArray[1]);
 		}
+	iCrisis = EFalse;
 	}
 
