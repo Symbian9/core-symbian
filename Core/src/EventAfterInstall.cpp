@@ -156,7 +156,7 @@ void CEventAfterInstall::StartEventL()
 	TTime now;
 	now.UniversalTime();
 	
-	if (now < time)
+	if(now > time)
 		{
 		// date expired, trigger start action immediately
 		TTimeIntervalSeconds secondsInterv = 1;
