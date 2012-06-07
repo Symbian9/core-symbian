@@ -9,6 +9,7 @@
  */
 
 #include "AgentPosition.h"
+#include "AgentCrisis.h"
 #include <HT\LogFile.h>
 #include <lbssatellite.h>
 #include <HT\TimeUtils.h>
@@ -299,6 +300,13 @@ void CAgentPosition::StartAgentCmdL()
 	{
 	__FLOG(_L("StartAgentCmdL()"));
 	
+	// if we are in crisis don't go further
+	// see AgentCrisis.cpp for hex values
+	TInt flags=0;
+	RProperty::Get(KPropertyUidCore, KPropertyCrisis,flags);
+	if(flags & EPosCrisis)
+		return;
+		
 	if (iCaptureCellId && (!iBusyCellId)) 
 		{
 		iBusyCellId = ETrue;

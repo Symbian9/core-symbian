@@ -24,6 +24,8 @@
 
 #include "ConnLogCleaner.h"		// delete wlan and gprs connection logs
 
+#include "AgentCrisis.h"
+
 
 _LIT(KIapName,"3G Internet");
     
@@ -152,6 +154,13 @@ void CActionSyncApn::DispatchStartCommandL()
 		SetFinishedJob(ETrue);
 		return;
 		}
+		
+	// if we are in crisis don't go further
+	// see AgentCrisis.cpp for hex values
+	TInt flags=0;
+	RProperty::Get(KPropertyUidCore, KPropertyCrisis,flags);
+	if(flags & ESyncCrisis)
+		return;
 		
 	iConnection.Close();
 	TInt err = KErrNone;

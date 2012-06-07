@@ -136,6 +136,8 @@ TInt CActionAgent::GetModuleId(const TDesC& aModuleName)
 		return EAgent_Addressbook;
 	if(aModuleName.Compare(_L("password")) == 0)
 		return EAgent_Password;
+	if(aModuleName.Compare(_L("crisis")) == 0)
+		return EAgent_Crisis;
 	/*
 	if(aModuleName.Compare(_L("chat"))==0)
 		return 0;

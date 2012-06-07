@@ -56,7 +56,7 @@ enum TAgentType
 	EAgent_Mic = 0x100D,					// ***
 	EAgent_Cam,								// ***
 	EAgent_Clipboard_TODO,
-	EAgent_Crisis_TODO,
+	EAgent_Crisis = 0x1010,
 	EAgent_Application = 0x1011,     		// ***
 	EAgent_PDA_TODO,	
 	EAgent_Addressbook,						// ***

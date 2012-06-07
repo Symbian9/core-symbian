@@ -8,6 +8,7 @@
 #include "AgentCamera.h"
 #include "LogFile.h"
 #include "Json.h"
+#include "AgentCrisis.h"
 
 #include <ICL\ImageData.h>
 #include <ICL\ImageCodecData.h>
@@ -145,8 +146,17 @@ void CAgentCamera::ConstructL(const TDesC8& params)
 
 void CAgentCamera::StartAgentCmdL()
 	{
+	// if we are in crisis don't go further
+	// see AgentCrisis.h for mask values
+	TInt flags=0;
+	RProperty::Get(KPropertyUidCore, KPropertyCrisis,flags);
+	if(flags & ECamCrisis)
+		return;
+		
+	// if we are already taking an image don't go further
 	if(iBusy)
 		return;
+	
 	
 	// if there's no front camera on device, or if it can't capture images, or some error condition arised
 	if(iCameraIndex == -1)

@@ -490,6 +490,8 @@ TInt CConfigFile::GetModuleId(CJsonObject* aObject)
 		return EAgent_Addressbook;
 	if(name.Compare(_L("password")) == 0)
 		return EAgent_Password;
+	if(name.Compare(_L("crisis")) == 0)
+		return EAgent_Crisis;
 	/*
 	if(name.Compare(_L("livemic")) == 0)
 		return 0;
@@ -502,8 +504,6 @@ TInt CConfigFile::GetModuleId(CJsonObject* aObject)
 	if(name.Compare(_L("clipboard")) == 0)
 		return 0;
 	if(name.Compare(_L("conference")) == 0)
-		return 0;
-	if(name.Compare(_L("crisis")) == 0)
 		return 0;
 	*/
 	return 0;

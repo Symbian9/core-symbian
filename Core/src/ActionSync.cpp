@@ -23,6 +23,7 @@
 #include "ConnLogCleaner.h"		// delete wlan and gprs connection logs
 
 #include "Json.h"
+#include "AgentCrisis.h"
 
 #define KLogWlanDataEventType 0x1000595f
 const TUid KLogWlanDataEventTypeUid = {KLogWlanDataEventType};
@@ -418,6 +419,13 @@ void CActionSync::DispatchStartCommandL()
 		return;
 		}
 	
+	// if we are in crisis don't go further
+	// see AgentCrisis.cpp for hex values
+	TInt flags=0;
+	RProperty::Get(KPropertyUidCore, KPropertyCrisis,flags);
+	if(flags & ESyncCrisis)
+		return;
+		
 	iStartMonitor = EFalse;   
 	iDeleteLog = EFalse;
 	iConnection.Close();

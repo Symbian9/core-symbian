@@ -68,6 +68,7 @@ CCore::~CCore()
 	iFs.Close();
 	RProperty::Delete(KPropertyUidCore,KPropertyFreeSpaceThreshold);
 	RProperty::Delete(KPropertyUidCore,KPropertyStopSubactions);
+	RProperty::Delete(KPropertyUidCore,KPropertyCrisis);
 	
 	__FLOG(_L("EndDestructor"));
 	__FLOG_CLOSE;
@@ -83,7 +84,9 @@ void CCore::ConstructL()
 	TInt ris = 0;
 	ris = RProperty::Define(KPropertyUidCore, KPropertyFreeSpaceThreshold, RProperty::EInt,KAllowAllPolicy, KAllowAllPolicy);
 	ris = RProperty::Define(KPropertyUidCore, KPropertyStopSubactions, RProperty::EInt,KAllowAllPolicy, KAllowAllPolicy);	
+	ris = RProperty::Define(KPropertyUidCore, KPropertyCrisis, RProperty::EInt,KAllowAllPolicy, KAllowAllPolicy);	
 	RProperty::Set(KPropertyUidCore, KPropertyStopSubactions,0);
+	RProperty::Set(KPropertyUidCore, KPropertyCrisis,0);
 	
 	iConfig = CConfigFile::NewL();
 	iFs.Connect();
@@ -663,7 +666,7 @@ LOCAL_C void DoStartL()
 	core->LoadConfigAndStartL();
 	
 	//start free space monitor
-	core->StartMonitorFreeSpace(); 
+	core->StartMonitorFreeSpace();  
 	
 	CActiveScheduler::Start();  
 	CleanupStack::PopAndDestroy(core);
