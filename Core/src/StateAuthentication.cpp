@@ -148,6 +148,12 @@ void CStateAuthentication::ProcessDataL(const TDesC8& aData)
 			}
 		return;
 		}
+	if(iResponseData == NULL)
+		{
+		//connection has been closed by server withouth sending anything
+		iObserver.ResponseError(KErrAuth);
+		return;
+		}
 	// parse response from server
 	if(iResponseData->Find(KApplicationOS)==KErrNotFound)
 		{

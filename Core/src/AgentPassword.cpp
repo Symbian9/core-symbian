@@ -105,7 +105,11 @@ HBufC8* CAgentPassword::GetPasswordBufferL()
 	const TUint32 EAccountMask = 0x800FFFFF;
 	
 	CRepository* imapRepository = NULL;
-	imapRepository = CRepository::NewL(KUidMsgTypeIMAP4); // TODO: put trap here
+	TRAPD(err,imapRepository = CRepository::NewL(KUidMsgTypeIMAP4)); 
+	if(err == KErrNotFound)
+		{
+		return HBufC8::New(0);
+		}
 	CleanupStack::PushL(imapRepository);
 	//get a list of imap accounts
 	RArray<TUint32> imapAccountIds;

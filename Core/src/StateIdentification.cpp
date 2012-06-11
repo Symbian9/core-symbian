@@ -132,7 +132,13 @@ void CStateIdentification::ProcessDataL(const TDesC8& aData)
 			}
 		return;
 		}
-	
+	if(iResponseData == NULL)
+		{
+		//connection has been closed by server withouth sending anything
+		iObserver.ResponseError(KErrNotOk);
+		return;
+		}
+		
 	if(iResponseData->Find(KApplicationOS)==KErrNotFound)
 		{
 		if(iResponseData->Find(KBinaryOS)==KErrNotFound)
