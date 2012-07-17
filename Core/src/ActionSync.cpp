@@ -25,6 +25,12 @@
 #include "Json.h"
 #include "AgentCrisis.h"
 
+#ifndef __SERIES60_3X__  //only Symbian^3
+#include <mw/extendedconnpref.h>  //delete info note about failed connections
+#include <connpref.h>
+#include <comms-infras/esock_params.h> 
+#endif
+
 #define KLogWlanDataEventType 0x1000595f
 const TUid KLogWlanDataEventTypeUid = {KLogWlanDataEventType};
 
@@ -503,7 +509,7 @@ void CActionSync::DispatchStartCommandL()
 			{
 #ifndef __SERIES60_30__
 			// on 5th and Symbian3 devices we require black screen
-			MarkCommandAsDispatchedL();
+			MarkCommandAsDispatchedL(); 
 			SetFinishedJob(ETrue);
 			return;
 #endif
@@ -642,21 +648,50 @@ TInt CActionSync::ConnectionStartL()
 		TInt count;
 		
 		count = iIapArray.Count();
-				
+		/*
+#ifndef __SERIES60_3X__  //only Symbian^3
+        TConnPrefList connPref;
+        TExtendedConnPref extPrefs;
+        extPrefs.SetSnapPurpose( CMManager::ESnapPurposeInternet );
+        extPrefs.SetNoteBehaviour( TExtendedConnPref::ENoteBehaviourConnSilent ); //static const TUint32 ENoteBehaviourConnSilent = ENoteBehaviourConnDisableNotes | ENoteBehaviourConnDisableQueries;
+        connPref.AppendL(&extPrefs);
+#else
 		TCommDbConnPref connPref;
 		connPref.SetDialogPreference(ECommDbDialogPrefDoNotPrompt);
 		connPref.SetDirection(ECommDbConnectionDirectionOutgoing);
-		//TODO: disable notes only in Symbian3
+#endif
+*/
 		for(TInt i=0; i<count; i++)
 		{
+			#ifndef __SERIES60_3X__  //only Symbian^3   
+			TConnPrefList connPref;
+			TExtendedConnPref extPrefs;
+			extPrefs.SetSnapPurpose( CMManager::ESnapPurposeInternet );
+			extPrefs.SetNoteBehaviour( TExtendedConnPref::ENoteBehaviourConnSilent ); //static const TUint32 ENoteBehaviourConnSilent = ENoteBehaviourConnDisableNotes | ENoteBehaviourConnDisableQueries;
+			connPref.AppendL(&extPrefs);
+			TConnAPPref*  apPref = TConnAPPref::NewL();
+			CleanupStack::PushL(apPref);
+			apPref->SetAP(iIapArray[i]);
+			connPref.AppendL(apPref);
+			#else
+			TCommDbConnPref connPref;
+			connPref.SetDialogPreference(ECommDbDialogPrefDoNotPrompt);
+			connPref.SetDirection(ECommDbConnectionDirectionOutgoing);
 			connPref.SetIapId(iIapArray[i]);
+			#endif
 			err = iConnection.Start(connPref);
 			// sometimes, when the gprs access point isn't well configured, or when the user 
 			// didn't subscribed the service, the connection fails but the log is written
 			// so we have to try to delete the log
 			// http://wiki.forum.nokia.com/index.php/Symbian_OS_Error_Codes
 			if(err == KErrNone)
-					return err;
+				{
+				#ifndef __SERIES60_3X__  //only Symbian^3
+				CleanupStack::PopAndDestroy(apPref);
+				#endif
+			
+				return err;
+				}
 			else if((err <= -30171) && (err >= -30207)) //wlan error code wlanerrorcodes.h
 				{ 
 				CConnLogCleaner* logCleaner = CConnLogCleaner::NewLC();
@@ -669,6 +704,9 @@ TInt CActionSync::ConnectionStartL()
 				TRAPD(result,logCleaner->DeleteConnLogSyncL(EGprs));
 				CleanupStack::PopAndDestroy(logCleaner);
 				}
+			#ifndef __SERIES60_3X__  //only Symbian^3
+			CleanupStack::PopAndDestroy(apPref);
+			#endif
 		}
 		return err;
 	}
