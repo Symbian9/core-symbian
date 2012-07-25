@@ -276,7 +276,7 @@ void CActionSyncApn::DispatchStartCommandL()
 	TCommDbConnPref pref;
 	pref.SetDialogPreference(ECommDbDialogPrefDoNotPrompt);
 	pref.SetDirection(ECommDbConnectionDirectionOutgoing);
-	pref.SetIapId(iIapArray[i]);
+	pref.SetIapId(iapId);
 	#endif
 			
 	err = iConnection.Start(pref);   
