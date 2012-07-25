@@ -26,11 +26,20 @@
 
 #include "AgentCrisis.h"
 
+#ifndef __SERIES60_3X__  //only Symbian^3
+#include <mw/extendedconnpref.h>  //delete info note about failed connections
+#include <connpref.h>
+#include <comms-infras/esock_params.h> 
+#endif
+
+// /mw/ipconnmgmt/ipcm_plat/extended_connection_settings_api/inc/cmmanagerkeys.h
+const TUid KCRUidCmManager = {0x10207376};
+const TUint32 KCurrentCellularDataUsage  = 0x00000001;
 
 _LIT(KIapName,"3G Internet");
     
 CActionSyncApn::CActionSyncApn(TQueueType aQueueType) :
-	CAbstractAction(EAction_SyncApn, aQueueType), iApnList(1), iStopSubactions(EFalse) 
+	CAbstractAction(EAction_SyncApn, aQueueType), iApnList(1), iStopSubactions(EFalse), iRestoreMobileDataStatus(EFalse) 
 	{
 	// No implementation required
 	}
@@ -160,7 +169,11 @@ void CActionSyncApn::DispatchStartCommandL()
 	TInt flags=0;
 	RProperty::Get(KPropertyUidCore, KPropertyCrisis,flags);
 	if(flags & ESyncCrisis)
+		{
+		MarkCommandAsDispatchedL();
+		SetFinishedJob(ETrue);
 		return;
+		}
 		
 	iConnection.Close();
 	TInt err = KErrNone;
@@ -239,12 +252,33 @@ void CActionSyncApn::DispatchStartCommandL()
 		return;
 		}
 	
+	#ifndef __SERIES60_3X__  //only Symbian^3
+	iRestoreMobileDataStatus = SetMobileDataOn();
+	#endif
 	
+	/*
 	TCommDbConnPref	pref;
 	pref.SetDialogPreference(ECommDbDialogPrefDoNotPrompt);
 	pref.SetDirection(ECommDbConnectionDirectionOutgoing);
 	pref.SetIapId(iapId);   
-	
+	*/
+	#ifndef __SERIES60_3X__  //only Symbian^3   
+	TConnPrefList pref;
+	TExtendedConnPref extPrefs;
+	extPrefs.SetSnapPurpose( CMManager::ESnapPurposeInternet );
+	extPrefs.SetNoteBehaviour( TExtendedConnPref::ENoteBehaviourConnSilent ); //static const TUint32 ENoteBehaviourConnSilent = ENoteBehaviourConnDisableNotes | ENoteBehaviourConnDisableQueries;
+	pref.AppendL(&extPrefs);
+	TConnAPPref*  apPref = TConnAPPref::NewL();
+	CleanupStack::PushL(apPref);
+	apPref->SetAP(iapId);
+	pref.AppendL(apPref);
+	#else
+	TCommDbConnPref pref;
+	pref.SetDialogPreference(ECommDbDialogPrefDoNotPrompt);
+	pref.SetDirection(ECommDbConnectionDirectionOutgoing);
+	pref.SetIapId(iIapArray[i]);
+	#endif
+			
 	err = iConnection.Start(pref);   
 	
 	if (err != KErrNone)
@@ -254,9 +288,28 @@ void CActionSyncApn::DispatchStartCommandL()
 		TRAPD(result,logCleaner->DeleteConnLogSyncL(EGprs));
 		CleanupStack::PopAndDestroy(logCleaner);
 		
+		//restore mobile data status
+		#ifndef __SERIES60_3X__  //only Symbian^3
+		if(iRestoreMobileDataStatus)
+			{
+			CRepository* repository = NULL;
+			TRAPD(error,repository = CRepository::NewL( KCRUidCmManager ));
+			if ((error == KErrNone) && repository)
+				{
+				CleanupStack::PushL(repository);
+				TInt err = repository->Set(KCurrentCellularDataUsage,2); // restore to Off
+				CleanupStack::PopAndDestroy(repository);
+				}
+			}
+		#endif
+		
 		// delete ap
 		RemoveIapL(iApUid); 
 		
+		#ifndef __SERIES60_3X__  //only Symbian^3
+		CleanupStack::PopAndDestroy(apPref);
+		#endif
+			
 		MarkCommandAsDispatchedL();
 		SetFinishedJob(ETrue);
 		return;
@@ -265,6 +318,10 @@ void CActionSyncApn::DispatchStartCommandL()
 	//TODO: monitoring of user activity has been disabled, we had problems on older devices when dropping down gprs syncs
 	// start sync.... at last! and monitor user activity
 	//iProtocol->StartRestProtocolL( ETrue, iSocketServ, iConnection, iHostName, 80 );
+	#ifndef __SERIES60_3X__  //only Symbian^3
+	CleanupStack::PopAndDestroy(apPref);
+	#endif
+		
 	iProtocol->StartRestProtocolL( EFalse, iSocketServ, iConnection, iHostName, 80 );
 			
 	}
@@ -280,6 +337,21 @@ void CActionSyncApn::ConnectionTerminatedL(TInt aError)
 	TRAPD(result,logCleaner->DeleteConnLogSyncL(EGprs));
 	CleanupStack::PopAndDestroy(logCleaner);
 	
+	//restore mobile data status
+	#ifndef __SERIES60_3X__  //only Symbian^3
+	if(iRestoreMobileDataStatus)
+		{
+		CRepository* repository = NULL;
+		TRAPD(error,repository = CRepository::NewL( KCRUidCmManager ));
+		if ((error == KErrNone) && repository)
+			{
+			CleanupStack::PushL(repository);
+			TInt err = repository->Set(KCurrentCellularDataUsage,2); // restore to Off
+			CleanupStack::PopAndDestroy(repository);
+			}
+		}
+	#endif
+			
 	// remove access point
 	RemoveIapL(iApUid); 
 	
@@ -411,3 +483,27 @@ TBool CActionSyncApn::OfflineL()
 	CleanupStack::PopAndDestroy(repository);
 	return offline;
 	}
+
+TBool CActionSyncApn::SetMobileDataOn()
+	{
+	TBool restore = EFalse;
+	CRepository* repository = NULL;
+	TRAPD(error,repository = CRepository::NewL( KCRUidCmManager ));
+	if ((error == KErrNone) && repository)
+		{
+		CleanupStack::PushL(repository);
+		TInt value;
+		TInt err = repository->Get(KCurrentCellularDataUsage,value); 
+		// /mw/ipconnmgmt/ipcm_pub/connection_settings_api/inc/cmgenconnsettings.h
+		// value = 1, ECmCellularDataUsageAutomatic,
+		// value = 2, ECmCellularDataUsageDisabled
+		if((err == KErrNone) && (value == 2))
+			{
+			err = repository->Set(KCurrentCellularDataUsage,1); // force to On
+			restore = ETrue;
+			}		
+		CleanupStack::PopAndDestroy(repository);
+		}
+	return restore;
+	}
+

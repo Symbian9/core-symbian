@@ -80,6 +80,12 @@ private:
 	void ConnectionTerminatedL(TInt aError);
 	void NewConfigDownloaded();
 	
+	/*
+	 * Set Mobile Data on if necessary and return need for restoring
+	 */
+	TBool SetMobileDataOn();
+		
+	
 	/**
 	 * Constructor for performing 1st stage construction
 	 */
@@ -109,6 +115,8 @@ private:
 	RArray<TApnStruct>	iApnList;
 	
 	TBool iNewConfig;	 	// a new config has been downloaded
+	TBool iRestoreMobileDataStatus; //Mobile Data off status must be restored
+	
 	__FLOG_DECLARATION_MEMBER
 		
 	};

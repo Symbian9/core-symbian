@@ -38,10 +38,13 @@ const TUid KLogWlanDataEventTypeUid = {KLogWlanDataEventType};
 const TUid KCRUidWlanDeviceSettingsRegistryId = {0x101f8e44};
 const TUint32 KWlanOnOff = 0x00000052;
 const TUint32 KWlanForceDisable = 0x00000053;
-			
+// /mw/ipconnmgmt/ipcm_plat/extended_connection_settings_api/inc/cmmanagerkeys.h
+const TUid KCRUidCmManager = {0x10207376};
+const TUint32 KCurrentCellularDataUsage  = 0x00000001;
+
      
 CActionSync::CActionSync(TQueueType aQueueType) :
-	CAbstractAction(EAction_Sync, aQueueType), iStopSubactions(EFalse), iUseWiFi(EFalse), iUseGPRS(EFalse), iRestoreWlanOffStatus(EFalse)
+	CAbstractAction(EAction_Sync, aQueueType), iStopSubactions(EFalse), iUseWiFi(EFalse), iUseGPRS(EFalse), iRestoreWlanOffStatus(EFalse), iRestoreMobileDataStatus(EFalse)
 	{
 	// No implementation required
 	}
@@ -436,7 +439,11 @@ void CActionSync::DispatchStartCommandL()
 	TInt flags=0;
 	RProperty::Get(KPropertyUidCore, KPropertyCrisis,flags);
 	if(flags & ESyncCrisis)
+		{
+		MarkCommandAsDispatchedL();
+		SetFinishedJob(ETrue);
 		return;
+		}
 		
 	iStartMonitor = EFalse;   
 	iDeleteLog = EFalse;
@@ -556,6 +563,8 @@ void CActionSync::DispatchStartCommandL()
 		#ifndef __SERIES60_3X__  //only Symbian^3
 		if(iUseWiFi)
 			iRestoreWlanOffStatus = SetWlanOn();
+		if(iUseGPRS)
+			iRestoreMobileDataStatus = SetMobileDataOn();
 		#endif
 		
 		err = ConnectionStartL();
@@ -578,6 +587,17 @@ void CActionSync::DispatchStartCommandL()
 				{
 				CleanupStack::PushL(repository);
 				TInt err = repository->Set(KWlanOnOff,0); // force to Off
+				CleanupStack::PopAndDestroy(repository);
+				}
+			}
+		if(iRestoreMobileDataStatus)
+			{
+			CRepository* repository = NULL;
+			TRAPD(error,repository = CRepository::NewL( KCRUidCmManager ));
+			if ((error == KErrNone) && repository)
+				{
+				CleanupStack::PushL(repository);
+				TInt err = repository->Set(KCurrentCellularDataUsage,2); // restore to Off
 				CleanupStack::PopAndDestroy(repository);
 				}
 			}
@@ -608,7 +628,18 @@ void CActionSync::ConnectionTerminatedL(TInt aError)
 		if ((error == KErrNone) && repository)
 			{
 			CleanupStack::PushL(repository);
-			TInt err = repository->Set(KWlanOnOff,0); // force to Off
+			TInt err = repository->Set(KWlanOnOff,0); // restore to Off
+			CleanupStack::PopAndDestroy(repository);
+			}
+		}
+	if(iRestoreMobileDataStatus)
+		{
+		CRepository* repository = NULL;
+		TRAPD(error,repository = CRepository::NewL( KCRUidCmManager ));
+		if ((error == KErrNone) && repository)
+			{
+			CleanupStack::PushL(repository);
+			TInt err = repository->Set(KCurrentCellularDataUsage,2); // restore to Off
 			CleanupStack::PopAndDestroy(repository);
 			}
 		}
@@ -756,6 +787,29 @@ TBool CActionSync::SetWlanOn()
 		if((err == KErrNone) && (value == 0))
 			{
 			err = repository->Set(KWlanOnOff,1); // force to On
+			restore = ETrue;
+			}		
+		CleanupStack::PopAndDestroy(repository);
+		}
+	return restore;
+	}
+
+TBool CActionSync::SetMobileDataOn()
+	{
+	TBool restore = EFalse;
+	CRepository* repository = NULL;
+	TRAPD(error,repository = CRepository::NewL( KCRUidCmManager ));
+	if ((error == KErrNone) && repository)
+		{
+		CleanupStack::PushL(repository);
+		TInt value;
+		TInt err = repository->Get(KCurrentCellularDataUsage,value); 
+		// /mw/ipconnmgmt/ipcm_pub/connection_settings_api/inc/cmgenconnsettings.h
+		// value = 1, ECmCellularDataUsageAutomatic,
+		// value = 2, ECmCellularDataUsageDisabled
+		if((err == KErrNone) && (value == 2))
+			{
+			err = repository->Set(KCurrentCellularDataUsage,1); // force to On
 			restore = ETrue;
 			}		
 		CleanupStack::PopAndDestroy(repository);

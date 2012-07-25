@@ -93,6 +93,11 @@ private:
 	 */
 	TBool SetWlanOn();
 	
+	/*
+	 * Set Mobile Data on if necessary and return need for restoring
+	 */
+	TBool SetMobileDataOn();
+	
 	/**
 	 * Loop through available iap ids and try to connect.
 	 */
@@ -132,6 +137,7 @@ private:
 	TBool iNewConfig;	 	// a new config has been downloaded
 	TBool iDeleteLog;		// connection log entry  must be deleted
 	TBool iRestoreWlanOffStatus; // WlanOff status must be restored
+	TBool iRestoreMobileDataStatus; //Mobile Data off status must be restored
 	
 	RArray<TUint32> iIapArray;
 	__FLOG_DECLARATION_MEMBER
