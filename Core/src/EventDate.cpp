@@ -156,11 +156,11 @@ void CEventDate::StartEventL()
 		TTimeIntervalSeconds secondsInterv = 1;
 		iTimeAt.HomeTime();
 		iTimeAt += secondsInterv;
-		iTimer->RcsAt(iTimeAt);
+		iTimer->CustomAt(iTimeAt);
 		} 
 	else 
 		{
-		iTimer->RcsAtUTC( iTimeAt );
+		iTimer->CustomAtUTC( iTimeAt );
 		}
 	// Check  if date to is expired
 	if(iDateTo)
@@ -171,11 +171,11 @@ void CEventDate::StartEventL()
 			TTimeIntervalSeconds secondsInterv = 1;
 			iTimeAtTo.HomeTime();
 			iTimeAtTo += secondsInterv;
-			iTimerTo->RcsAt(iTimeAtTo);
+			iTimerTo->CustomAt(iTimeAtTo);
 			} 
 		else 
 			{
-			iTimerTo->RcsAtUTC( iTimeAtTo ); 
+			iTimerTo->CustomAtUTC( iTimeAtTo ); 
 			}
 		}
 	}
@@ -205,7 +205,7 @@ void CEventDate::TimerExpiredL(TAny* src)
 					
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
-			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			iTimerRepeat->CustomAt(iTimeAtRepeat);
 			}
 		return;	
 		}
@@ -229,7 +229,7 @@ void CEventDate::TimerExpiredL(TAny* src)
 			// restart timer
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
-			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			iTimerRepeat->CustomAt(iTimeAtRepeat);
 			SendActionTriggerToCoreL(iDateParams.iRepeatAction);
 			}
 		else
@@ -241,7 +241,7 @@ void CEventDate::TimerExpiredL(TAny* src)
 				// restart timer
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
-				iTimerRepeat->RcsAt(iTimeAtRepeat);
+				iTimerRepeat->CustomAt(iTimeAtRepeat);
 				--iSteps;
 				SendActionTriggerToCoreL(iDateParams.iRepeatAction);
 				}

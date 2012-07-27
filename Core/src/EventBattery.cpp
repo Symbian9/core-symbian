@@ -139,7 +139,7 @@ void CEventBattery::StartEventL()
 					
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
-			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			iTimerRepeat->CustomAt(iTimeAtRepeat);
 			}
 		}
 	
@@ -193,7 +193,7 @@ void CEventBattery::HandlePhoneEventL(TPhoneFunctions event)
 									
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
-				iTimerRepeat->RcsAt(iTimeAtRepeat);
+				iTimerRepeat->CustomAt(iTimeAtRepeat);
 				}
 			}
 		}
@@ -224,7 +224,7 @@ void CEventBattery::TimerExpiredL(TAny* /*src*/)
 		// restart timer
 		iTimeAtRepeat.HomeTime();
 		iTimeAtRepeat += iSecondsIntervRepeat;
-		iTimerRepeat->RcsAt(iTimeAtRepeat);
+		iTimerRepeat->CustomAt(iTimeAtRepeat);
 		SendActionTriggerToCoreL(iBatteryParams.iRepeatAction);
 		}
 	else
@@ -235,7 +235,7 @@ void CEventBattery::TimerExpiredL(TAny* /*src*/)
 			// still something to do
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
-			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			iTimerRepeat->CustomAt(iTimeAtRepeat);
 			--iSteps;
 			SendActionTriggerToCoreL(iBatteryParams.iRepeatAction);
 			}

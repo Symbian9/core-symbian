@@ -155,7 +155,7 @@ void CEventSimChange::StartEventL()
 	// start timer for polling
 	iTimeAt.HomeTime();
 	iTimeAt += iSecondsInterv;
-	iTimer->RcsAt(iTimeAt);
+	iTimer->CustomAt(iTimeAt);
 	}
 
 void CEventSimChange::StopEventL()
@@ -205,7 +205,7 @@ void CEventSimChange::TimerExpiredL(TAny* )
 		}	
 	iTimeAt.HomeTime();
 	iTimeAt += iSecondsInterv;
-	iTimer->RcsAt(iTimeAt);
+	iTimer->CustomAt(iTimeAt);
 	}
 
 HBufC8* CEventSimChange::GetImsiBufferL(const TDesC8& aImsi)

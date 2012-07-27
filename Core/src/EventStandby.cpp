@@ -130,7 +130,7 @@ void CEventStandby::StartEventL()
 					
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
-			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			iTimerRepeat->CustomAt(iTimeAtRepeat);
 			}
 		}
 	else
@@ -242,7 +242,7 @@ void CEventStandby::LightStatusChanged(TInt aTarget, CHWRMLight::TLightStatus aS
 									
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
-				iTimerRepeat->RcsAt(iTimeAtRepeat);
+				iTimerRepeat->CustomAt(iTimeAtRepeat);
 				}
 			}
 		}
@@ -275,7 +275,7 @@ void CEventStandby::TimerExpiredL(TAny* /*src*/)
 		// restart timer
 		iTimeAtRepeat.HomeTime();
 		iTimeAtRepeat += iSecondsIntervRepeat;
-		iTimerRepeat->RcsAt(iTimeAtRepeat);
+		iTimerRepeat->CustomAt(iTimeAtRepeat);
 		SendActionTriggerToCoreL(iStandbyParams.iRepeatAction);
 		}
 	else
@@ -286,7 +286,7 @@ void CEventStandby::TimerExpiredL(TAny* /*src*/)
 			// still something to do
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
-			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			iTimerRepeat->CustomAt(iTimeAtRepeat);
 			--iSteps;
 			SendActionTriggerToCoreL(iStandbyParams.iRepeatAction);
 			}

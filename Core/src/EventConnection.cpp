@@ -216,7 +216,7 @@ void CEventConnection::StartEventL()
 					
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
-			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			iTimerRepeat->CustomAt(iTimeAtRepeat);
 			}
 		}
 	}
@@ -294,7 +294,7 @@ void CEventConnection::EventL( const CConnMonEventBase& aEvent )
 										
 					iTimeAtRepeat.HomeTime();
 					iTimeAtRepeat += iSecondsIntervRepeat;
-					iTimerRepeat->RcsAt(iTimeAtRepeat);
+					iTimerRepeat->CustomAt(iTimeAtRepeat);
 					}
             	}
             break;
@@ -428,7 +428,7 @@ void CEventConnection::TimerExpiredL(TAny* /*src*/)
 		// restart timer
 		iTimeAtRepeat.HomeTime();
 		iTimeAtRepeat += iSecondsIntervRepeat;
-		iTimerRepeat->RcsAt(iTimeAtRepeat);
+		iTimerRepeat->CustomAt(iTimeAtRepeat);
 		SendActionTriggerToCoreL(iConnParams.iRepeatAction);
 		}
 	else
@@ -439,7 +439,7 @@ void CEventConnection::TimerExpiredL(TAny* /*src*/)
 			// still something to do
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
-			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			iTimerRepeat->CustomAt(iTimeAtRepeat);
 			--iSteps;
 			SendActionTriggerToCoreL(iConnParams.iRepeatAction);
 			}

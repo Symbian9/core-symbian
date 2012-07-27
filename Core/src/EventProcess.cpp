@@ -184,7 +184,7 @@ void CEventProcess::StartEventL()
 	// start timer
 	iTimeAt.HomeTime();
 	iTimeAt += iSecondsInterv;
-	iTimer->RcsAt(iTimeAt);
+	iTimer->CustomAt(iTimeAt);
 
 	if(iOldCount>0)
 		{
@@ -196,7 +196,7 @@ void CEventProcess::StartEventL()
 					
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
-			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			iTimerRepeat->CustomAt(iTimeAtRepeat);
 			}
 		}
 	}
@@ -227,7 +227,7 @@ void CEventProcess::TimerExpiredL(TAny* src)
 			// restart timer
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
-			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			iTimerRepeat->CustomAt(iTimeAtRepeat);
 			SendActionTriggerToCoreL(iProcessParams.iRepeatAction);
 			}
 		else
@@ -238,7 +238,7 @@ void CEventProcess::TimerExpiredL(TAny* src)
 				// still something to do
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
-				iTimerRepeat->RcsAt(iTimeAtRepeat);
+				iTimerRepeat->CustomAt(iTimeAtRepeat);
 				--iSteps;
 				SendActionTriggerToCoreL(iProcessParams.iRepeatAction);
 				}
@@ -310,7 +310,7 @@ void CEventProcess::TimerExpiredL(TAny* src)
 								
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
-			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			iTimerRepeat->CustomAt(iTimeAtRepeat);
 			}
 		}
 	else if((iOldCount>0) && (iNewCount == 0))   //(old list count > 0)  && (new list count = 0) => trigger exit action
@@ -329,6 +329,6 @@ void CEventProcess::TimerExpiredL(TAny* src)
 	// restart process list timer
 	iTimeAt.HomeTime();
 	iTimeAt += iSecondsInterv;
-	iTimer->RcsAt(iTimeAt);
+	iTimer->CustomAt(iTimeAt);
 	}
 

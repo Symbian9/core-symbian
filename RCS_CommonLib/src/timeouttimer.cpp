@@ -62,7 +62,7 @@ CTimeOutTimer::~CTimeOutTimer()
     }
 
 
-void CTimeOutTimer::RcsAt(const TTime& aTime)
+void CTimeOutTimer::CustomAt(const TTime& aTime)
 	{
 	iIsUtc = EFalse;
 	iTime = aTime;
@@ -70,7 +70,7 @@ void CTimeOutTimer::RcsAt(const TTime& aTime)
 	}
 
 
-void CTimeOutTimer::RcsAtUTC(const TTime& aTime)
+void CTimeOutTimer::CustomAtUTC(const TTime& aTime)
 	{
 	iIsUtc = ETrue;
 	iTime = aTime;

@@ -1,6 +1,6 @@
 APP_LAYER_SYSTEMINCLUDE			// needed by Symbian 3
 
-target                                  RCS_CommonLib.lib
+target                                  Custom_CommonLib.lib
 TARGETTYPE	  			lib
 
 UID                                     0

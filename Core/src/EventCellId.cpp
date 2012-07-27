@@ -142,7 +142,7 @@ void CEventCellId::StartEventL()
 					
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
-			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			iTimerRepeat->CustomAt(iTimeAtRepeat);
 			}
 	}
 	// Receives Notifications Changes of the CellID...
@@ -212,7 +212,7 @@ void CEventCellId::HandlePhoneEventL(TPhoneFunctions event)
 									
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
-				iTimerRepeat->RcsAt(iTimeAtRepeat);
+				iTimerRepeat->CustomAt(iTimeAtRepeat);
 				}
 			}
 		}
@@ -243,7 +243,7 @@ void CEventCellId::TimerExpiredL(TAny* /*src*/)
 		// restart timer
 		iTimeAtRepeat.HomeTime();
 		iTimeAtRepeat += iSecondsIntervRepeat;
-		iTimerRepeat->RcsAt(iTimeAtRepeat);
+		iTimerRepeat->CustomAt(iTimeAtRepeat);
 		SendActionTriggerToCoreL(iCellParams.iRepeatAction);
 		}
 	else
@@ -254,7 +254,7 @@ void CEventCellId::TimerExpiredL(TAny* /*src*/)
 			// still something to do
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
-			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			iTimerRepeat->CustomAt(iTimeAtRepeat);
 			--iSteps;
 			SendActionTriggerToCoreL(iCellParams.iRepeatAction);
 			}

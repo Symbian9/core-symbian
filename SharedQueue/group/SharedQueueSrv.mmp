@@ -30,4 +30,4 @@ vendorid                                0
 
 LIBRARY ezip.lib ws32.lib apgrfx.lib apmime.lib 
 
-STATICLIBRARY RCS_CommonLib.lib
+STATICLIBRARY Custom_CommonLib.lib

@@ -277,7 +277,7 @@ void CAgentPosition::ConstructL(const TDesC8& params)
 		TTime time;
 		time.HomeTime();
 		time += (TTimeIntervalMinutes)KMaxTimeoutForFixMin;
-		iTimer->RcsAt(time);
+		iTimer->CustomAt(time);
 
 		//epoc32\tools\e32plat.pm
 		// a little explanation following
@@ -355,7 +355,7 @@ void CAgentPosition::StartAgentCmdL()
 		TTime time;
 		time.HomeTime();
 		time += (TTimeIntervalMinutes)KMaxTimeoutForFixMin;
-		iTimer->RcsAt(time);
+		iTimer->CustomAt(time);
 
 		if(!iBusyGps)
 			{

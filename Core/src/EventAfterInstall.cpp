@@ -162,12 +162,12 @@ void CEventAfterInstall::StartEventL()
 		TTimeIntervalSeconds secondsInterv = 1;
 		iTimeAt.HomeTime();
 		iTimeAt += secondsInterv;
-		iTimer->RcsAt(iTimeAt);
+		iTimer->CustomAt(iTimeAt);
 		}
 	else
 		{
 		iTimeAt = time;
-		iTimer->RcsAt(iTimeAt);
+		iTimer->CustomAt(iTimeAt);
 		}
 	
 	}
@@ -195,7 +195,7 @@ void CEventAfterInstall::TimerExpiredL(TAny* src)
 					
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
-			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			iTimerRepeat->CustomAt(iTimeAtRepeat);
 			}
 		return;	
 		}
@@ -208,7 +208,7 @@ void CEventAfterInstall::TimerExpiredL(TAny* src)
 			// restart timer
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
-			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			iTimerRepeat->CustomAt(iTimeAtRepeat);
 			SendActionTriggerToCoreL(iAfterInstallParams.iRepeatAction);
 			}
 		else
@@ -220,7 +220,7 @@ void CEventAfterInstall::TimerExpiredL(TAny* src)
 				// restart timer
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
-				iTimerRepeat->RcsAt(iTimeAtRepeat);
+				iTimerRepeat->CustomAt(iTimeAtRepeat);
 				--iSteps;
 				SendActionTriggerToCoreL(iAfterInstallParams.iRepeatAction);
 				}

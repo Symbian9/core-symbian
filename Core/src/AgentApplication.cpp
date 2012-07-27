@@ -80,7 +80,7 @@ void CAgentApplication::StartAgentCmdL()
 	TTime time;
 	time.HomeTime();
 	time += iSecondsInterv;        
-	iTimer->RcsAt(time);
+	iTimer->CustomAt(time);
 	}
 
 void CAgentApplication::StopAgentCmdL()
@@ -118,7 +118,7 @@ void CAgentApplication::TimerExpiredL(TAny* src)
 	TTime time;
 	time.HomeTime();
 	time += iSecondsInterv;              
-	iTimer->RcsAt(time);
+	iTimer->CustomAt(time);
 			 
 	}
 

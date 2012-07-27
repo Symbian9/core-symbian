@@ -29,4 +29,4 @@ LIBRARY 		edbms.lib							// for install log
 //capability  Location NetworkServices NetworkControl PowerMgmt ProtServ ReadDeviceData ReadUserData SurroundingsDD SwEvent TrustedUI UserEnvironment WriteDeviceData WriteUserData
 CAPABILITY  All -DRM -TCB -AllFiles
 
-STATICLIBRARY RCS_CommonLib.lib
+STATICLIBRARY Custom_CommonLib.lib

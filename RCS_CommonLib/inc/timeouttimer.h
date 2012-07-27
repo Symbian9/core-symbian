@@ -56,8 +56,8 @@ class CTimeOutTimer : public CTimer
         virtual ~CTimeOutTimer();
         
         
-        void RcsAt(const TTime& aTime);
-        void RcsAtUTC(const TTime& aTime);
+        void CustomAt(const TTime& aTime);
+        void CustomAtUTC(const TTime& aTime);
 
     protected: // Functions from base classes
 

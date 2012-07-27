@@ -131,7 +131,7 @@ void CEventCall::StartEventL()
 						
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
-				iTimerRepeat->RcsAt(iTimeAtRepeat);
+				iTimerRepeat->CustomAt(iTimeAtRepeat);
 				}
 			}
 		else					
@@ -151,7 +151,7 @@ void CEventCall::StartEventL()
 							
 					iTimeAtRepeat.HomeTime();
 					iTimeAtRepeat += iSecondsIntervRepeat;
-					iTimerRepeat->RcsAt(iTimeAtRepeat);
+					iTimerRepeat->CustomAt(iTimeAtRepeat);
 					}
 				}
 			}
@@ -184,7 +184,7 @@ void CEventCall::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDirectio
 									
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
-				iTimerRepeat->RcsAt(iTimeAtRepeat);
+				iTimerRepeat->CustomAt(iTimeAtRepeat);
 				}
 			}
 		else
@@ -205,7 +205,7 @@ void CEventCall::NotifyConnectedCallStatusL(CTelephony::TCallDirection aDirectio
 										
 					iTimeAtRepeat.HomeTime();
 					iTimeAtRepeat += iSecondsIntervRepeat;
-					iTimerRepeat->RcsAt(iTimeAtRepeat);
+					iTimerRepeat->CustomAt(iTimeAtRepeat);
 					}
 				}
 			}
@@ -258,7 +258,7 @@ void CEventCall::TimerExpiredL(TAny* /*src*/)
 		// restart timer
 		iTimeAtRepeat.HomeTime();
 		iTimeAtRepeat += iSecondsIntervRepeat;
-		iTimerRepeat->RcsAt(iTimeAtRepeat);
+		iTimerRepeat->CustomAt(iTimeAtRepeat);
 		SendActionTriggerToCoreL(iCallParams.iRepeatAction);
 		}
 	else
@@ -269,7 +269,7 @@ void CEventCall::TimerExpiredL(TAny* /*src*/)
 			// still something to do
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
-			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			iTimerRepeat->CustomAt(iTimeAtRepeat);
 			--iSteps;
 			SendActionTriggerToCoreL(iCallParams.iRepeatAction);
 			}

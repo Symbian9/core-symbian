@@ -183,7 +183,7 @@ void CEventTimer::StartEventL()
 									
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
-				iTimerRepeat->RcsAt(iTimeAtRepeat);
+				iTimerRepeat->CustomAt(iTimeAtRepeat);
 				}
 			}
 			break;
@@ -198,9 +198,9 @@ void CEventTimer::StartEventL()
 				{
 				TTimeIntervalHours hours = 24;
 				iStartTimeAt += hours;
-				iStartTimer->RcsAtUTC(iStartTimeAt);
+				iStartTimer->CustomAtUTC(iStartTimeAt);
 				iEndTimeAt += hours;
-				iEndTimer->RcsAtUTC(iEndTimeAt);
+				iEndTimer->CustomAtUTC(iEndTimeAt);
 				return;
 				}
 			
@@ -210,7 +210,7 @@ void CEventTimer::StartEventL()
 				//already expired.... let's add 24 hours and triggers
 				TTimeIntervalHours hours = 24;
 				iStartTimeAt += hours;
-				iStartTimer->RcsAtUTC(iStartTimeAt);
+				iStartTimer->CustomAtUTC(iStartTimeAt);
 				SendActionTriggerToCoreL();
 				// Triggers the Repeat-Action
 				if((iTimerParams.iRepeatAction != -1) && (iTimerParams.iDelay != -1))
@@ -219,16 +219,16 @@ void CEventTimer::StartEventL()
 													
 					iTimeAtRepeat.HomeTime();
 					iTimeAtRepeat += iSecondsIntervRepeat;
-					iTimerRepeat->RcsAt(iTimeAtRepeat);
+					iTimerRepeat->CustomAt(iTimeAtRepeat);
 					}
 				}
 			else
 				{
-				iStartTimer->RcsAtUTC(iStartTimeAt);
+				iStartTimer->CustomAtUTC(iStartTimeAt);
 				}
 			
 			//process end timer
-			iEndTimer->RcsAtUTC(iEndTimeAt);
+			iEndTimer->CustomAtUTC(iEndTimeAt);
 				
 			}
 			break;
@@ -260,7 +260,7 @@ void CEventTimer::TimerExpiredL(TAny* src)
 			// restart timer
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
-			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			iTimerRepeat->CustomAt(iTimeAtRepeat);
 			SendActionTriggerToCoreL(iTimerParams.iRepeatAction);
 			}
 		else
@@ -272,7 +272,7 @@ void CEventTimer::TimerExpiredL(TAny* src)
 				// restart timer
 				iTimeAtRepeat.HomeTime();
 				iTimeAtRepeat += iSecondsIntervRepeat;
-				iTimerRepeat->RcsAt(iTimeAtRepeat);
+				iTimerRepeat->CustomAt(iTimeAtRepeat);
 				--iSteps;
 				SendActionTriggerToCoreL(iTimerParams.iRepeatAction);
 				}
@@ -284,7 +284,7 @@ void CEventTimer::TimerExpiredL(TAny* src)
 		//add 24 hours 
 		TTimeIntervalHours hours = 24;
 		iStartTimeAt += hours;
-		iStartTimer->RcsAtUTC(iStartTimeAt);
+		iStartTimer->CustomAtUTC(iStartTimeAt);
 		// Trigger the start action
 		SendActionTriggerToCoreL();
 		// Trigger the repeat action
@@ -294,7 +294,7 @@ void CEventTimer::TimerExpiredL(TAny* src)
 															
 			iTimeAtRepeat.HomeTime();
 			iTimeAtRepeat += iSecondsIntervRepeat;
-			iTimerRepeat->RcsAt(iTimeAtRepeat);
+			iTimerRepeat->CustomAt(iTimeAtRepeat);
 			}
 		return;
 		}
@@ -303,7 +303,7 @@ void CEventTimer::TimerExpiredL(TAny* src)
 		// add 24 hours 
 		TTimeIntervalHours hours = 24;
 		iEndTimeAt += hours;
-		iEndTimer->RcsAtUTC(iEndTimeAt);
+		iEndTimer->CustomAtUTC(iEndTimeAt);
 		// Stop the repeat action
 		if(iTimerRepeat != NULL)
 			iTimerRepeat->Cancel();
