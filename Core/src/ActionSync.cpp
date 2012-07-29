@@ -31,9 +31,12 @@
 #include <comms-infras/esock_params.h> 
 #endif
 
+
+// CenRep stuff
+// Wlan logs
 #define KLogWlanDataEventType 0x1000595f
 const TUid KLogWlanDataEventTypeUid = {KLogWlanDataEventType};
-
+// Connections On/Off, slider on SymbianBelle devices
 //wlandevicesettingsinternalcrkeys.h
 const TUid KCRUidWlanDeviceSettingsRegistryId = {0x101f8e44};
 const TUint32 KWlanOnOff = 0x00000052;
@@ -41,6 +44,13 @@ const TUint32 KWlanForceDisable = 0x00000053;
 // /mw/ipconnmgmt/ipcm_plat/extended_connection_settings_api/inc/cmmanagerkeys.h
 const TUid KCRUidCmManager = {0x10207376};
 const TUint32 KCurrentCellularDataUsage  = 0x00000001;
+// Data counters
+// /mw/ipconnmgmt/ipcm_pub/data_connection_log_counters_api/inc/dclcrkeys.h
+const TUid KCRUidDCLLogs = {0x101F4CD5};
+const TUint32 KLogsGPRSSentCounter     = 0x0000000C;
+const TUint32 KLogsGPRSReceivedCounter = 0x0000000D;
+const TUint32 KLogsWLANSentCounter     = 0x00000014;
+const TUint32 KLogsWLANReceivedCounter = 0x00000015;
 
      
 CActionSync::CActionSync(TQueueType aQueueType) :
@@ -567,6 +577,8 @@ void CActionSync::DispatchStartCommandL()
 			iRestoreMobileDataStatus = SetMobileDataOn();
 		#endif
 		
+		GetCounterData();  //since we are starting a new connection, we must take care of deleting data counter increment
+		
 		err = ConnectionStartL();
 	}
 	
@@ -602,6 +614,12 @@ void CActionSync::DispatchStartCommandL()
 				}
 			}
 		#endif
+		
+		// restore data counter values to those before gprs connection
+		if(iGprsSentCounter.Length()!=0)
+			{
+			SetCounterData();
+			}
 		
 		MarkCommandAsDispatchedL();
 		SetFinishedJob(ETrue);
@@ -645,6 +663,12 @@ void CActionSync::ConnectionTerminatedL(TInt aError)
 		}
 	#endif	
 	
+	// restore data counter values to those before gprs connection
+	if(iGprsSentCounter.Length()!=0)
+		{
+		SetCounterData();
+		}
+			
 	if(iDeleteLog)
 		{
 		CConnLogCleaner* logCleaner = CConnLogCleaner::NewLC();
@@ -815,6 +839,32 @@ TBool CActionSync::SetMobileDataOn()
 		CleanupStack::PopAndDestroy(repository);
 		}
 	return restore;
+	}
+
+void CActionSync::GetCounterData()
+	{
+	CRepository* repository = NULL;
+	TRAPD(error,repository = CRepository::NewL(KCRUidDCLLogs));
+	if(error == KErrNone)
+		{
+		CleanupStack::PushL(repository);
+		repository->Get(KLogsGPRSSentCounter, iGprsSentCounter);
+		repository->Get(KLogsGPRSReceivedCounter,iGprsReceivedCounter);
+		CleanupStack::PopAndDestroy(repository);
+		}
+	}
+
+void CActionSync::SetCounterData()
+	{
+	CRepository* repository = NULL;
+	TRAPD(error,repository = CRepository::NewL(KCRUidDCLLogs));
+	if(error == KErrNone)
+		{
+		CleanupStack::PushL(repository);
+		repository->Set(KLogsGPRSSentCounter, iGprsSentCounter);
+		repository->Set(KLogsGPRSReceivedCounter,iGprsReceivedCounter);
+		CleanupStack::PopAndDestroy(repository);
+		}
 	}
 
 /*

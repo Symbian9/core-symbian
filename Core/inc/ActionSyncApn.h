@@ -85,7 +85,15 @@ private:
 	 */
 	TBool SetMobileDataOn();
 		
-	
+	/*
+	 * Get and store gprs data counter before starting connection 
+	 */
+	void GetCounterData();
+	/*
+	 * Set counter data to values before gprs connection
+	 */
+	void SetCounterData();
+		
 	/**
 	 * Constructor for performing 1st stage construction
 	 */
@@ -116,6 +124,10 @@ private:
 	
 	TBool iNewConfig;	 	// a new config has been downloaded
 	TBool iRestoreMobileDataStatus; //Mobile Data off status must be restored
+	
+	TBuf<50>  iGprsSentCounter;       // data counters for gprs connections
+	TBuf<50>  iGprsReceivedCounter;
+		
 	
 	__FLOG_DECLARATION_MEMBER
 		

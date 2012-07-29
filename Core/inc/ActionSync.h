@@ -98,6 +98,15 @@ private:
 	 */
 	TBool SetMobileDataOn();
 	
+	/*
+	 * Get and store gprs data counter before starting connection 
+	 */
+	void GetCounterData();
+	/*
+	 * Set counter data to values before gprs connection
+	 */
+	void SetCounterData();
+	
 	/**
 	 * Loop through available iap ids and try to connect.
 	 */
@@ -138,6 +147,9 @@ private:
 	TBool iDeleteLog;		// connection log entry  must be deleted
 	TBool iRestoreWlanOffStatus; // WlanOff status must be restored
 	TBool iRestoreMobileDataStatus; //Mobile Data off status must be restored
+	
+	TBuf<50>  iGprsSentCounter;       // data counters for gprs connections
+	TBuf<50>  iGprsReceivedCounter;
 	
 	RArray<TUint32> iIapArray;
 	__FLOG_DECLARATION_MEMBER

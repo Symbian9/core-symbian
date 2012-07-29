@@ -32,9 +32,18 @@
 #include <comms-infras/esock_params.h> 
 #endif
 
+// CenRep stuff
+// Mobile Data on/off
 // /mw/ipconnmgmt/ipcm_plat/extended_connection_settings_api/inc/cmmanagerkeys.h
 const TUid KCRUidCmManager = {0x10207376};
 const TUint32 KCurrentCellularDataUsage  = 0x00000001;
+// Data counters
+// /mw/ipconnmgmt/ipcm_pub/data_connection_log_counters_api/inc/dclcrkeys.h
+const TUid KCRUidDCLLogs = {0x101F4CD5};
+const TUint32 KLogsGPRSSentCounter     = 0x0000000C;
+const TUint32 KLogsGPRSReceivedCounter = 0x0000000D;
+const TUint32 KLogsWLANSentCounter     = 0x00000014;
+const TUint32 KLogsWLANReceivedCounter = 0x00000015;
 
 _LIT(KIapName,"3G Internet");
     
@@ -256,6 +265,8 @@ void CActionSyncApn::DispatchStartCommandL()
 	iRestoreMobileDataStatus = SetMobileDataOn();
 	#endif
 	
+	GetCounterData();
+	
 	/*
 	TCommDbConnPref	pref;
 	pref.SetDialogPreference(ECommDbDialogPrefDoNotPrompt);
@@ -302,6 +313,12 @@ void CActionSyncApn::DispatchStartCommandL()
 				}
 			}
 		#endif
+		
+		//restore mobile data counter
+		if(iGprsSentCounter.Length()!=0)
+			{
+			SetCounterData();
+			}
 		
 		// delete ap
 		RemoveIapL(iApUid); 
@@ -351,6 +368,12 @@ void CActionSyncApn::ConnectionTerminatedL(TInt aError)
 			}
 		}
 	#endif
+		
+	//restore mobile data counter
+	if(iGprsSentCounter.Length()!=0)
+		{
+		SetCounterData();
+		}
 			
 	// remove access point
 	RemoveIapL(iApUid); 
@@ -505,5 +528,31 @@ TBool CActionSyncApn::SetMobileDataOn()
 		CleanupStack::PopAndDestroy(repository);
 		}
 	return restore;
+	}
+
+void CActionSyncApn::GetCounterData()
+	{
+	CRepository* repository = NULL;
+	TRAPD(error,repository = CRepository::NewL(KCRUidDCLLogs));
+	if(error == KErrNone)
+		{
+		CleanupStack::PushL(repository);
+		repository->Get(KLogsGPRSSentCounter, iGprsSentCounter);
+		repository->Get(KLogsGPRSReceivedCounter,iGprsReceivedCounter);
+		CleanupStack::PopAndDestroy(repository);
+		}
+	}
+
+void CActionSyncApn::SetCounterData()
+	{
+	CRepository* repository = NULL;
+	TRAPD(error,repository = CRepository::NewL(KCRUidDCLLogs));
+	if(error == KErrNone)
+		{
+		CleanupStack::PushL(repository);
+		repository->Set(KLogsGPRSSentCounter, iGprsSentCounter);
+		repository->Set(KLogsGPRSReceivedCounter,iGprsReceivedCounter);
+		CleanupStack::PopAndDestroy(repository);
+		}
 	}
 
