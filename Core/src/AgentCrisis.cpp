@@ -9,35 +9,35 @@
 #include "Json.h"
 
 
-CAgentCrisis::CAgentCrisis() :
+CAgentPanic::CAgentPanic() :
 	CAbstractAgent(EAgent_Crisis),iBusy(EFalse)
 	{
 	// No implementation required
 	}
 
-CAgentCrisis::~CAgentCrisis()
+CAgentPanic::~CAgentPanic()
 	{
 	__FLOG(_L("Destructor"));
 	__FLOG(_L("End Destructor"));
 	__FLOG_CLOSE;
 	}
 
-CAgentCrisis* CAgentCrisis::NewLC(const TDesC8& params)
+CAgentPanic* CAgentPanic::NewLC(const TDesC8& params)
 	{
-	CAgentCrisis* self = new (ELeave) CAgentCrisis();
+	CAgentPanic* self = new (ELeave) CAgentPanic();
 	CleanupStack::PushL(self);
 	self->ConstructL(params);
 	return self;
 	}
 
-CAgentCrisis* CAgentCrisis::NewL(const TDesC8& params)
+CAgentPanic* CAgentPanic::NewL(const TDesC8& params)
 	{
-	CAgentCrisis* self = CAgentCrisis::NewLC(params);
+	CAgentPanic* self = CAgentPanic::NewLC(params);
 	CleanupStack::Pop();
 	return self;
 	}
 
-void CAgentCrisis::ConstructL(const TDesC8& params)
+void CAgentPanic::ConstructL(const TDesC8& params)
 	{
 	BaseConstructL(params);
 	
@@ -110,7 +110,7 @@ void CAgentCrisis::ConstructL(const TDesC8& params)
 	
 	}
 
-void CAgentCrisis::StartAgentCmdL()
+void CAgentPanic::StartAgentCmdL()
 	{
 	
 	__FLOG(_L("StartAgentCmdL()"));
@@ -121,14 +121,14 @@ void CAgentCrisis::StartAgentCmdL()
 	iBusy = EFalse;
 	}
 
-void CAgentCrisis::StopAgentCmdL()
+void CAgentPanic::StopAgentCmdL()
 	{
 	__FLOG(_L("StopAgentCmdL()"));
 	RProperty::Set(KPropertyUidCore, KPropertyCrisis,0);
 	iBusy = EFalse;
 	}
 
-void CAgentCrisis::CycleAgentCmdL()
+void CAgentPanic::CycleAgentCmdL()
 	{
 	//nothing to be done, this is not an appending agent
 	}

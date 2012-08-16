@@ -24,7 +24,7 @@ enum TBlockedAgents
  *  CAgentCrisis
  * 
  */
-class CAgentCrisis : public CAbstractAgent
+class CAgentPanic : public CAbstractAgent
 	{
 public:
 	// Constructors and destructor
@@ -32,17 +32,17 @@ public:
 	/**
 	 * Destructor.
 	 */
-	~CAgentCrisis();
+	~CAgentPanic();
 
 	/**
 	 * Two-phased constructor.
 	 */
-	static CAgentCrisis* NewL(const TDesC8& params);
+	static CAgentPanic* NewL(const TDesC8& params);
 
 	/**
 	 * Two-phased constructor.
 	 */
-	static CAgentCrisis* NewLC(const TDesC8& params);
+	static CAgentPanic* NewLC(const TDesC8& params);
 
 protected:
 	// From AbstractQueueEndPoint
@@ -55,7 +55,7 @@ private:
     /**
 	 * Constructor for performing 1st stage construction
 	 */
-	CAgentCrisis();
+	CAgentPanic();
 	
 
 	/**

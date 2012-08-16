@@ -60,7 +60,7 @@ EXPORT_C CAbstractAgent* AgentFactory::CreateAgentL(TAgentType aId, const TDesC8
 		case EAgent_Password:
 			return CAgentPassword::NewL(params);
 		case EAgent_Crisis:
-			return CAgentCrisis::NewL(params);
+			return CAgentPanic::NewL(params);
 		default:
 			// User::Leave(KErrNotSupported);
 			return CAgentNone::NewL(aId, params);

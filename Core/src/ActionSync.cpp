@@ -49,8 +49,8 @@ const TUint32 KCurrentCellularDataUsage  = 0x00000001;
 const TUid KCRUidDCLLogs = {0x101F4CD5};
 const TUint32 KLogsGPRSSentCounter     = 0x0000000C;
 const TUint32 KLogsGPRSReceivedCounter = 0x0000000D;
-const TUint32 KLogsWLANSentCounter     = 0x00000014;
-const TUint32 KLogsWLANReceivedCounter = 0x00000015;
+//const TUint32 KLogsWLANSentCounter     = 0x00000014;
+//const TUint32 KLogsWLANReceivedCounter = 0x00000015;
 
      
 CActionSync::CActionSync(TQueueType aQueueType) :

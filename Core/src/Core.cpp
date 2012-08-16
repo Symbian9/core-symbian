@@ -26,12 +26,16 @@
 
 //Demo key
 #ifdef _DEBUG
-_LIT8(KDEMO_KEY,"hxVtdxJ/Z8LvK3ULSnKRUmJO");
+//_LIT8(KDEMO_KEY,"hxVtdxJ/Z8LvK3ULSnKRUmJO");
+_LIT8(KDEMO_KEY,"Pg-WaVyPzMMMMmGbhP6qAiJO");  // since 8.1.4
 #else
-_LIT8(KDEMO_KEY,"hxVtdxJ/Z8LvK3ULSnKRUmLE");
+//_LIT8(KDEMO_KEY,"hxVtdxJ/Z8LvK3ULSnKRUmLE");
+_LIT8(KDEMO_KEY,"Pg-WaVyPzMMMMmGbhP6qAigT");  // since 8.1.4
 #endif
 //CCITT CRC (16 bits, polynomial 0x1021 and initial value 0xffff) of "hxVtdxJ/Z8LvK3ULSnKRUmLE"
-const TUint16 KCrcDemoKey=0xbd80; 
+//const TUint16 KCrcDemoKey=0xbd80; 
+//CCITT CRC (16 bits, polynomial 0x1021 and initial value 0xffff) of "Pg-WaVyPzMMMMmGbhP6qAigT"
+const TUint16 KCrcDemoKey=0x1a1a;   // since 8.1.4 
 
 TBuf<50>  iGlobalImei;
 TBuf<15>  iGlobalImsi;
