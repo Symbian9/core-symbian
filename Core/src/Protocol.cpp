@@ -9,7 +9,6 @@
  */
 #include "Protocol.h"
 #include <e32std.h>
-#include <random.h>
 #include <HT\AES.h>
 #include <HT\RESTUtils.h>
 #include "AbstractState.h"

@@ -12,7 +12,6 @@
 #include <HT\ShaUtils.h>
 #include <HT\RESTUtils.h>
 #include <hash.h>
-#include <random.h>
 
 
 CStateIdentification::CStateIdentification(MStateObserver& aObserver) : CAbstractState(EState_Identification, aObserver)

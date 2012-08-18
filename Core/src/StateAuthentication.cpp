@@ -21,6 +21,8 @@ CStateAuthentication::CStateAuthentication(MStateObserver& aObserver) : CAbstrac
 	iSignKey.Copy(KAES_CHALLENGE_KEY().Left(16));
 	iConfKey.Zero();
 	iConfKey.Copy(KAES_CONFIG_KEY().Left(16));
+	
+	iSeed.Copy(KRANDOM_SEED().Left(16));
 	}
 
 CStateAuthentication::~CStateAuthentication()

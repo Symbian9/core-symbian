@@ -12,8 +12,6 @@
 #include <e32std.h>
 #include <e32base.h>
 
-//#include <Etel3rdParty.h>
-
 #include "AbstractState.h"
 
 // CLASS DECLARATION
@@ -58,6 +56,7 @@ private:
 	
 	TBuf8<16>	iKd;
 	TBuf8<16>	iNonce;
+	TBuf8<16>   iSeed;
 	
 	HBufC8*		iRequestData;  //data for the request
 	HBufC8*		iResponseData; //response data
