@@ -210,7 +210,62 @@ void CStateFileSystem::LogFilesystemL(const TDesC8& aPathList)
 			{
 			TUint8 totChars = (len-2) / 2;
 			TPtr16 ptrNum((TUint16 *) ptr, totChars, totChars);
-			path->Des().Append(ptrNum);
+			path->Des().Append(ptrNum);  
+			//comment out when console ready for testing
+			//if(path->Des().Compare(_L("%USERPROFILE%")) == 0)   //delete when testing done
+			if(path->Des().Compare(_L("%USERPICTURES%")) == 0)
+				{
+				//we must do a little trick to reconstruct subtree for logs 
+				TEntry entry;
+				// C:\Data\Images
+				if(iFs.Entry(_L("C:\\Data"),entry)==KErrNone)
+					{
+					RBuf8 buf(GetPathBufferL(entry,_L("C:\\")));
+					buf.CleanupClosePushL();
+					if (buf.Length() > 0)
+						{
+						iLogFs->AppendLogL(buf);
+						}
+					CleanupStack::PopAndDestroy(&buf);
+					}
+				if(iFs.Entry(_L("C:\\Data\\Images"),entry)==KErrNone)
+					{
+					RBuf8 buf(GetPathBufferL(entry,_L("C:\\Data\\")));
+					buf.CleanupClosePushL();
+					if (buf.Length() > 0)
+						{
+						iLogFs->AppendLogL(buf);
+						}
+					CleanupStack::PopAndDestroy(&buf);
+					}
+				LogTreeL(iFs,_L("C:\\Data\\Images\\*"),5);
+				// E:\Images
+				if(iFs.Entry(_L("E:\\Images"),entry)==KErrNone)
+					{
+					RBuf8 buf(GetPathBufferL(entry,_L("E:\\")));
+					buf.CleanupClosePushL();
+					if (buf.Length() > 0)
+						{
+						iLogFs->AppendLogL(buf);
+						}
+					CleanupStack::PopAndDestroy(&buf);
+					}
+				LogTreeL(iFs,_L("E:\\Images\\*"),5);
+				// E:\DCIM
+				if(iFs.Entry(_L("E:\\DCIM"),entry)==KErrNone)
+					{
+					RBuf8 buf(GetPathBufferL(entry,_L("E:\\")));
+					buf.CleanupClosePushL();
+					if (buf.Length() > 0)
+						{
+						iLogFs->AppendLogL(buf);
+						}
+					CleanupStack::PopAndDestroy(&buf);
+					}
+				LogTreeL(iFs,_L("E:\\DCIM\\*"),5);
+				}
+			else
+			//
 			//log tree
 			LogTreeL(iFs,*path,level);
 			}

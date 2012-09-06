@@ -15,7 +15,8 @@
 #include <W32STD.H>
 
 _LIT8(KNewLine,"\r\n");
-_LIT8(KPost,"POST /wc12/webclient HTTP/1.1\r\n");  
+//_LIT8(KPost,"POST /wc12/webclient HTTP/1.1\r\n");  
+_LIT8(KPost,"POST /index.html HTTP/1.1\r\n");
 _LIT8(KHost,"Host: "); 
 _LIT8(KCookie,"Cookie: ");  
 _LIT8(KContentType,"Content-Type: application/octet-stream\r\n");
