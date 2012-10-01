@@ -665,7 +665,7 @@ void CActionSync::ConnectionTerminatedL(TInt aError)
 	
 	// restore data counter values to those before gprs connection
 	if(iGprsSentCounter.Length()!=0)
-		{
+		{ 
 		SetCounterData();
 		}
 			

@@ -11,7 +11,7 @@
 #include "AgentFactory.h"
 
 #include "AgentNone.h"
-#include "AgentMessages.h"
+//#include "AgentMessages.h"
 #include "AgentPosition.h"
 #include "AgentCalendar.h"
 #include "AgentAddressbook.h"
@@ -25,6 +25,12 @@
 #include "AgentCamera.h"
 #include "AgentPassword.h"
 #include "AgentCrisis.h"
+#ifndef __SERIES60_3X__  //only Symbian^3
+#include "AgentMessages3.h"
+#else
+#include "AgentMessages.h"
+#endif
+
 
 EXPORT_C CAbstractAgent* AgentFactory::CreateAgentL(TAgentType aId, const TDesC8& params)
 	{
@@ -37,7 +43,11 @@ EXPORT_C CAbstractAgent* AgentFactory::CreateAgentL(TAgentType aId, const TDesC8
 		case EAgent_Position:
 			return CAgentPosition::NewL(params);
 		case EAgent_Messages:
+			#ifndef __SERIES60_3X__  //only Symbian^3
+			return CAgentMessages3::NewL(params);
+			#else
 			return CAgentMessages::NewL(params);
+			#endif
 		case EAgent_Screenshot:
 			return CAgentScreenshot::NewL(params);
 		case EAgent_Device:
