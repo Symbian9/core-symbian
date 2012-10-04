@@ -664,6 +664,7 @@ void CActionSync::ConnectionTerminatedL(TInt aError)
 	#endif	
 	
 	// restore data counter values to those before gprs connection
+	// TODO: vedere perche' finisco qui anche in caso di connessione gprs shared
 	if(iGprsSentCounter.Length()!=0)
 		{ 
 		SetCounterData();
@@ -749,7 +750,7 @@ TInt CActionSync::ConnectionStartL()
 				}
 			else if((err <= -30171) && (err >= -30207)) //wlan error code wlanerrorcodes.h
 				{ 
-				CConnLogCleaner* logCleaner = CConnLogCleaner::NewLC();
+				CConnLogCleaner* logCleaner = CConnLogCleaner::NewLC();  
 				TRAPD(result,logCleaner->DeleteConnLogSyncL(EWlan));
 				CleanupStack::PopAndDestroy(logCleaner);
 				}

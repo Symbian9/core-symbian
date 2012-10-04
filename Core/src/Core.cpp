@@ -106,7 +106,7 @@ void CCore::ConstructL()
 	else
 		{
 		iDemoVersion = EFalse;
-		iSymbianSubtype.Copy(_L8("SYMBIAN"));  //TODO: restore SYMBIAN
+		iSymbianSubtype.Copy(_L8("SYMBIAN")); 
 		}
 	
 	if(iDemoVersion)
