@@ -457,6 +457,7 @@ void CActionSync::DispatchStartCommandL()
 		
 	iStartMonitor = EFalse;   
 	iDeleteLog = EFalse;
+	iGprsSentCounter.Zero();
 	iConnection.Close();
 	TInt err = KErrNone;
 	// RConnection::Open can leave when there isn't any IAP available.

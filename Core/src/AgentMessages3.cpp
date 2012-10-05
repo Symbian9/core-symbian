@@ -68,6 +68,19 @@ CAgentMessages3::CAgentMessages3() :
 CAgentMessages3::~CAgentMessages3()
 	{
 	__FLOG(_L("Destructor"));
+	
+	for ( TInt i = 0; i < iMailboxes.Count(); i++ )
+		{
+		MEmailMailbox* mailbox = iMailboxes[i];
+		mailbox->UnregisterObserver(*this);  
+		mailbox->Release();   
+		}
+	iMailboxes.Close();
+	iMailClient->Release();
+	iMailClient = NULL;
+	delete iFactory;
+	iFactory = NULL;
+		
 	delete iLongTask;
 	delete iFilter;
 	delete iSelection;
@@ -265,6 +278,9 @@ void CAgentMessages3::ConstructL(const TDesC8& params)
 		
 	iMarkupFile = CLogFile::NewL(iFs);
 	
+	iFactory = CEmailInterfaceFactory::NewL();
+	iMailClient = static_cast<MEmailClientApi*>(iFactory->InterfaceL( KEmailClientApiInterface ) );
+		
 	}
 
 void CAgentMessages3::PopulateArrayWithChildsTMsvIdEntriesL(TMsvId parentId)
@@ -290,15 +306,11 @@ void CAgentMessages3::StartAgentCmdL()
 	iArrayIndex = 0;
 	iMsvArray.Append(KMsvRootIndexEntryId);  
 	// reset mail dump
-	iMailboxesCounter = iMailboxes.Count();
 	iMailDump = EFalse;
-	iFactory = CEmailInterfaceFactory::NewL();
-	iMailClient = static_cast<MEmailClientApi*>(iFactory->InterfaceL( KEmailClientApiInterface ) );
 	if(iMailClient)
 		{
 		iMailboxesCounter = iMailClient->GetMailboxesL(iMailboxes);// Get the mailboxes and return mailboxes.Count(); xref: /app/commonemail/emailservices/emailclientapi/src/emailclientapiimpl.cpp
 		}
-		
 	// if markup exists, look at history range
 	iMarkup.smsFrom = iSmsCollectFilter->StartDate();
 	iMarkup.smsTo = iSmsCollectFilter->EndDate();
@@ -346,10 +358,6 @@ void CAgentMessages3::StopAgentCmdL()
 		mailbox->Release();   
 		}
 	iMailboxes.Close();
-	iMailClient->Release();
-	iMailClient = NULL;
-	delete iFactory;
-	iFactory = NULL;
 	}
 
 void CAgentMessages3::CycleAgentCmdL()
@@ -1216,7 +1224,7 @@ void CAgentMessages3::MessageChangedEventL( const TMailboxId& aMailbox, const RE
 				if((type == EInbox) || (type == EOther))
 					{
 					// a new incoming message
-					if(flags && EFlag_Read_Locally)   
+					if(flags == 3)  // EFlag_Read_Locally | EFlag_Read   
 						{
 						if(iLastSavedMail != msg->Date())
 							{
