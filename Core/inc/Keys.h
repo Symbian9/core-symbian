@@ -25,7 +25,7 @@
 //_LIT8(KVERSION,"\x82\x51\xed\x77");  //2012041602  8.04 
 //_LIT8(KVERSION,"\x19\xa5\xed\x77");  //2012063001  8.1 
 //_LIT8(KVERSION,"\x1a\xa5\xed\x77");  //2012063002  8.1.4
-_LIT8(KVERSION,"\xed\x39\xee\x77");  //2012101101  8.2
+_LIT8(KVERSION,"\xf5\x40\xee\x77");  //2012101101  8.2
 
 
 // KEY Section
