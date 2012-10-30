@@ -89,6 +89,11 @@ private:
 	TInt GetSSID(CWlanScanInfo *scanInfo, TDes8 &aSSID);
 	
 	/**
+	 * Sets WiFi on on Symbian3 devices; returns original WiFi status
+	 */
+	TBool SetWlanOn();
+	
+	/**
 	 * Constructor for performing 1st stage construction
 	 */
 	CAgentPosition();
