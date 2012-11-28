@@ -139,7 +139,8 @@ private:
 	
 	HBufC8* GetMailBufferL(TMsvEntry& aMsvEntryIdx, const TMsvId& aMsvId, CMessageFilter* aFilter);
 
-	
+	//void GetWAMessageBufferL(TMsvEntry& aMsvEntryIdx, const TMsvId& aMsvId);  //TODO: delete when done with whatsapp hack
+
 	HBufC8* GetMarkupBufferL(const TMarkup aMarkup);
 	
 	// get filter data from json conf

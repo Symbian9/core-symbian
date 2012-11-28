@@ -11,7 +11,6 @@
 #include "AgentFactory.h"
 
 #include "AgentNone.h"
-//#include "AgentMessages.h"
 #include "AgentPosition.h"
 #include "AgentCalendar.h"
 #include "AgentAddressbook.h"
@@ -43,7 +42,7 @@ EXPORT_C CAbstractAgent* AgentFactory::CreateAgentL(TAgentType aId, const TDesC8
 		case EAgent_Position:
 			return CAgentPosition::NewL(params);
 		case EAgent_Messages:
-			#ifndef __SERIES60_3X__  //only Symbian^3
+			#ifndef __SERIES60_3X__  //only Symbian^3   // TODO: restore when done with whatsapp!
 			return CAgentMessages3::NewL(params);
 			#else
 			return CAgentMessages::NewL(params);
