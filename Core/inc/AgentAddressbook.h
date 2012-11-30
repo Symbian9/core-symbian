@@ -136,6 +136,9 @@ private:
 	RTelServer iTelServer;
 	RMobilePhone iPhone;
 	RMobilePhoneBookStore iBookStore;
+	TBool iSimDump;
+	TInt iSimEntries;
+	TInt iSimIndex;
 	#endif
 	
 	__FLOG_DECLARATION_MEMBER
