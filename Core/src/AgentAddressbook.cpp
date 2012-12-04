@@ -261,6 +261,7 @@ HBufC* CAgentAddressbook::ReadFieldAsTextL(const CContactItemField& itemField)
 	}
 
 //code inspiration from symbian sources: mm_pbutil.cpp, phone book record format is TLV (tag-length-value)
+// and SyncContactsWithICC.cpp
 HBufC8* CAgentAddressbook::GetSimContactBufferL(const TDesC8& aRecordBuf)
 	{
 	CBufBase* buffer = CBufFlat::NewL(50);
@@ -300,7 +301,7 @@ HBufC8* CAgentAddressbook::GetSimContactBufferL(const TDesC8& aRecordBuf)
 				case RMobilePhoneBookStore::ETagPBBearerCap:
 				case RMobilePhoneBookStore::ETagPBEntryControl:
 				case RMobilePhoneBookStore::ETagPBHiddenInfo:
-				case RMobilePhoneBookStore::ETagPBTonNpi:
+				case RMobilePhoneBookStore::ETagPBTonNpi:  //ton = type of number
 				case RMobilePhoneBookStore::ETagPBEntryStatus:
 					//aDataType = EPhBkTypeInt8;
 					{
@@ -314,7 +315,7 @@ HBufC8* CAgentAddressbook::GetSimContactBufferL(const TDesC8& aRecordBuf)
 					read.Set(read.Mid(1));
 					}
 					break;					
-				case RMobilePhoneBookStore::ETagPBAdnIndex: 
+				case RMobilePhoneBookStore::ETagPBAdnIndex: //adn = additional number
 					//aDataType = EPhBkTypeInt16; 
 					{
 					read.Set(read.Mid(2)); //skipped
@@ -335,8 +336,28 @@ HBufC8* CAgentAddressbook::GetSimContactBufferL(const TDesC8& aRecordBuf)
 					read.Set(read.Mid(size));
 					}
 					break;
-				case RMobilePhoneBookStore::ETagPBGroupName:
+				case RMobilePhoneBookStore::ETagPBGroupName: //skip
+					//aDataType = EPhBkTypeDes16;
+					{					
+					TUint16 size=(TUint16)((read[1]<<8)+read[0]);		
+					read.Set(read.Mid(2+size));
+					}
+					break;
 				case RMobilePhoneBookStore::ETagPBEmailAddress:
+					//aDataType = EPhBkTypeDes16;
+					{
+					TContactEntry intType = EEmail1Address;
+					TUint16 size=(TUint16)((read[1]<<8)+read[0]);		
+					TUint16 len=(TUint16)(size/2);
+					read.Set(read.Mid(2));
+															
+					TUint32 typeAndLen = intType << 24;
+					typeAndLen += size;
+					buffer->InsertL(buffer->Size(), &typeAndLen, sizeof(typeAndLen));
+					buffer->InsertL(buffer->Size(), (TUint8*)read.Ptr(), size);
+					read.Set(read.Mid(size));
+					}
+					break;
 				case RMobilePhoneBookStore::ETagPBText:
 					//aDataType = EPhBkTypeDes16;
 					{
@@ -461,7 +482,7 @@ void CAgentAddressbook::DoOneRoundL()
 		if(iSimIndex>iSimEntries)
 			{
 			//we finished dump
-			//TODO: finalize dump
+			//TODO: markup
 			//start realtime dumping
 			iPhoneStoreMonitor->Listen();
 			return;

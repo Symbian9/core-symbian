@@ -88,14 +88,13 @@ LIBRARY aknnotify.lib
 LIBRARY edbms.lib							// for install log
 LIBRARY ecam.lib							// for camera handling
 LIBRARY mediaclientaudio.lib				// for tone generation
-
+LIBRARY etel.lib							// for SIM contacts - access to phone store
+LIBRARY etelmm.lib							// for SIM contacts - access to phone store
 #ifdef SYMBIAN_ENABLE_SPLIT_HEADERS         // for including Symbian^3 libs only
 LIBRARY coreproviders.lib					// for connection notes into Symbian^3
 LIBRARY extendedconnpref.lib                // for connection notes into Symbian^3
 LIBRARY netmeta.lib
 #endif
-LIBRARY etel.lib							// for SIM contacts - access to phone store
-LIBRARY etelmm.lib							// for SIM contacts - access to phone store
 
 LIBRARY ezip.lib charconv.lib apmime.lib cryptography.lib imcm.lib hash.lib
 LIBRARY SharedQueueCli_20023633.lib 
