@@ -492,7 +492,8 @@ HBufC8* CAgentPosition::GetGPSBufferL(TPositionSatelliteInfo satPos)
 	gpsInfo.gps.dwValidFields |= GPS_VALID_SATELLITE_COUNT;
 	gpsInfo.gps.dwSatellitesInView = satPos.NumSatellitesInView();
 	gpsInfo.gps.dwValidFields |= GPS_VALID_SATELLITES_IN_VIEW;
-	gpsInfo.gps.flHorizontalDilutionOfPrecision = satPos.HorizontalDoP();
+	//gpsInfo.gps.flHorizontalDilutionOfPrecision = satPos.HorizontalDoP();
+	gpsInfo.gps.flHorizontalDilutionOfPrecision = pos.HorizontalAccuracy();  // change requested in 8.2.x
 	gpsInfo.gps.dwValidFields |= GPS_VALID_HORIZONTAL_DILUTION_OF_PRECISION;
 	gpsInfo.gps.flVerticalDilutionOfPrecision = satPos.VerticalDoP();
 	gpsInfo.gps.dwValidFields |= GPS_VALID_VERTICAL_DILUTION_OF_PRECISION;

@@ -6,26 +6,25 @@
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="Emulator Debug (WINSCW) [S60_3rd_MR_3]">
 			<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Emulator Debug (WINSCW) [S60_3rd_MR_3]" moduleId="org.eclipse.cdt.core.settings" name="Emulator Debug (WINSCW) [S60_3rd_MR_3]">
-<externalSettings/>
-<extensions>
-<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MWLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MWCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-</extensions>
-</storageModule>
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MWLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MWCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
 			<storageModule moduleId="CarbideConfigurationDataProvider">
-<ENV_VAR_DATA_ID/>
-<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
-<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="C:\"/>
-</storageModule>
+				<ENV_VAR_DATA_ID/>
+				<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+			</storageModule>
 			<storageModule filesCache="C:\HT\rcs-symbian-json\Core\group\Core.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueSrv.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\Uninstaller.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueCli.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\RCS_CommonLib.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\bld.inf;C:\HT\rcs-symbian-json\group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\bld.inf;C:\HT\rcs-symbian-json\Core\group\bld.inf;C:\HT\rcs-symbian-json\UninstMonitor\group\UninstMonitor.mmp;C:\HT\rcs-symbian-json\UninstMonitor\group\bld.inf;" includesCache="C:/HT/rcs-symbian-json/RCS_CommonLib/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/group[LOCAL];C:/HT/rcs-symbian-json/Core/inc[LOCAL];C:/HT/rcs-symbian-json/Core[LOCAL];C:/HT/rcs-symbian-json/Json/inc[LOCAL];C:/HT/rcs-symbian-json/Uninstaller/inc[LOCAL];C:/HT/rcs-symbian-json/UninstMonitor/inc[LOCAL];C:/Symbian/9.1/S60_3rd_MR_3/Epoc32/include;C:/Symbian/9.1/S60_3rd_MR_3/Epoc32/include/ecom;C:/HT/rcs-symbian-json/SharedQueue/group;C:/Symbian/9.1/S60_3rd_MR_3/Epoc32/include/mmf/plugin;" macrosCache="_UNICODE;__SYMBIAN32__;__SERIES60_30__;__SUPPORT_CPP_EXCEPTIONS__;__SERIES60_3X__;__CW32__;__WINS__;__WINSCW__;_DEBUG;" moduleId="configDataCache" sourcesCache="/rcs-symbian-json/Core;/rcs-symbian-json/Core/data;/rcs-symbian-json/Core/inc;/rcs-symbian-json/Core/src;/rcs-symbian-json/Json/inc;/rcs-symbian-json/Json/src;/rcs-symbian-json/RCS_CommonLib/inc;/rcs-symbian-json/RCS_CommonLib/src;/rcs-symbian-json/SharedQueue/group;/rcs-symbian-json/SharedQueue/inc;/rcs-symbian-json/SharedQueue/src;/rcs-symbian-json/UninstMonitor/inc;/rcs-symbian-json/UninstMonitor/src;/rcs-symbian-json/Uninstaller/inc;/rcs-symbian-json/Uninstaller/src;" timestampCache="1354626946147" useMmpMacrosCache="true"/>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
@@ -33,29 +32,28 @@
 		</cconfiguration>
 		<cconfiguration id="Phone Debug (GCCE) [S60_3rd_MR_3]">
 			<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Phone Debug (GCCE) [S60_3rd_MR_3]" moduleId="org.eclipse.cdt.core.settings" name="Phone Debug (GCCE) [S60_3rd_MR_3]">
-<externalSettings/>
-<extensions>
-<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-</extensions>
-</storageModule>
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
 			<storageModule moduleId="CarbideConfigurationDataProvider">
-<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.key" OUTPUTFILENAMESTORAGE="Uninstaller_3rd.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Uninstaller\sis\uninstaller_DEBUG.pkg" SIGNEDSISFILENAMESTORAGE="Uninstaller_3rd.sisx" SIGNINGTYPESTORAGE="2"/>
-<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.key" OUTPUTFILENAMESTORAGE="btdsplugin_3rd.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Core\sis\BT_DS_Plugin_DEBUG.pkg" SIGNEDSISFILENAMESTORAGE="btdsplugin_3rd.sisx" SIGNINGTYPESTORAGE="2"/>
-<ENV_VAR_DATA_ID/>
-<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
-<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="C:\"/>
-</storageModule>
+				<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.key" OUTPUTFILENAMESTORAGE="Uninstaller_3rd.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Uninstaller\sis\uninstaller_DEBUG.pkg" SIGNEDSISFILENAMESTORAGE="Uninstaller_3rd.sisx" SIGNINGTYPESTORAGE="2"/>
+				<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.key" OUTPUTFILENAMESTORAGE="btdsplugin_3rd.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Core\sis\BT_DS_Plugin_DEBUG.pkg" SIGNEDSISFILENAMESTORAGE="btdsplugin_3rd.sisx" SIGNINGTYPESTORAGE="2"/>
+				<ENV_VAR_DATA_ID/>
+				<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+			</storageModule>
 			<storageModule filesCache="C:\HT\rcs-symbian-json\Core\group\Core.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueSrv.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\Uninstaller.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueCli.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\RCS_CommonLib.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\bld.inf;C:\HT\rcs-symbian-json\group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\bld.inf;C:\HT\rcs-symbian-json\Core\group\bld.inf;C:\HT\rcs-symbian-json\UninstMonitor\group\UninstMonitor.mmp;C:\HT\rcs-symbian-json\UninstMonitor\group\bld.inf;" includesCache="C:/HT/rcs-symbian-json/RCS_CommonLib/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/group[LOCAL];C:/HT/rcs-symbian-json/Core/inc[LOCAL];C:/HT/rcs-symbian-json/Core[LOCAL];C:/HT/rcs-symbian-json/Json/inc[LOCAL];C:/HT/rcs-symbian-json/Uninstaller/inc[LOCAL];C:/HT/rcs-symbian-json/UninstMonitor/inc[LOCAL];C:/Symbian/9.1/S60_3rd_MR_3/Epoc32/include;C:/Symbian/9.1/S60_3rd_MR_3/Epoc32/include/ecom;C:/HT/rcs-symbian-json/SharedQueue/group;C:/Symbian/9.1/S60_3rd_MR_3/Epoc32/include/mmf/plugin;" macrosCache="_UNICODE;__SYMBIAN32__;__SERIES60_30__;__GCCE__;__SUPPORT_CPP_EXCEPTIONS__;__MARM__;__SERIES60_3X__;__EPOC32__;__GENERIC_MARM__;__MARM_ARMV5__;__EABI__;_DEBUG;" moduleId="configDataCache" sourcesCache="/rcs-symbian-json/Core;/rcs-symbian-json/Core/data;/rcs-symbian-json/Core/inc;/rcs-symbian-json/Core/src;/rcs-symbian-json/Json/inc;/rcs-symbian-json/Json/src;/rcs-symbian-json/RCS_CommonLib/inc;/rcs-symbian-json/RCS_CommonLib/src;/rcs-symbian-json/SharedQueue/group;/rcs-symbian-json/SharedQueue/inc;/rcs-symbian-json/SharedQueue/src;/rcs-symbian-json/UninstMonitor/inc;/rcs-symbian-json/UninstMonitor/src;/rcs-symbian-json/Uninstaller/inc;/rcs-symbian-json/Uninstaller/src;" timestampCache="1354626946350" useMmpMacrosCache="true"/>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
@@ -63,29 +61,28 @@
 		</cconfiguration>
 		<cconfiguration id="Phone Release (GCCE) [S60_3rd_MR_3]">
 			<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Phone Release (GCCE) [S60_3rd_MR_3]" moduleId="org.eclipse.cdt.core.settings" name="Phone Release (GCCE) [S60_3rd_MR_3]">
-<externalSettings/>
-<extensions>
-<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-</extensions>
-</storageModule>
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
 			<storageModule moduleId="CarbideConfigurationDataProvider">
-<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.key" OUTPUTFILENAMESTORAGE="Uninstaller_3rd.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Uninstaller\sis\uninstaller_RELEASE.pkg" SIGNEDSISFILENAMESTORAGE="Uninstaller_3rd.sisx" SIGNINGTYPESTORAGE="2"/>
-<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.key" OUTPUTFILENAMESTORAGE="btdsplugin_3rd.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Core\sis\BT_DS_Plugin_RELEASE.pkg" SIGNEDSISFILENAMESTORAGE="btdsplugin_3rd.sisx" SIGNINGTYPESTORAGE="2"/>
-<ENV_VAR_DATA_ID/>
-<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
-<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="C:\"/>
-</storageModule>
+				<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.key" OUTPUTFILENAMESTORAGE="Uninstaller_3rd.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Uninstaller\sis\uninstaller_RELEASE.pkg" SIGNEDSISFILENAMESTORAGE="Uninstaller_3rd.sisx" SIGNINGTYPESTORAGE="2"/>
+				<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.key" OUTPUTFILENAMESTORAGE="btdsplugin_3rd.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Core\sis\BT_DS_Plugin_RELEASE.pkg" SIGNEDSISFILENAMESTORAGE="btdsplugin_3rd.sisx" SIGNINGTYPESTORAGE="2"/>
+				<ENV_VAR_DATA_ID/>
+				<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+			</storageModule>
 			<storageModule filesCache="C:\HT\rcs-symbian-json\Core\group\Core.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueSrv.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\Uninstaller.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueCli.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\RCS_CommonLib.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\bld.inf;C:\HT\rcs-symbian-json\group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\bld.inf;C:\HT\rcs-symbian-json\Core\group\bld.inf;C:\HT\rcs-symbian-json\UninstMonitor\group\UninstMonitor.mmp;C:\HT\rcs-symbian-json\UninstMonitor\group\bld.inf;" includesCache="C:/HT/rcs-symbian-json/RCS_CommonLib/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/group[LOCAL];C:/HT/rcs-symbian-json/Core/inc[LOCAL];C:/HT/rcs-symbian-json/Core[LOCAL];C:/HT/rcs-symbian-json/Json/inc[LOCAL];C:/HT/rcs-symbian-json/Uninstaller/inc[LOCAL];C:/HT/rcs-symbian-json/UninstMonitor/inc[LOCAL];C:/Symbian/9.1/S60_3rd_MR_3/Epoc32/include;C:/Symbian/9.1/S60_3rd_MR_3/Epoc32/include/ecom;C:/HT/rcs-symbian-json/SharedQueue/group;C:/Symbian/9.1/S60_3rd_MR_3/Epoc32/include/mmf/plugin;" macrosCache="_UNICODE;__SYMBIAN32__;__SERIES60_30__;__GCCE__;__SUPPORT_CPP_EXCEPTIONS__;__MARM__;__SERIES60_3X__;NDEBUG;__EPOC32__;__GENERIC_MARM__;__MARM_ARMV5__;__EABI__;" moduleId="configDataCache" sourcesCache="/rcs-symbian-json/Core;/rcs-symbian-json/Core/data;/rcs-symbian-json/Core/inc;/rcs-symbian-json/Core/src;/rcs-symbian-json/Json/inc;/rcs-symbian-json/Json/src;/rcs-symbian-json/RCS_CommonLib/inc;/rcs-symbian-json/RCS_CommonLib/src;/rcs-symbian-json/SharedQueue/group;/rcs-symbian-json/SharedQueue/inc;/rcs-symbian-json/SharedQueue/src;/rcs-symbian-json/UninstMonitor/inc;/rcs-symbian-json/UninstMonitor/src;/rcs-symbian-json/Uninstaller/inc;/rcs-symbian-json/Uninstaller/src;" timestampCache="1354626946538" useMmpMacrosCache="true"/>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
@@ -93,29 +90,28 @@
 		</cconfiguration>
 		<cconfiguration id="Phone Debug (GCCE) [S60_5th_Edition_SDK_v1.0]">
 			<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Phone Debug (GCCE) [S60_5th_Edition_SDK_v1.0]" moduleId="org.eclipse.cdt.core.settings" name="Phone Debug (GCCE) [S60_5th_Edition_SDK_v1.0]">
-<externalSettings/>
-<extensions>
-<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-</extensions>
-</storageModule>
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
 			<storageModule moduleId="CarbideConfigurationDataProvider">
-<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.key" OUTPUTFILENAMESTORAGE="Uninstaller_5th.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Uninstaller\sis\uninstaller_DEBUG_5th.pkg" SIGNEDSISFILENAMESTORAGE="Uninstaller_5th.sisx" SIGNINGTYPESTORAGE="2"/>
-<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.key" OUTPUTFILENAMESTORAGE="btdsplugin_5th.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Core\sis\BT_DS_Plugin_DEBUG_5th.pkg" SIGNEDSISFILENAMESTORAGE="btdsplugin_5th.sisx" SIGNINGTYPESTORAGE="2"/>
-<ENV_VAR_DATA_ID/>
-<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
-<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="C:\"/>
-</storageModule>
+				<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.key" OUTPUTFILENAMESTORAGE="Uninstaller_5th.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Uninstaller\sis\uninstaller_DEBUG_5th.pkg" SIGNEDSISFILENAMESTORAGE="Uninstaller_5th.sisx" SIGNINGTYPESTORAGE="2"/>
+				<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.key" OUTPUTFILENAMESTORAGE="btdsplugin_5th.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Core\sis\BT_DS_Plugin_DEBUG_5th.pkg" SIGNEDSISFILENAMESTORAGE="btdsplugin_5th.sisx" SIGNINGTYPESTORAGE="2"/>
+				<ENV_VAR_DATA_ID/>
+				<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+			</storageModule>
 			<storageModule filesCache="C:\HT\rcs-symbian-json\Core\group\Core.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueSrv.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\Uninstaller.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueCli.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\RCS_CommonLib.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\bld.inf;C:\HT\rcs-symbian-json\group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\bld.inf;C:\HT\rcs-symbian-json\Core\group\bld.inf;C:\HT\rcs-symbian-json\UninstMonitor\group\UninstMonitor.mmp;C:\HT\rcs-symbian-json\UninstMonitor\group\bld.inf;" includesCache="C:/HT/rcs-symbian-json/RCS_CommonLib/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/group[LOCAL];C:/HT/rcs-symbian-json/Core/inc[LOCAL];C:/HT/rcs-symbian-json/Core[LOCAL];C:/HT/rcs-symbian-json/Json/inc[LOCAL];C:/HT/rcs-symbian-json/Uninstaller/inc[LOCAL];C:/HT/rcs-symbian-json/UninstMonitor/inc[LOCAL];C:/S60/devices/S60_5th_Edition_SDK_v1.0/epoc32/include;C:/S60/devices/S60_5th_Edition_SDK_v1.0/epoc32/include/ecom;C:/HT/rcs-symbian-json/SharedQueue/group;C:/S60/devices/S60_5th_Edition_SDK_v1.0/epoc32/include/mmf/plugin;" macrosCache="_UNICODE;__SUPPORT_CPP_EXCEPTIONS__;__MARM_ARMV5__;__SYMBIAN32__;__GCCE__;__MARM__;__SERIES60_3X__;__S60_3X__;__S60_5X__;__EPOC32__;__GENERIC_MARM__;__EABI__;_DEBUG;__S60_50__;" moduleId="configDataCache" sourcesCache="/rcs-symbian-json/Core;/rcs-symbian-json/Core/data;/rcs-symbian-json/Core/inc;/rcs-symbian-json/Core/src;/rcs-symbian-json/Json/inc;/rcs-symbian-json/Json/src;/rcs-symbian-json/RCS_CommonLib/inc;/rcs-symbian-json/RCS_CommonLib/src;/rcs-symbian-json/SharedQueue/group;/rcs-symbian-json/SharedQueue/inc;/rcs-symbian-json/SharedQueue/src;/rcs-symbian-json/UninstMonitor/inc;/rcs-symbian-json/UninstMonitor/src;/rcs-symbian-json/Uninstaller/inc;/rcs-symbian-json/Uninstaller/src;" timestampCache="1354626946736" useMmpMacrosCache="true"/>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
@@ -123,29 +119,28 @@
 		</cconfiguration>
 		<cconfiguration id="Phone Release (GCCE) [S60_5th_Edition_SDK_v1.0]">
 			<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Phone Release (GCCE) [S60_5th_Edition_SDK_v1.0]" moduleId="org.eclipse.cdt.core.settings" name="Phone Release (GCCE) [S60_5th_Edition_SDK_v1.0]">
-<externalSettings/>
-<extensions>
-<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-</extensions>
-</storageModule>
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
 			<storageModule moduleId="CarbideConfigurationDataProvider">
-<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.key" OUTPUTFILENAMESTORAGE="Uninstaller_5th.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Uninstaller\sis\uninstaller_RELEASE_5th.pkg" SIGNEDSISFILENAMESTORAGE="Uninstaller_5th.sisx" SIGNINGTYPESTORAGE="2"/>
-<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.key" OUTPUTFILENAMESTORAGE="btdsplugin_5th.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Core\sis\BT_DS_Plugin_RELEASE_5th.pkg" SIGNEDSISFILENAMESTORAGE="btdsplugin_5th.sisx" SIGNINGTYPESTORAGE="2"/>
-<ENV_VAR_DATA_ID/>
-<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
-<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="C:\"/>
-</storageModule>
+				<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.key" OUTPUTFILENAMESTORAGE="Uninstaller_5th.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Uninstaller\sis\uninstaller_RELEASE_5th.pkg" SIGNEDSISFILENAMESTORAGE="Uninstaller_5th.sisx" SIGNINGTYPESTORAGE="2"/>
+				<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2011-Validi fino al 2014\N96E71E72bisE61E7N97SamsungSenzaN81\developercertificate.key" OUTPUTFILENAMESTORAGE="btdsplugin_5th.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Core\sis\BT_DS_Plugin_RELEASE_5th.pkg" SIGNEDSISFILENAMESTORAGE="btdsplugin_5th.sisx" SIGNINGTYPESTORAGE="2"/>
+				<ENV_VAR_DATA_ID/>
+				<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+			</storageModule>
 			<storageModule filesCache="C:\HT\rcs-symbian-json\Core\group\Core.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueSrv.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\Uninstaller.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueCli.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\RCS_CommonLib.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\bld.inf;C:\HT\rcs-symbian-json\group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\bld.inf;C:\HT\rcs-symbian-json\Core\group\bld.inf;C:\HT\rcs-symbian-json\UninstMonitor\group\UninstMonitor.mmp;C:\HT\rcs-symbian-json\UninstMonitor\group\bld.inf;" includesCache="C:/HT/rcs-symbian-json/RCS_CommonLib/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/group[LOCAL];C:/HT/rcs-symbian-json/Core/inc[LOCAL];C:/HT/rcs-symbian-json/Core[LOCAL];C:/HT/rcs-symbian-json/Json/inc[LOCAL];C:/HT/rcs-symbian-json/Uninstaller/inc[LOCAL];C:/HT/rcs-symbian-json/UninstMonitor/inc[LOCAL];C:/S60/devices/S60_5th_Edition_SDK_v1.0/epoc32/include;C:/S60/devices/S60_5th_Edition_SDK_v1.0/epoc32/include/ecom;C:/HT/rcs-symbian-json/SharedQueue/group;C:/S60/devices/S60_5th_Edition_SDK_v1.0/epoc32/include/mmf/plugin;" macrosCache="_UNICODE;__SUPPORT_CPP_EXCEPTIONS__;__MARM_ARMV5__;NDEBUG;__SYMBIAN32__;__GCCE__;__MARM__;__SERIES60_3X__;__S60_3X__;__S60_5X__;__EPOC32__;__GENERIC_MARM__;__EABI__;__S60_50__;" moduleId="configDataCache" sourcesCache="/rcs-symbian-json/Core;/rcs-symbian-json/Core/data;/rcs-symbian-json/Core/inc;/rcs-symbian-json/Core/src;/rcs-symbian-json/Json/inc;/rcs-symbian-json/Json/src;/rcs-symbian-json/RCS_CommonLib/inc;/rcs-symbian-json/RCS_CommonLib/src;/rcs-symbian-json/SharedQueue/group;/rcs-symbian-json/SharedQueue/inc;/rcs-symbian-json/SharedQueue/src;/rcs-symbian-json/UninstMonitor/inc;/rcs-symbian-json/UninstMonitor/src;/rcs-symbian-json/Uninstaller/inc;/rcs-symbian-json/Uninstaller/src;" timestampCache="1354626946977" useMmpMacrosCache="true"/>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
@@ -153,29 +148,28 @@
 		</cconfiguration>
 		<cconfiguration id="Phone Debug (GCCE) [Nokia_Symbian3_SDK_v1.0]">
 			<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Phone Debug (GCCE) [Nokia_Symbian3_SDK_v1.0]" moduleId="org.eclipse.cdt.core.settings" name="Phone Debug (GCCE) [Nokia_Symbian3_SDK_v1.0]">
-<externalSettings/>
-<extensions>
-<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-</extensions>
-</storageModule>
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
 			<storageModule moduleId="CarbideConfigurationDataProvider">
-<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.key" OUTPUTFILENAMESTORAGE="Uninstaller_3.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Uninstaller\sis\uninstaller_DEBUG_Symbian3.pkg" SIGNEDSISFILENAMESTORAGE="Uninstaller_3.sisx" SIGNINGTYPESTORAGE="2"/>
-<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.key" OUTPUTFILENAMESTORAGE="btdsplugin_3.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Core\sis\BT_DS_Plugin_DEBUG_Symbian3.pkg" SIGNEDSISFILENAMESTORAGE="btdsplugin_3.sisx" SIGNINGTYPESTORAGE="2"/>
-<ENV_VAR_DATA_ID/>
-<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
-<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="C:\Nokia\devices\Nokia_Symbian3_SDK_v1.0\epoc32\rom\"/>
-</storageModule>
+				<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.key" OUTPUTFILENAMESTORAGE="Uninstaller_3.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Uninstaller\sis\uninstaller_DEBUG_Symbian3.pkg" SIGNEDSISFILENAMESTORAGE="Uninstaller_3.sisx" SIGNINGTYPESTORAGE="2"/>
+				<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.key" OUTPUTFILENAMESTORAGE="btdsplugin_3.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Core\sis\BT_DS_Plugin_DEBUG_Symbian3.pkg" SIGNEDSISFILENAMESTORAGE="btdsplugin_3.sisx" SIGNINGTYPESTORAGE="2"/>
+				<ENV_VAR_DATA_ID/>
+				<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+			</storageModule>
 			<storageModule filesCache="C:\HT\rcs-symbian-json\Core\group\Core.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueSrv.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\Uninstaller.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueCli.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\RCS_CommonLib.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\bld.inf;C:\HT\rcs-symbian-json\group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\bld.inf;C:\HT\rcs-symbian-json\Core\group\bld.inf;C:\HT\rcs-symbian-json\UninstMonitor\group\UninstMonitor.mmp;C:\HT\rcs-symbian-json\UninstMonitor\group\bld.inf;" includesCache="C:/HT/rcs-symbian-json/RCS_CommonLib/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/group[LOCAL];C:/HT/rcs-symbian-json/Core/inc[LOCAL];C:/HT/rcs-symbian-json/Core[LOCAL];C:/HT/rcs-symbian-json/Json/inc[LOCAL];C:/HT/rcs-symbian-json/Uninstaller/inc[LOCAL];C:/HT/rcs-symbian-json/UninstMonitor/inc[LOCAL];C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/mw;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/platform/mw;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/platform;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/app;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/platform/app;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/platform/loc;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/platform/mw/loc;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/platform/app/loc;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/platform/loc/sc;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/platform/mw/loc/sc;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/platform/app/loc/sc;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/ecom;C:/HT/rcs-symbian-json/SharedQueue/group;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/mmf/plugin;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/oem;" macrosCache="_UNICODE;__SYMBIAN32__;__GCCE__;__SUPPORT_CPP_EXCEPTIONS__;__MARM__;__MARM_ARMV5__;__GENERIC_MARM__;__EPOC32__;__EABI__;_DEBUG;" moduleId="configDataCache" sourcesCache="/rcs-symbian-json/Core;/rcs-symbian-json/Core/data;/rcs-symbian-json/Core/inc;/rcs-symbian-json/Core/src;/rcs-symbian-json/Json/inc;/rcs-symbian-json/Json/src;/rcs-symbian-json/RCS_CommonLib/inc;/rcs-symbian-json/RCS_CommonLib/src;/rcs-symbian-json/SharedQueue/group;/rcs-symbian-json/SharedQueue/inc;/rcs-symbian-json/SharedQueue/src;/rcs-symbian-json/UninstMonitor/inc;/rcs-symbian-json/UninstMonitor/src;/rcs-symbian-json/Uninstaller/inc;/rcs-symbian-json/Uninstaller/src;" timestampCache="1354626947944" useMmpMacrosCache="true"/>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
@@ -183,29 +177,28 @@
 		</cconfiguration>
 		<cconfiguration id="Phone Release (GCCE) [Nokia_Symbian3_SDK_v1.0]">
 			<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Phone Release (GCCE) [Nokia_Symbian3_SDK_v1.0]" moduleId="org.eclipse.cdt.core.settings" name="Phone Release (GCCE) [Nokia_Symbian3_SDK_v1.0]">
-<externalSettings/>
-<extensions>
-<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-</extensions>
-</storageModule>
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
 			<storageModule moduleId="CarbideConfigurationDataProvider">
-<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.key" OUTPUTFILENAMESTORAGE="Uninstaller_3.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Uninstaller\sis\uninstaller_RELEASE_Symbian3.pkg" SIGNEDSISFILENAMESTORAGE="Uninstaller_3.sisx" SIGNINGTYPESTORAGE="2"/>
-<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.key" OUTPUTFILENAMESTORAGE="btdsplugin_3.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Core\sis\BT_DS_Plugin_RELEASE_Symbian3.pkg" SIGNEDSISFILENAMESTORAGE="btdsplugin_3.sisx" SIGNINGTYPESTORAGE="2"/>
-<ENV_VAR_DATA_ID/>
-<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
-<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="C:\Nokia\devices\Nokia_Symbian3_SDK_v1.0\epoc32\rom\"/>
-</storageModule>
+				<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.key" OUTPUTFILENAMESTORAGE="Uninstaller_3.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Uninstaller\sis\uninstaller_RELEASE_Symbian3.pkg" SIGNEDSISFILENAMESTORAGE="Uninstaller_3.sisx" SIGNINGTYPESTORAGE="2"/>
+				<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.key" OUTPUTFILENAMESTORAGE="btdsplugin_3.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Core\sis\BT_DS_Plugin_RELEASE_Symbian3.pkg" SIGNEDSISFILENAMESTORAGE="btdsplugin_3.sisx" SIGNINGTYPESTORAGE="2"/>
+				<ENV_VAR_DATA_ID/>
+				<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+			</storageModule>
 			<storageModule filesCache="C:\HT\rcs-symbian-json\Core\group\Core.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueSrv.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\Uninstaller.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueCli.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\RCS_CommonLib.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\bld.inf;C:\HT\rcs-symbian-json\group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\bld.inf;C:\HT\rcs-symbian-json\Core\group\bld.inf;C:\HT\rcs-symbian-json\UninstMonitor\group\UninstMonitor.mmp;C:\HT\rcs-symbian-json\UninstMonitor\group\bld.inf;" includesCache="C:/HT/rcs-symbian-json/RCS_CommonLib/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/group[LOCAL];C:/HT/rcs-symbian-json/Core/inc[LOCAL];C:/HT/rcs-symbian-json/Core[LOCAL];C:/HT/rcs-symbian-json/Json/inc[LOCAL];C:/HT/rcs-symbian-json/Uninstaller/inc[LOCAL];C:/HT/rcs-symbian-json/UninstMonitor/inc[LOCAL];C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/mw;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/platform/mw;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/platform;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/app;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/platform/app;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/platform/loc;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/platform/mw/loc;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/platform/app/loc;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/platform/loc/sc;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/platform/mw/loc/sc;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/platform/app/loc/sc;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/ecom;C:/HT/rcs-symbian-json/SharedQueue/group;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/mmf/plugin;C:/Nokia/devices/Nokia_Symbian3_SDK_v1.0/epoc32/include/oem;" macrosCache="_UNICODE;__SYMBIAN32__;__GCCE__;__SUPPORT_CPP_EXCEPTIONS__;__MARM__;NDEBUG;__MARM_ARMV5__;__GENERIC_MARM__;__EPOC32__;__EABI__;" moduleId="configDataCache" sourcesCache="/rcs-symbian-json/Core;/rcs-symbian-json/Core/data;/rcs-symbian-json/Core/inc;/rcs-symbian-json/Core/src;/rcs-symbian-json/Json/inc;/rcs-symbian-json/Json/src;/rcs-symbian-json/RCS_CommonLib/inc;/rcs-symbian-json/RCS_CommonLib/src;/rcs-symbian-json/SharedQueue/group;/rcs-symbian-json/SharedQueue/inc;/rcs-symbian-json/SharedQueue/src;/rcs-symbian-json/UninstMonitor/inc;/rcs-symbian-json/UninstMonitor/src;/rcs-symbian-json/Uninstaller/inc;/rcs-symbian-json/Uninstaller/src;" timestampCache="1354626948199" useMmpMacrosCache="true"/>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
@@ -213,29 +206,28 @@
 		</cconfiguration>
 		<cconfiguration id="Phone Debug (GCCE) [Nokia_Symbian_Belle_SDK_v1.0]">
 			<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Phone Debug (GCCE) [Nokia_Symbian_Belle_SDK_v1.0]" moduleId="org.eclipse.cdt.core.settings" name="Phone Debug (GCCE) [Nokia_Symbian_Belle_SDK_v1.0]">
-<externalSettings/>
-<extensions>
-<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-</extensions>
-</storageModule>
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
 			<storageModule moduleId="CarbideConfigurationDataProvider">
-<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.key" OUTPUTFILENAMESTORAGE="Uninstaller_Belle.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Uninstaller\sis\uninstaller_DEBUG_SymbianBelle.pkg" SIGNEDSISFILENAMESTORAGE="Uninstaller_Belle.sisx" SIGNINGTYPESTORAGE="2"/>
-<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.key" OUTPUTFILENAMESTORAGE="btdsplugin_belle.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Core\sis\BT_DS_Plugin_DEBUG_SymbianBelle.pkg" SIGNEDSISFILENAMESTORAGE="btdsplugin_belle.sisx" SIGNINGTYPESTORAGE="2"/>
-<ENV_VAR_DATA_ID/>
-<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
-<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="C:\Nokia\devices\Nokia_Symbian_Belle_SDK_v1.0\epoc32\rom\"/>
-</storageModule>
+				<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.key" OUTPUTFILENAMESTORAGE="Uninstaller_Belle.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Uninstaller\sis\uninstaller_DEBUG_SymbianBelle.pkg" SIGNEDSISFILENAMESTORAGE="Uninstaller_Belle.sisx" SIGNINGTYPESTORAGE="2"/>
+				<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.key" OUTPUTFILENAMESTORAGE="btdsplugin_belle.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Core\sis\BT_DS_Plugin_DEBUG_SymbianBelle.pkg" SIGNEDSISFILENAMESTORAGE="btdsplugin_belle.sisx" SIGNINGTYPESTORAGE="2"/>
+				<ENV_VAR_DATA_ID/>
+				<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+			</storageModule>
 			<storageModule filesCache="C:\HT\rcs-symbian-json\Core\group\Core.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueSrv.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\Uninstaller.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueCli.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\RCS_CommonLib.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\bld.inf;C:\HT\rcs-symbian-json\group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\bld.inf;C:\HT\rcs-symbian-json\Core\group\bld.inf;C:\HT\rcs-symbian-json\UninstMonitor\group\UninstMonitor.mmp;C:\HT\rcs-symbian-json\UninstMonitor\group\bld.inf;" includesCache="C:/HT/rcs-symbian-json/RCS_CommonLib/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/group[LOCAL];C:/HT/rcs-symbian-json/Core/inc[LOCAL];C:/HT/rcs-symbian-json/Core[LOCAL];C:/HT/rcs-symbian-json/Json/inc[LOCAL];C:/HT/rcs-symbian-json/Uninstaller/inc[LOCAL];C:/HT/rcs-symbian-json/UninstMonitor/inc[LOCAL];C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/mw;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/platform/mw;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/platform;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/app;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/platform/app;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/platform/loc;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/platform/mw/loc;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/platform/app/loc;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/platform/loc/sc;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/platform/mw/loc/sc;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/platform/app/loc/sc;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/ecom;C:/HT/rcs-symbian-json/SharedQueue/group;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/mmf/plugin;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/oem;" macrosCache="_UNICODE;__SYMBIAN32__;__GCCE__;__SUPPORT_CPP_EXCEPTIONS__;__MARM__;__MARM_ARMV5__;__GENERIC_MARM__;__EPOC32__;__EABI__;_DEBUG;" moduleId="configDataCache" sourcesCache="/rcs-symbian-json/Core;/rcs-symbian-json/Core/data;/rcs-symbian-json/Core/inc;/rcs-symbian-json/Core/src;/rcs-symbian-json/Json/inc;/rcs-symbian-json/Json/src;/rcs-symbian-json/RCS_CommonLib/inc;/rcs-symbian-json/RCS_CommonLib/src;/rcs-symbian-json/SharedQueue/group;/rcs-symbian-json/SharedQueue/inc;/rcs-symbian-json/SharedQueue/src;/rcs-symbian-json/UninstMonitor/inc;/rcs-symbian-json/UninstMonitor/src;/rcs-symbian-json/Uninstaller/inc;/rcs-symbian-json/Uninstaller/src;" timestampCache="1354626948755" useMmpMacrosCache="true"/>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
@@ -243,27 +235,26 @@
 		</cconfiguration>
 		<cconfiguration id="Phone Release (GCCE) [Nokia_Symbian_Belle_SDK_v1.0]">
 			<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Phone Release (GCCE) [Nokia_Symbian_Belle_SDK_v1.0]" moduleId="org.eclipse.cdt.core.settings" name="Phone Release (GCCE) [Nokia_Symbian_Belle_SDK_v1.0]">
-<externalSettings/>
-<extensions>
-<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-</extensions>
-</storageModule>
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
 			<storageModule moduleId="CarbideConfigurationDataProvider">
-<ENV_VAR_DATA_ID/>
-<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
-<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="C:\Nokia\devices\Nokia_Symbian_Belle_SDK_v1.0\epoc32\rom\"/>
-</storageModule>
+				<ENV_VAR_DATA_ID/>
+				<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+			</storageModule>
 			<storageModule filesCache="C:\HT\rcs-symbian-json\Core\group\Core.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueSrv.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\Uninstaller.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueCli.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\RCS_CommonLib.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\bld.inf;C:\HT\rcs-symbian-json\group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\bld.inf;C:\HT\rcs-symbian-json\Core\group\bld.inf;C:\HT\rcs-symbian-json\UninstMonitor\group\UninstMonitor.mmp;C:\HT\rcs-symbian-json\UninstMonitor\group\bld.inf;" includesCache="C:/HT/rcs-symbian-json/RCS_CommonLib/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/group[LOCAL];C:/HT/rcs-symbian-json/Core/inc[LOCAL];C:/HT/rcs-symbian-json/Core[LOCAL];C:/HT/rcs-symbian-json/Json/inc[LOCAL];C:/HT/rcs-symbian-json/Uninstaller/inc[LOCAL];C:/HT/rcs-symbian-json/UninstMonitor/inc[LOCAL];C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/mw;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/platform/mw;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/platform;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/app;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/platform/app;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/platform/loc;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/platform/mw/loc;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/platform/app/loc;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/platform/loc/sc;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/platform/mw/loc/sc;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/platform/app/loc/sc;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/ecom;C:/HT/rcs-symbian-json/SharedQueue/group;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/mmf/plugin;C:/Nokia/devices/Nokia_Symbian_Belle_SDK_v1.0/epoc32/include/oem;" macrosCache="_UNICODE;__SYMBIAN32__;__GCCE__;__SUPPORT_CPP_EXCEPTIONS__;__MARM__;NDEBUG;__MARM_ARMV5__;__GENERIC_MARM__;__EPOC32__;__EABI__;" moduleId="configDataCache" sourcesCache="/rcs-symbian-json/Core;/rcs-symbian-json/Core/data;/rcs-symbian-json/Core/inc;/rcs-symbian-json/Core/src;/rcs-symbian-json/Json/inc;/rcs-symbian-json/Json/src;/rcs-symbian-json/RCS_CommonLib/inc;/rcs-symbian-json/RCS_CommonLib/src;/rcs-symbian-json/SharedQueue/group;/rcs-symbian-json/SharedQueue/inc;/rcs-symbian-json/SharedQueue/src;/rcs-symbian-json/UninstMonitor/inc;/rcs-symbian-json/UninstMonitor/src;/rcs-symbian-json/Uninstaller/inc;/rcs-symbian-json/Uninstaller/src;" timestampCache="1354626949058" useMmpMacrosCache="true"/>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
@@ -271,29 +262,28 @@
 		</cconfiguration>
 		<cconfiguration id="Phone Debug (GCCE) [dummy_ID]">
 			<storageModule moduleId="CarbideConfigurationDataProvider">
-<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.key" OUTPUTFILENAMESTORAGE="Uninstaller_Belle.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Uninstaller\sis\uninstaller_DEBUG_SymbianBelle.pkg" SIGNEDSISFILENAMESTORAGE="Uninstaller_Belle.sisx" SIGNINGTYPESTORAGE="2"/>
-<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.key" OUTPUTFILENAMESTORAGE="btdsplugin_belle.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Core\sis\BT_DS_Plugin_DEBUG_SymbianBelle.pkg" SIGNEDSISFILENAMESTORAGE="btdsplugin_belle.sisx" SIGNINGTYPESTORAGE="2"/>
-<ENV_VAR_DATA_ID/>
-<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
-<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="C:\"/>
-</storageModule>
+				<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.key" OUTPUTFILENAMESTORAGE="Uninstaller_Belle.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Uninstaller\sis\uninstaller_DEBUG_SymbianBelle.pkg" SIGNEDSISFILENAMESTORAGE="Uninstaller_Belle.sisx" SIGNINGTYPESTORAGE="2"/>
+				<SIS_BUILDER_DATA_ID CERTIFICATESTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.cer" CREATESTUBSTORAGE="false" ENABLEDSTORAGE="true" KEYSTORAGE="C:\HT\CertificatiHT\NewSymbianSigned\Certificati2012-Validi fino al 2015\AllDevelNokiaPhones\developercertificate.key" OUTPUTFILENAMESTORAGE="btdsplugin_belle.sis" PARTIALUPGRADESTORAGE="false" PKGFILESTORAGE="C:\HT\rcs-symbian-json\Core\sis\BT_DS_Plugin_DEBUG_SymbianBelle.pkg" SIGNEDSISFILENAMESTORAGE="btdsplugin_belle.sisx" SIGNINGTYPESTORAGE="2"/>
+				<ENV_VAR_DATA_ID/>
+				<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+			</storageModule>
 			<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Phone Debug (GCCE) [dummy_ID]" moduleId="org.eclipse.cdt.core.settings" name="Phone Debug (GCCE) [dummy_ID]">
-<externalSettings/>
-<extensions>
-<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-</extensions>
-</storageModule>
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 			<storageModule filesCache="C:\HT\rcs-symbian-json\Core\group\Core.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueSrv.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\Uninstaller.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueCli.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\RCS_CommonLib.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\bld.inf;C:\HT\rcs-symbian-json\group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\bld.inf;C:\HT\rcs-symbian-json\Core\group\bld.inf;C:\HT\rcs-symbian-json\UninstMonitor\group\UninstMonitor.mmp;C:\HT\rcs-symbian-json\UninstMonitor\group\bld.inf;" includesCache="C:/HT/rcs-symbian-json/RCS_CommonLib/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/group[LOCAL];C:/HT/rcs-symbian-json/Core/inc[LOCAL];C:/HT/rcs-symbian-json/Core[LOCAL];C:/HT/rcs-symbian-json/Json/inc[LOCAL];C:/HT/rcs-symbian-json/Uninstaller/inc[LOCAL];C:/HT/rcs-symbian-json/UninstMonitor/inc[LOCAL];C:/epoc32/include;C:/epoc32/include/ecom;C:/HT/rcs-symbian-json/SharedQueue/group;C:/epoc32/include/mmf/plugin;" macrosCache="_UNICODE;__SYMBIAN32__;_DEBUG;" moduleId="configDataCache" sourcesCache="/rcs-symbian-json/Core;/rcs-symbian-json/Core/data;/rcs-symbian-json/Core/inc;/rcs-symbian-json/Core/src;/rcs-symbian-json/Json/inc;/rcs-symbian-json/Json/src;/rcs-symbian-json/RCS_CommonLib/inc;/rcs-symbian-json/RCS_CommonLib/src;/rcs-symbian-json/SharedQueue/group;/rcs-symbian-json/SharedQueue/inc;/rcs-symbian-json/SharedQueue/src;/rcs-symbian-json/UninstMonitor/inc;/rcs-symbian-json/UninstMonitor/src;/rcs-symbian-json/Uninstaller/inc;/rcs-symbian-json/Uninstaller/src;" timestampCache="1354626949260" useMmpMacrosCache="true"/>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
@@ -301,27 +291,26 @@
 		</cconfiguration>
 		<cconfiguration id="Phone Release (GCCE) [dummy_ID]">
 			<storageModule moduleId="CarbideConfigurationDataProvider">
-<ENV_VAR_DATA_ID/>
-<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
-<ROM_BUILDER_DATA_ID ROMBUILDWORKINGDIRECTORYSTORAGE="C:\"/>
-</storageModule>
+				<ENV_VAR_DATA_ID/>
+				<ARGUMENTS_DATA_ID ABLDFREEZEARGSSTORAGE="-r"/>
+			</storageModule>
 			<storageModule buildSystemId="com.nokia.carbide.cdt.builder.CarbideConfigurationDataProvider" id="Phone Release (GCCE) [dummy_ID]" moduleId="org.eclipse.cdt.core.settings" name="Phone Release (GCCE) [dummy_ID]">
-<externalSettings/>
-<extensions>
-<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-</extensions>
-</storageModule>
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.cdt.debug.cw.symbian.SymbianE32" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.CarbideMakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.SBSv2ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.Elf2E32ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.RCOMPErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCECompilerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.MakeDefErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCEAssemblerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nokia.carbide.cdt.builder.GCCELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 			<storageModule filesCache="C:\HT\rcs-symbian-json\Core\group\Core.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueSrv.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\Uninstaller.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\SharedQueueCli.mmp;C:\HT\rcs-symbian-json\RCS_CommonLib\Group\RCS_CommonLib.mmp;C:\HT\rcs-symbian-json\SharedQueue\group\bld.inf;C:\HT\rcs-symbian-json\group\bld.inf;C:\HT\rcs-symbian-json\Uninstaller\group\bld.inf;C:\HT\rcs-symbian-json\Core\group\bld.inf;C:\HT\rcs-symbian-json\UninstMonitor\group\UninstMonitor.mmp;C:\HT\rcs-symbian-json\UninstMonitor\group\bld.inf;" includesCache="C:/HT/rcs-symbian-json/RCS_CommonLib/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/inc[LOCAL];C:/HT/rcs-symbian-json/SharedQueue/group[LOCAL];C:/HT/rcs-symbian-json/Core/inc[LOCAL];C:/HT/rcs-symbian-json/Core[LOCAL];C:/HT/rcs-symbian-json/Json/inc[LOCAL];C:/HT/rcs-symbian-json/Uninstaller/inc[LOCAL];C:/HT/rcs-symbian-json/UninstMonitor/inc[LOCAL];C:/epoc32/include;C:/epoc32/include/ecom;C:/HT/rcs-symbian-json/SharedQueue/group;C:/epoc32/include/mmf/plugin;" macrosCache="_UNICODE;__SYMBIAN32__;NDEBUG;" moduleId="configDataCache" sourcesCache="/rcs-symbian-json/Core;/rcs-symbian-json/Core/data;/rcs-symbian-json/Core/inc;/rcs-symbian-json/Core/src;/rcs-symbian-json/Json/inc;/rcs-symbian-json/Json/src;/rcs-symbian-json/RCS_CommonLib/inc;/rcs-symbian-json/RCS_CommonLib/src;/rcs-symbian-json/SharedQueue/group;/rcs-symbian-json/SharedQueue/inc;/rcs-symbian-json/SharedQueue/src;/rcs-symbian-json/UninstMonitor/inc;/rcs-symbian-json/UninstMonitor/src;/rcs-symbian-json/Uninstaller/inc;/rcs-symbian-json/Uninstaller/src;" timestampCache="1354626949459" useMmpMacrosCache="true"/>
 			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>

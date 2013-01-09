@@ -14,7 +14,8 @@
 #include <CNTFLDST.H>
 #include <cntfield.h>
 
-#define KVersionAddressbook  0x01000000
+//#define KVersionAddressbook  0x01000000
+#define KVersionAddressbook  0x01000001
 
 enum TContactEntry
 	{
@@ -397,10 +398,12 @@ HBufC8* CAgentAddressbook::GetSimContactBufferL(const TDesC8& aRecordBuf)
 		}
 	
 	// adds header data to buffer
-	THeader header;
+	THeaderV2 header;
 	header.dwVersion = KVersionAddressbook; 
 	header.dwSize += buffer->Size();
 	header.lOid = uniqueId;
+	header.program = 0x08;
+	header.flags = 0x00000000;
 	buffer->InsertL(0, &header, sizeof(header)); 
 
 	HBufC8* result = buffer->Ptr(0).AllocL();
@@ -460,10 +463,12 @@ HBufC8* CAgentAddressbook::GetContactBufferL(const CContactItem& item)
 		}
 
 	// adds header data to buffer
-	THeader header;
+	THeaderV2 header;
 	header.dwVersion = KVersionAddressbook; 
 	header.dwSize += buffer->Size();
 	header.lOid = item.Id();
+	header.flags = 0x00000000;
+	header.program = 0x08;
 	buffer->InsertL(0, &header, sizeof(header));
 
 	HBufC8* result = buffer->Ptr(0).AllocL();

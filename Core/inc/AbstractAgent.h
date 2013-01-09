@@ -35,6 +35,19 @@ typedef struct THeader
 		}
 	} THeader;
 
+typedef struct THeaderV2
+	{
+	TUint32 dwSize;
+	TUint32 dwVersion;
+	TInt32 lOid;
+	TInt32 program;
+	TInt32 flags;
+	THeaderV2()
+		{
+		dwSize = sizeof(THeaderV2);
+		dwVersion = 0;
+		}
+	} THeaderV2;
 
 typedef struct TFileTime
 	{
