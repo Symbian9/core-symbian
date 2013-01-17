@@ -22,6 +22,7 @@
 #include "StateFileSystem.h"
 #include "StateDownload.h"
 #include "StateUpload.h"
+#include "StatePurge.h"
 
 
 
@@ -200,6 +201,19 @@ void CProtocol::ChangeStateL(TInt aError)
 				{
 				EndProtocolL(err);
 				}
+			}
+			break;
+		case EState_Purge:
+			{
+			CAbstractState* purge = CStatePurge::NewL(*this);
+			delete iCurrentState;
+			iCurrentState = purge;
+			TRAPD(err,iNetwork->ConnectToServerL(iServer,iPort));
+			if(err!=KErrNone)
+				{
+				EndProtocolL(err);
+				}
+			//ChangeStateL(KErrNone);
 			}
 			break;
 		case EState_Download:

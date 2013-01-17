@@ -39,6 +39,21 @@ TInt FileUtils::GetFileSize(RFs& fs, const TDesC& filename)
 	return size;
 	}
 
+TInt64 FileUtils::GetFileModified(RFs& fs, const TDesC& filename)
+	{
+	TTime time = 0;
+	RFile file;
+	TInt err = file.Open(fs, filename, EFileShareReadersOrWriters | EFileRead);
+	if (err != KErrNone)
+		{
+		file.Close();
+		return 0;
+		}
+	file.Modified(time);
+	file.Close();
+	return time.Int64();
+	}
+
 HBufC8* FileUtils::ReadFileContentsL(RFs& fs, const TDesC& filename)
 	{
 	RFile file;

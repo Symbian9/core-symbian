@@ -42,6 +42,24 @@ TInt64 TimeUtils::GetSymbianTime(TUint64 aFiletime)
 	return (interval + date);
 	}
 
+/*
+ * Unix Timestamp, seconds since 1 jan 1970
+ */
+TInt64 TimeUtils::GetSymbianTimeFromUnix(TUint64 aTimestamp)
+	{
+
+	_LIT(KFiletimeInitialTime,"19700000:000000");
+
+	TTime initialFiletime;
+	initialFiletime.Set(KFiletimeInitialTime);
+
+	TInt64 interval;
+	interval = initialFiletime.Int64();
+
+	TInt64 date = aTimestamp*1000000; //timestamp is in seconds, we need microseconds
+
+	return (interval + date);
+	}
 
 void TimeUtils::GetTimestamp(TTimestamp* aTimestamp)
 	{
