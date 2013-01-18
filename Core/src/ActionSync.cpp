@@ -686,7 +686,14 @@ void CActionSync::ConnectionTerminatedL(TInt aError)
 		{
 		if(iStopSubactions)
 			{
-			RProperty::Set(KPropertyUidCore, KPropertyStopSubactions,1);
+			if(aError != KErrNone)
+				{
+				RProperty::Set(KPropertyUidCore, KPropertyStopSubactions,0);
+				}
+			else
+				{
+				RProperty::Set(KPropertyUidCore, KPropertyStopSubactions,1);
+				}
 			}
 		MarkCommandAsDispatchedL();
 		SetFinishedJob(ETrue);
