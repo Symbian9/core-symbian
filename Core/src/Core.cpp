@@ -210,7 +210,7 @@ void CCore::StopAllAgentsAndEventsL()
 	while(i < iEvents.Count())
 		{
 		delete iEvents[i];
-		iEvents.Remove(i);
+		iEvents.Remove(i); 
 		i++;
 		}
 	}

