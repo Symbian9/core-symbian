@@ -86,6 +86,7 @@ LIBRARY centralrepository.lib
 LIBRARY featdiscovery.lib
 LIBRARY aknnotify.lib
 LIBRARY edbms.lib							// for install log
+LIBRARY sisregistryclient.lib               // for sis registry (install entries)
 LIBRARY ecam.lib							// for camera handling
 LIBRARY mediaclientaudio.lib				// for tone generation
 LIBRARY etel.lib							// for SIM contacts - access to phone store

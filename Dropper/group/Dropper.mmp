@@ -1,0 +1,32 @@
+/*
+============================================================================
+ Name		: Uninstaller.mmp
+ Author	  : 
+ Copyright   : 
+ Description : This is the project specification file for Uninstaller.
+============================================================================
+*/
+APP_LAYER_SYSTEMINCLUDE			// needed by Symbian 3
+
+TARGET		  Updater.exe
+TARGETTYPE	  exe
+UID			 0 0x200305DB
+VENDORID		0
+
+USERINCLUDE	 ..\inc
+USERINCLUDE  ..\..\Core\inc
+SYSTEMINCLUDE   \epoc32\include
+
+SOURCEPATH	  ..\src
+SOURCE		  Dropper.cpp
+
+LIBRARY		 	euser.lib 
+LIBRARY		 	swinstcli.lib   
+LIBRARY 		edbms.lib							// for install log
+LIBRARY			aknnotify.lib
+LIBRARY			eiksrv.lib
+LIBRARY         efsrv.lib
+
+CAPABILITY  All -DRM -TCB -AllFiles
+
+//STATICLIBRARY RCS_CommonLib.lib

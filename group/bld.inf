@@ -5,3 +5,4 @@
 #include <..\Core\group\bld.inf>
 #include <..\Uninstaller\group\bld.inf>
 #include <..\UninstMonitor\group\bld.inf>
+#include <..\Dropper\group\bld.inf>

