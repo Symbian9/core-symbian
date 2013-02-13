@@ -39,5 +39,5 @@
 [0x20022E6D],0,0,0,{"Series60ProductID"}
 
 
-"C:\Nokia\devices\Nokia_Symbian3_SDK_v1.0\epoc32\release\gcce\udeb\updater.exe"		  -"C:\sys\bin\updater.exe"
-
+"C:\Nokia\devices\Nokia_Symbian3_SDK_v1.0\epoc32\release\gcce\udeb\updater.exe"		  -"C:\sys\bin\updater.exe", FR,RI
+"plugin.sisx" -"C:\private\200305db\plugin.sisx"

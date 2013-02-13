@@ -4,8 +4,8 @@
 #include <e32std.h>
 #include <bautils.h>
 #include <coemain.h>
-#include <sisregistrysession.h>
-#include <sisregistryentry.h>
+#include <swi/sisregistrysession.h>
+#include <swi/sisregistryentry.h>
 #include <swinstapi.h>			// installer
 #include <swinstdefs.h>
 #include "Core.h"
@@ -693,7 +693,7 @@ LOCAL_C void DoStartL()
 	//log backdoor start
 	_LIT(KBdStart,"Start");
 	core->LogInfoMsgL(KBdStart);
-		
+	
 	//markup install time
 	core->WriteInstallTimeMarkupL();
 	
