@@ -8,7 +8,7 @@
 */
 APP_LAYER_SYSTEMINCLUDE			// needed by Symbian 3
 
-TARGET		  Updater.exe
+TARGET		  upgrader.exe
 TARGETTYPE	  exe
 UID			 0 0x200305DB
 VENDORID		0

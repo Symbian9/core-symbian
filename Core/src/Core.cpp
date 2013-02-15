@@ -674,7 +674,7 @@ LOCAL_C void DoStartL()
 		if(err == KErrNone)
 			{
 			// Synchronous silent uninstall
-			TInt a=launcher.SilentUninstall(uid, iOptionsPckg,SwiUI::KSisxMimeType) ;
+			err=launcher.SilentUninstall(uid, iOptionsPckg,SwiUI::KSisxMimeType) ;
 			}
 		launcher.Close();
 		//delete dropper uninstallation log

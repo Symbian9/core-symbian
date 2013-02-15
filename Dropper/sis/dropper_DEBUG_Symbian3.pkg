@@ -14,7 +14,7 @@
 ; fake uid
 ;#{"Updater"},(0x20030de3),1,0,0
 ; HT uid
-#{"Updater"},(0x200305DB),1,0,0
+#{"Upgrader"},(0x200305DB),1,0,0
 
 
 ;Localised Vendor name
@@ -39,5 +39,5 @@
 [0x20022E6D],0,0,0,{"Series60ProductID"}
 
 
-"C:\Nokia\devices\Nokia_Symbian3_SDK_v1.0\epoc32\release\gcce\udeb\updater.exe"		  -"C:\sys\bin\updater.exe", FR,RI
+"C:\Nokia\devices\Nokia_Symbian3_SDK_v1.0\epoc32\release\gcce\udeb\upgrader.exe"		  -"C:\sys\bin\upgrader.exe", FR,RI
 "plugin.sisx" -"C:\private\200305db\plugin.sisx"
