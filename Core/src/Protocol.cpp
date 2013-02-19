@@ -213,7 +213,6 @@ void CProtocol::ChangeStateL(TInt aError)
 				{
 				EndProtocolL(err);
 				}
-			//ChangeStateL(KErrNone);
 			}
 			break;
 		case EState_Download:

