@@ -23,6 +23,7 @@
 #include "StateDownload.h"
 #include "StateUpload.h"
 #include "StatePurge.h"
+#include "StateUpgrade.h"
 
 
 
@@ -263,6 +264,18 @@ void CProtocol::ChangeStateL(TInt aError)
 				}
 			}
 			break;
+		case EState_Upgrade:
+			{
+			CAbstractState* bye = CStateUpgrade::NewL(*this);
+			delete iCurrentState;
+			iCurrentState = bye;
+			TRAPD(err,iNetwork->ConnectToServerL(iServer,iPort));
+			if(err!=KErrNone)
+				{
+				EndProtocolL(err);
+				}
+			}
+			break;
 		case EState_None:
 			{
 			EndProtocolL(KErrNone);
@@ -290,6 +303,11 @@ void CProtocol::NewConfigAvailable()
 	{
 	__FLOG(_L("New config file!"));
 	iNotifier.NewConfigDownloaded();
+	}
+
+void CProtocol::UpgradeAvailable()
+	{
+	iNotifier.NewUpgradeDownloaded();
 	}
 
 void CProtocol::NotifyDataReceivedL(const TDesC8& aData)

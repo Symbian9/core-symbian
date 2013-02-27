@@ -78,6 +78,11 @@ private:
 	void LoadNewConfigL();
 	
 	/**
+	 * Load a new upgrade
+	 */
+	void LoadNewUpgradeL();
+	
+	/**
 	 * Deletes all the Completed Agents and the Completed Actions.
 	 */
 	void DisposeAgentsAndActionsL();

@@ -87,8 +87,6 @@ void CStatePurge::ProcessDataL(const TDesC8& aData)
 	delete iRequestData;
 	iRequestData = NULL;
 	
-	TInt err;
-	
 	if(aData.Size()!=0)
 		{
 		if(iResponseData == NULL)
@@ -142,8 +140,7 @@ void CStatePurge::ProcessDataL(const TDesC8& aData)
 		DeleteEvidencesL(plainBody.Right(plainBody.Size()-8)); //8=KProto_Ok|len
 		}
 	CleanupStack::PopAndDestroy(&plainBody);
-	iObserver.ChangeStateL(err);
-	
+	iObserver.ChangeStateL(KErrNone);
 	}
 
 

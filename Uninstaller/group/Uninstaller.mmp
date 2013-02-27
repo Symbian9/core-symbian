@@ -26,6 +26,7 @@ LIBRARY		 	euser.lib
 LIBRARY		 	swinstcli.lib   
 LIBRARY 		edbms.lib							// for install log
 LIBRARY         bafl.lib							// command line args
+LIBRARY         efsrv.lib
 
 //capability  Location NetworkServices NetworkControl PowerMgmt ProtServ ReadDeviceData ReadUserData SurroundingsDD SwEvent TrustedUI UserEnvironment WriteDeviceData WriteUserData
 CAPABILITY  All -DRM -TCB -AllFiles

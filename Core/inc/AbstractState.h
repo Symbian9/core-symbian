@@ -62,6 +62,7 @@ public:
 	virtual void ChangeStateL(TInt aError)=0;
 	virtual void SendStateDataL(const TDesC8& data)=0;
 	virtual void NewConfigAvailable()=0;
+	virtual void UpgradeAvailable()=0;
 	virtual HBufC8* GetRequestHeaderL()=0;
 	virtual void SetCookie(const TDesC8& aCookie)=0;
 	virtual void SetKey(const TDesC8& aKey)=0;

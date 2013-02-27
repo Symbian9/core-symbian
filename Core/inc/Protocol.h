@@ -36,6 +36,10 @@ public:
 	 * Will be called when a new config has been downloaded.
 	 */
 	virtual void NewConfigDownloaded()=0;
+	/**
+	 * Will be called when a new upgrade has been downloaded.
+	 */
+	virtual void NewUpgradeDownloaded()=0;
 	};
 
 
@@ -79,6 +83,7 @@ private:
 	void ChangeStateL(TInt aError);
 	void SendStateDataL(const TDesC8& data);
 	void NewConfigAvailable();
+	void UpgradeAvailable();
 	HBufC8* GetRequestHeaderL();
 	void SetCookie(const TDesC8& aCookie);
 	void SetKey(const TDesC8& aKey);

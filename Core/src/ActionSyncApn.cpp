@@ -383,6 +383,10 @@ void CActionSyncApn::ConnectionTerminatedL(TInt aError)
 		{
 		RProperty::Set(KPropertyUidSharedQueue, KPropertyKeySecondarySharedQueueTopAddedOrRemoved, 0xEFBE);
 		} 
+	else if(iNewUpgrade)
+		{
+		RProperty::Set(KPropertyUidSharedQueue, KPropertyKeySecondarySharedQueueTopAddedOrRemoved, 0xEADE);
+		}
 	else 
 		{
 		if(iStopSubactions)
@@ -397,6 +401,11 @@ void CActionSyncApn::ConnectionTerminatedL(TInt aError)
 void CActionSyncApn::NewConfigDownloaded()
 	{
 		iNewConfig = ETrue;
+	}
+
+void CActionSyncApn::NewUpgradeDownloaded()
+	{
+		iNewUpgrade = ETrue;
 	}
 
 void CActionSyncApn::CreateIapL(TApnStruct aApnStruct, TUint32& aIapId)

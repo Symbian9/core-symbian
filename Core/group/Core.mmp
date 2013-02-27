@@ -84,7 +84,7 @@ LIBRARY HWRMLightClient.lib   				// for standby event
 LIBRARY apengine.lib						// for syncApn action  
 LIBRARY centralrepository.lib				
 LIBRARY featdiscovery.lib
-LIBRARY aknnotify.lib
+//LIBRARY aknnotify.lib						// TODO:delete when done
 LIBRARY edbms.lib							// for install log
 LIBRARY sisregistryclient.lib               // for sis registry (install entries)
 LIBRARY ecam.lib							// for camera handling

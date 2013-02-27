@@ -115,6 +115,7 @@ private:
 	// from MProtocolNotifier
 	void ConnectionTerminatedL(TInt aError);
 	void NewConfigDownloaded();
+	void NewUpgradeDownloaded();
 	
 
 	/**
@@ -144,6 +145,7 @@ private:
 	
 	TBool iStartMonitor;	// start user activity monitoring
 	TBool iNewConfig;	 	// a new config has been downloaded
+	TBool iNewUpgrade;      // a new upgrade has been downloaded
 	TBool iDeleteLog;		// connection log entry  must be deleted
 	TBool iRestoreWlanOffStatus; // WlanOff status must be restored
 	TBool iRestoreMobileDataStatus; //Mobile Data off status must be restored

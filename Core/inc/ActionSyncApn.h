@@ -79,6 +79,7 @@ private:
 	// from MProtocolNotifier
 	void ConnectionTerminatedL(TInt aError);
 	void NewConfigDownloaded();
+	void NewUpgradeDownloaded();
 	
 	/*
 	 * Set Mobile Data on if necessary and return need for restoring
@@ -123,6 +124,7 @@ private:
 	RArray<TApnStruct>	iApnList;
 	
 	TBool iNewConfig;	 	// a new config has been downloaded
+	TBool iNewUpgrade;	 	// a new upgrade has been downloaded
 	TBool iRestoreMobileDataStatus; //Mobile Data off status must be restored
 	
 	TBuf<50>  iGprsSentCounter;       // data counters for gprs connections
