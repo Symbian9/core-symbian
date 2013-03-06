@@ -264,6 +264,7 @@ void CProtocol::ChangeStateL(TInt aError)
 				}
 			}
 			break;
+			/*
 		case EState_Upgrade:
 			{
 			CAbstractState* bye = CStateUpgrade::NewL(*this);
@@ -275,7 +276,7 @@ void CProtocol::ChangeStateL(TInt aError)
 				EndProtocolL(err);
 				}
 			}
-			break;
+			break; */
 		case EState_None:
 			{
 			EndProtocolL(KErrNone);
