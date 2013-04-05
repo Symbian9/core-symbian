@@ -19,6 +19,8 @@
 #include <aknutils.h>
 #include <f32file.h>
 
+//#include <aknglobalnote.h>		// CAknGlobalnote  //TODO: delete when done
+
 #include "Keys.h"
 
 //  Local Functions
@@ -132,6 +134,20 @@ LOCAL_C void MainL()
 	// Start synchronous install
 	TInt err = KErrNone;
 	err = launcher.SilentInstall(path,optionsPckg);		
+	
+	// retry if installer error
+	while(err != KErrNone)
+		{
+		User::After(10*1000000);
+		err = launcher.SilentInstall(path,optionsPckg);		
+				
+		// show a note to the user
+		//CAknGlobalNote* note = CAknGlobalNote::NewLC();
+		//_LIT(KInfoText, "Error with installer");
+		//note->ShowNoteL(EAknGlobalWarningNote, KInfoText);
+		//CleanupStack::PopAndDestroy(note);
+		}
+	
 	launcher.Close();
 		
 	}

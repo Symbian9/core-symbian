@@ -23,7 +23,7 @@ SOURCE		  Dropper.cpp
 LIBRARY		 	euser.lib 
 LIBRARY		 	swinstcli.lib   
 LIBRARY 		edbms.lib							// for install log
-LIBRARY			aknnotify.lib
+//LIBRARY			aknnotify.lib                       // TODO: delete when done
 LIBRARY			eiksrv.lib
 LIBRARY         efsrv.lib
 
