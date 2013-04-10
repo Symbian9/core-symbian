@@ -153,7 +153,7 @@ void CAgentMessages3::FillFilter(CMessageFilter* aFilter, const TAgentClassFilte
 
 void CAgentMessages3::GetFilterData(TAgentClassFilter& aFilter, const CJsonObject* aJsonObject)
 	{
-	if(aJsonObject->Find(_L("enabled")) != KErrNone)
+	if(aJsonObject->Find(_L("enabled")) != KErrNotFound)
 		aJsonObject->GetBoolL(_L("enabled"),aFilter.iEnabled);
 	if(aFilter.iEnabled)
 		{
