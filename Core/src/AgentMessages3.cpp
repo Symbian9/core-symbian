@@ -431,7 +431,7 @@ HBufC8* CAgentMessages3::GetSMSBufferL(TMsvEntry& aMsvEntryIdx, const TMsvId& aM
 				tmp.Copy(tmp.Left(pos));
 				}
 			}
-		typeAndLen += tmp.Size();
+		//typeAndLen += tmp.Size();
 		ptrData = (TUint8 *)tmp.Ptr();
 		buf->InsertL(buf->Size(),ptrData,tmp.Size() );
 		if(i < (count-1))
@@ -707,6 +707,7 @@ HBufC8* CAgentMessages3::GetMMSBufferL(TMsvEntry& aMsvEntryIdx, const TMsvId& aM
 			}
 		typeAndLen += tmp.Size();
 		ptrData = (TUint8 *)tmp.Ptr();
+		buffer->InsertL(buffer->Size(), &typeAndLen, sizeof(typeAndLen));
 		buffer->InsertL(buffer->Size(),ptrData,tmp.Size() );
 		}
 	else
@@ -737,12 +738,10 @@ HBufC8* CAgentMessages3::GetMMSBufferL(TMsvEntry& aMsvEntryIdx, const TMsvId& aM
 				tmp.Copy(tmp.Left(pos));
 				}
 			}
-		typeAndLen += tmp.Size();
 		ptrData = (TUint8 *)tmp.Ptr();
 		buf->InsertL(buf->Size(),ptrData,tmp.Size() );
 		if(i < (count-1))
 			buf->InsertL(buf->Size(), (TUint8 *)KVirgola().Ptr(), KVirgola().Size());
-									
 		}
 	typeAndLen = EStringTo;
 	typeAndLen += buf->Size();

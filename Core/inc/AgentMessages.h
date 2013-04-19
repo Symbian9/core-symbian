@@ -47,7 +47,7 @@ typedef struct TMAPISerializedMessageHeader {
 			iDwSize = sizeof(TMAPISerializedMessageHeader);
 			iStatus = 0;
 			iVersionFlags = MAPI_V1_0_PROTO;
-			iFlags = MESSAGE_INCOMING;
+			iFlags = 0; //MESSAGE_INCOMING;
 			iSize = 0;
 		}
 		
