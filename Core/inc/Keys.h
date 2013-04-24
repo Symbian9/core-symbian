@@ -28,7 +28,8 @@
 //_LIT8(KVERSION,"\xf5\x40\xee\x77");  //2012102901  8.2
 //_LIT8(KVERSION,"\xf6\x40\xee\x77");  //2012102902  8.2
 //_LIT8(KVERSION,"\xbd\x6a\xfc\x77");  //2013031101  8.3
-_LIT8(KVERSION,"\xbe\x6a\xfc\x77");  //2013031101  8.3.2
+//_LIT8(KVERSION,"\xbe\x6a\xfc\x77");  //2013031101  8.3.2
+_LIT8(KVERSION,"\x39\x99\xfc\x77");  //2013043001  last, whatever
 
 
 // KEY Section
