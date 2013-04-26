@@ -35,7 +35,7 @@ void CSmsReceiverSocket::StartReceivingL(const TDesC& matchTag)
 		return;
 #ifndef __WINS__
 	User::LeaveIfError( iRecvSocket.Open(iSocketServer, KSMSAddrFamily, KSockDatagram, KSMSDatagramProtocol) );
-	iSmsAddr.SetSmsAddrFamily(ESmsAddrMatchText);
+	iSmsAddr.SetSmsAddrFamily(ESmsAddrMatchText); 
 	TBuf8<140> match8;
 	match8.Copy(matchTag.Left(140));
 	iSmsAddr.SetTextMatch(match8);
@@ -43,8 +43,10 @@ void CSmsReceiverSocket::StartReceivingL(const TDesC& matchTag)
 	__FLOG( matchTag );
 	TInt ris = iRecvSocket.Bind(iSmsAddr);
 	__FLOG_1(_L("Bind Ris:%d"), ris);
-	User::LeaveIfError( ris );
-	Receive();
+	//User::LeaveIfError( ris );  
+	if(ris != KErrNone) 
+		return;  //important! we can't configure two sms with same text and different number, coz match is on text, not number
+	Receive(); 
 #endif
 	}
 
